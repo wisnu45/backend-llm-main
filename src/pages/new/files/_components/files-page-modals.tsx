@@ -6,6 +6,8 @@ import { TDocItem } from '@/api/document/type';
 import useDeleteDocument from '../_hooks/delete-document';
 import { useFiles } from '@/hooks/use-files';
 import useGetDetailDocument from '../_hooks/get-detail-document';
+import useEditDocument from '../_hooks/edit-document';
+import { useEffect } from 'react';
 
 type TModal = 'delete' | 'edit' | 'create' | 'detail' | null;
 
@@ -17,9 +19,16 @@ interface IFilesPageModals {
 
 const FilesPageModals = ({ modal, setModal, data }: IFilesPageModals) => {
   const createMutation = useCreateDocument();
+  const editMutation = useEditDocument(data?.id!);
   const deleteMutation = useDeleteDocument();
   const detailQuery = useGetDetailDocument(data?.id);
   const { setFiles } = useFiles();
+
+  useEffect(() => {
+    if (modal && modal !== 'create') {
+      detailQuery.refetch();
+    }
+  }, [modal, detailQuery]);
 
   return (
     <>
@@ -41,12 +50,23 @@ const FilesPageModals = ({ modal, setModal, data }: IFilesPageModals) => {
         }}
       />
       <FormModal
+        key={detailQuery.data?.data.id}
         open={modal === 'edit'}
         mode="edit"
+        loading={editMutation.isPending}
         onOpenChange={() => setModal(null)}
-        onSubmit={() => {}}
+        onSubmit={(data) => {
+          editMutation.mutate(data, {
+            onSuccess: () => {
+              setModal(null);
+              setFiles([]);
+            }
+          });
+        }}
         defaultValues={{
-          document_name: 'Aturan Karyawan'
+          document_name: detailQuery.data?.data.document_name,
+          document_path: detailQuery.data?.data.document_name,
+          portal_id: detailQuery.data?.data.portal_id ?? ''
         }}
       />
 

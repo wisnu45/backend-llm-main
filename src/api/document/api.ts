@@ -35,3 +35,19 @@ export const deleteDoc = async (params: {
   const res = await api.delete<TDefaultResponse>(`/documents/${params.id}`);
   return res.data;
 };
+
+export const editDoc = async (
+  req: TRequestCreateDocument,
+  params: { id: string }
+): Promise<TDefaultResponse> => {
+  const res = await api.patch<TDefaultResponse>(
+    `/documents/${params.id}`,
+    req,
+    {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    }
+  );
+  return res.data;
+};

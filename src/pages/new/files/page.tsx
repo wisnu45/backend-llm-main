@@ -68,7 +68,7 @@ const getColumns = (
     header: 'document name',
     cell: ({ row }) => (
       <div className="flex flex-col">
-        <span>{row.original.document_name?.split('.')[0]}</span>
+        <span>{row.original.document_name?.split('.pdf')[0]}</span>
         <span className="font-semibold text-gray-400">PDF</span>
       </div>
     )
