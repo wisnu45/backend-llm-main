@@ -9,4 +9,5 @@ const useGetListDocument = () => {
     queryFn: getDocs
   });
 };
+
 export default useGetListDocument;

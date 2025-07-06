@@ -1,5 +1,5 @@
 import api from '@/lib/api';
-import { TResponseListDocument, TUploadURLRequest } from './type';
+import { TRequestCreateDocument, TResponseListDocument } from './type';
 import { TDefaultResponse } from '@/commons/types/response';
 
 export const deleteAllDocs = async (): Promise<TDefaultResponse> => {
@@ -12,10 +12,10 @@ export const getDocs = async (): Promise<TResponseListDocument> => {
   return res.data;
 };
 
-export const uploadDoc = async (
-  formData: FormData
+export const createDoc = async (
+  req: TRequestCreateDocument
 ): Promise<TDefaultResponse> => {
-  const res = await api.post<TDefaultResponse>('/upload', formData, {
+  const res = await api.post<TDefaultResponse>('/documents', req, {
     headers: {
       'Content-Type': 'multipart/form-data'
     }
@@ -23,9 +23,9 @@ export const uploadDoc = async (
   return res.data;
 };
 
-export const uploadDocFromUrl = async (
-  req: TUploadURLRequest
-): Promise<TDefaultResponse> => {
-  const res = await api.post<TDefaultResponse>('/upload-url', req);
+export const deleteDoc = async (params: {
+  id: string;
+}): Promise<TDefaultResponse> => {
+  const res = await api.delete<TDefaultResponse>(`/documents/${params.id}`);
   return res.data;
 };

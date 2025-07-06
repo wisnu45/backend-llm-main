@@ -13,7 +13,6 @@ import { Link1Icon } from '@radix-ui/react-icons';
 type TDetail = {
   document_link: string;
   document_name: string;
-  description: string;
   created_at: string;
   updated_at: string;
 };
@@ -62,15 +61,6 @@ const DetailModal = ({ onEdit, onDelete, data, open, onOpenChange }: Props) => {
             </span>
             <p className="text-base text-gray-800">
               {data?.document_name ?? '-'}
-            </p>
-          </div>
-
-          <div>
-            <span className="mb-1 block text-sm font-semibold text-gray-500">
-              Description
-            </span>
-            <p className="text-base text-gray-800">
-              {data?.description ?? '-'}
             </p>
           </div>
 

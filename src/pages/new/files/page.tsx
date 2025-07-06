@@ -1,4 +1,4 @@
-import { Suspense, useState } from 'react';
+import { Suspense, useState, useEffect } from 'react';
 import { ColumnDef } from '@tanstack/react-table';
 import { DataTable } from '@/components/shared/data-table';
 import { Badge } from '@/components/ui/badge';
@@ -8,6 +8,7 @@ import { TDocItem } from '@/api/document/type';
 import useGetListDocument from './_hooks/get-list-document';
 import { formatDate } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import { toast } from '@/components/ui/use-toast';
 import FilesPageHeader from './_components/files-page-header';
 import FilesPageModals from './_components/files-page-modals';
 
@@ -15,12 +16,33 @@ type TModal = 'delete' | 'edit' | 'create' | 'detail' | null;
 
 const useFilesPage = () => {
   const [modal, setModal] = useState<TModal>(null);
+  const [data, setData] = useState<TDocItem | null>(null);
   const [tab, setTab] = useState('all');
   const query = useGetListDocument();
 
+  const handleSetModal = (modal: TModal, data: TDocItem | null) => {
+    setModal(modal);
+    setData(data);
+  };
+
+  // Handle query errors
+  useEffect(() => {
+    if (query.error) {
+      toast({
+        title: 'Failed to fetch documents',
+        description:
+          (query.error as any)?.response?.data?.message ||
+          (query.error as any)?.message ||
+          'An unexpected error occurred',
+        variant: 'destructive'
+      });
+    }
+  }, [query.error]);
+
   return {
+    data,
     modal,
-    setModal,
+    setModal: handleSetModal,
     tab,
     setTab,
     query
@@ -28,7 +50,7 @@ const useFilesPage = () => {
 };
 
 const getColumns = (
-  setModal: (modal: TModal) => void
+  setModal: (modal: TModal, data: TDocItem) => void
 ): ColumnDef<TDocItem>[] => [
   {
     accessorKey: 'id',
@@ -92,10 +114,13 @@ const getColumns = (
     header: 'Action',
     cell: ({ row }) => (
       <div>
-        <Button variant="ghost" onClick={() => setModal('detail')}>
+        <Button
+          variant="ghost"
+          onClick={() => setModal('detail', row.original)}
+        >
           View
         </Button>
-        <Button variant="ghost" onClick={() => setModal('edit')}>
+        <Button variant="ghost" onClick={() => setModal('edit', row.original)}>
           Edit
         </Button>
         <Button
@@ -103,7 +128,7 @@ const getColumns = (
             row.original.metadata === 'Meta Data Document' ? 'hidden' : ''
           }
           variant="ghost"
-          onClick={() => setModal('delete')}
+          onClick={() => setModal('delete', row.original)}
         >
           Delete
         </Button>
@@ -113,12 +138,12 @@ const getColumns = (
 ];
 
 const FilesPage = () => {
-  const { modal, setModal, tab, setTab, query } = useFilesPage();
+  const { modal, setModal, data, tab, setTab, query } = useFilesPage();
   const columns = getColumns(setModal);
 
   return (
     <div>
-      <FilesPageHeader setModal={setModal} />
+      <FilesPageHeader setModal={(modal) => setModal(modal, null)} />
       <Tabs
         defaultValue="all"
         onValueChange={(val) => {
@@ -134,7 +159,7 @@ const FilesPage = () => {
           <Suspense fallback={<LoaderCircle />}>
             <DataTable
               pageCount={10}
-              loading={false}
+              loading={query.isLoading}
               data={query.data?.data || []}
               columns={columns}
             />
@@ -142,7 +167,11 @@ const FilesPage = () => {
         </TabsContent>
       </Tabs>
 
-      <FilesPageModals modal={modal} setModal={setModal} />
+      <FilesPageModals
+        data={data}
+        modal={modal}
+        setModal={(modal) => setModal(modal, null)}
+      />
     </div>
   );
 };

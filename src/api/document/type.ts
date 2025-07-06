@@ -1,8 +1,6 @@
 import { TResponse } from '@/commons/types/response';
 
-export interface TUploadURLRequest {
-  answer: string;
-}
+export type TRequestCreateDocument = FormData;
 
 export type TDocItem = {
   created_at: string;
@@ -11,7 +9,7 @@ export type TDocItem = {
   id: string;
   metadata: unknown;
   portal_id: string | null;
-  //missing
+  // missing
   updated_at: string;
 };
 

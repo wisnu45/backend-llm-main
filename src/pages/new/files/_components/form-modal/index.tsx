@@ -19,18 +19,29 @@ import {
   FormLabel,
   FormMessage
 } from '@/components/ui/form';
-import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { useEffect } from 'react';
+import { useFiles } from '@/hooks/use-files';
+import { TRequestCreateDocument } from '@/api/document/type';
+import { Loader2 } from 'lucide-react';
 
 interface Props {
+  loading?: boolean;
   open?: boolean;
   onOpenChange: () => void;
   mode: 'create' | 'edit';
   defaultValues?: Partial<TDocumentFormData>;
+  onSubmit: (data: TRequestCreateDocument) => void;
 }
 
-const FormModal = ({ defaultValues, open, onOpenChange, mode }: Props) => {
+const FormModal = ({
+  defaultValues,
+  open,
+  onOpenChange,
+  onSubmit,
+  mode,
+  loading
+}: Props) => {
   const metaMap: Record<Props['mode'], { title: string; desc: string }> = {
     create: {
       title: 'Add New File',
@@ -47,20 +58,30 @@ const FormModal = ({ defaultValues, open, onOpenChange, mode }: Props) => {
     resolver: zodResolver(DocumentSchema)
   });
 
-  const handleSubmit = (data: TDocumentFormData) => {
-    console.log(data);
-  };
+  const { files } = useFiles();
 
-  console.log({
-    err: form.formState.errors
-  });
+  const handleSubmit = () => {
+    const file = files[0].file;
+
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('metadata', 'UPLOAD');
+
+    onSubmit(formData);
+  };
 
   useEffect(() => {
     form.reset(defaultValues);
   }, []);
 
+  useEffect(() => {
+    const file = files?.[0] || [];
+    form.setValue('document_path', file?.file?.name);
+    form.setValue('document_name', file?.file?.name?.split('.')[0]);
+  }, [files, form]);
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={loading ? undefined : onOpenChange}>
       <DialogContent
         className="no-scrollbar sm:max-w-md"
         onInteractOutside={(e) => e.preventDefault()}
@@ -107,7 +128,11 @@ const FormModal = ({ defaultValues, open, onOpenChange, mode }: Props) => {
                     <FormItem>
                       <FormLabel>Document Name *</FormLabel>
                       <FormControl>
-                        <Input placeholder="Document Name" {...field} />
+                        <Input
+                          placeholder="Document Name"
+                          disabled
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -116,29 +141,16 @@ const FormModal = ({ defaultValues, open, onOpenChange, mode }: Props) => {
               />
             </div>
 
-            <div>
-              <FormField
-                control={form.control}
-                name="description"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Description</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        placeholder="File description"
-                        className="resize-none"
-                        rows={6}
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
             <DialogFooter className="mt-2 sm:justify-start">
-              <Button type="submit" className="w-full">
-                Save
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  'Save'
+                )}
               </Button>
             </DialogFooter>
           </form>
