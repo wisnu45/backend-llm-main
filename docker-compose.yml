@@ -5,7 +5,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: dashboard-llm
+    container_name: combiphar-fe
     ports:
       - '8060:8060'
     volumes:

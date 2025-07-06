@@ -1,21 +1,24 @@
-# Stage 1: Build the React app with Vite
-FROM node:18-alpine as builder
+FROM node:20-alpine AS builder
 
 WORKDIR /app
-COPY . .
 
-COPY .env.example .env
-
+COPY package*.json ./
 RUN npm install
+
+COPY . .
 RUN npm run build
 
-# Stage 2: Set up Nginx to serve the static files
-FROM nginx:stable-alpine
+FROM nginx:alpine AS runner
 
+# Hapus default config nginx
+RUN rm -rf /usr/share/nginx/html/*
+
+# Copy hasil build Vite ke nginx folder
 COPY --from=builder /app/dist /usr/share/nginx/html
-COPY nginx.conf /etc/nginx/nginx.conf
 
-# Expose port 8080 for Cloud Run
-EXPOSE 8060
+# Copy custom nginx config (optional)
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+EXPOSE 80
 
 CMD ["nginx", "-g", "daemon off;"]
