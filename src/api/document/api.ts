@@ -1,14 +1,20 @@
 import api from '@/lib/api';
-import { TRequestCreateDocument, TResponseListDocument } from './type';
+import {
+  TRequestCreateDocument,
+  TResponseDetailDocument,
+  TResponseListDocument
+} from './type';
 import { TDefaultResponse } from '@/commons/types/response';
-
-export const deleteAllDocs = async (): Promise<TDefaultResponse> => {
-  const res = await api.get<TDefaultResponse>('/delete_all');
-  return res.data;
-};
 
 export const getDocs = async (): Promise<TResponseListDocument> => {
   const res = await api.get<TResponseListDocument>('/documents');
+  return res.data;
+};
+
+export const getDetailDoc = async (params: {
+  id?: string;
+}): Promise<TResponseDetailDocument> => {
+  const res = await api.get<TResponseDetailDocument>(`/documents/${params.id}`);
   return res.data;
 };
 

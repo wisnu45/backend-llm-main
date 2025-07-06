@@ -5,6 +5,7 @@ import useCreateDocument from '../_hooks/create-document';
 import { TDocItem } from '@/api/document/type';
 import useDeleteDocument from '../_hooks/delete-document';
 import { useFiles } from '@/hooks/use-files';
+import useGetDetailDocument from '../_hooks/get-detail-document';
 
 type TModal = 'delete' | 'edit' | 'create' | 'detail' | null;
 
@@ -17,6 +18,7 @@ interface IFilesPageModals {
 const FilesPageModals = ({ modal, setModal, data }: IFilesPageModals) => {
   const createMutation = useCreateDocument();
   const deleteMutation = useDeleteDocument();
+  const detailQuery = useGetDetailDocument(data?.id);
   const { setFiles } = useFiles();
 
   return (
@@ -51,13 +53,10 @@ const FilesPageModals = ({ modal, setModal, data }: IFilesPageModals) => {
       <DetailModal
         open={modal === 'detail'}
         onOpenChange={() => setModal(null)}
-        data={{
-          document_link: 'https://github.com/oemahsolution/dashboard-llm',
-          document_name: 'Undang-undang karyawan',
-          created_at: '2025-06-27 15:30 PM',
-          updated_at: '2025-06-27 15:30 PM'
+        data={detailQuery.data?.data}
+        onDelete={() => {
+          setModal('delete');
         }}
-        onDelete={() => {}}
         onEdit={() => {
           setModal('edit');
         }}
@@ -65,11 +64,15 @@ const FilesPageModals = ({ modal, setModal, data }: IFilesPageModals) => {
 
       <DeleteModal
         open={modal === 'delete'}
-        data={{ document_name: data?.document_name }}
+        data={{
+          document_name:
+            detailQuery.data?.data.document_name || data?.document_name
+        }}
         loading={deleteMutation.isPending}
         onDelete={() => {
+          const id = detailQuery.data?.data.id || data?.id;
           deleteMutation.mutate(
-            { id: data?.id! },
+            { id: id! },
             {
               onSuccess: () => {
                 setModal(null);

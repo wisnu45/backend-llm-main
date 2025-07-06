@@ -25,15 +25,11 @@ const useFilesPage = () => {
     setData(data);
   };
 
-  // Handle query errors
   useEffect(() => {
     if (query.error) {
       toast({
         title: 'Failed to fetch documents',
-        description:
-          (query.error as any)?.response?.data?.message ||
-          (query.error as any)?.message ||
-          'An unexpected error occurred',
+        description: query.error?.message || 'An unexpected error occurred',
         variant: 'destructive'
       });
     }
@@ -170,7 +166,7 @@ const FilesPage = () => {
       <FilesPageModals
         data={data}
         modal={modal}
-        setModal={(modal) => setModal(modal, null)}
+        setModal={(modal) => setModal(modal, data)}
       />
     </div>
   );
