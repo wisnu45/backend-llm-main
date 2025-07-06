@@ -20,10 +20,11 @@ import {
   FormMessage
 } from '@/components/ui/form';
 import { Button } from '@/components/ui/button';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useFiles } from '@/hooks/use-files';
 import { TRequestCreateDocument } from '@/api/document/type';
 import { Loader2 } from 'lucide-react';
+import { truncateFileName } from '@/lib/utils';
 
 interface Props {
   loading?: boolean;
@@ -52,6 +53,7 @@ const FormModal = ({
       desc: 'Edit document used in AI model training.'
     }
   };
+  const [editDoc, setEditDoc] = useState(true);
 
   const form = useForm<TDocumentFormData>({
     mode: 'onChange',
@@ -60,12 +62,23 @@ const FormModal = ({
 
   const { files } = useFiles();
 
-  const handleSubmit = () => {
-    const file = files[0].file;
+  const handleSubmit = (data: TDocumentFormData) => {
+    const file = files[0]?.file;
 
     const formData = new FormData();
-    formData.append('file', file);
-    formData.append('metadata', 'UPLOAD');
+
+    if (file) {
+      formData.append('file', file);
+      formData.append('metadata', 'UPLOAD');
+    }
+
+    if (data.portal_id) {
+      formData.append('portal_id', data.portal_id);
+    }
+
+    if (data.document_name) {
+      formData.append('document_name', data.document_name);
+    }
 
     onSubmit(formData);
   };
@@ -76,12 +89,24 @@ const FormModal = ({
 
   useEffect(() => {
     const file = files?.[0] || [];
+    if (!file.file) return;
+
     form.setValue('document_path', file?.file?.name);
     form.setValue('document_name', file?.file?.name?.split('.')[0]);
   }, [files, form]);
 
+  console.log(form.formState.errors);
+
   return (
-    <Dialog open={open} onOpenChange={loading ? undefined : onOpenChange}>
+    <Dialog
+      open={open}
+      onOpenChange={() => {
+        if (!open) {
+          setEditDoc(true);
+        }
+        onOpenChange();
+      }}
+    >
       <DialogContent
         className="no-scrollbar sm:max-w-md"
         onInteractOutside={(e) => e.preventDefault()}
@@ -97,27 +122,55 @@ const FormModal = ({
             className="flex flex-col gap-2"
           >
             <div>
-              <FormField
-                control={form.control}
-                name="document_path"
-                render={() => {
-                  return (
-                    <FormItem>
-                      <FormLabel>Document *</FormLabel>
-                      <FormControl>
-                        <FileUpload
-                          accept={{
-                            'application/pdf': ['.pdf']
-                          }}
-                          maxFiles={1}
-                          maxSize={10}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  );
-                }}
-              />
+              {mode === 'edit' && editDoc ? (
+                <div>
+                  <div className="flex items-end justify-between pb-1 pt-3">
+                    <div className="text-sm font-semibold">File accepted</div>
+                    <div
+                      className="text-sm hover:cursor-pointer hover:text-destructive"
+                      onClick={() => setEditDoc(false)}
+                    >
+                      Clear
+                    </div>
+                  </div>
+                  <div className="flex flex-col justify-center gap-2">
+                    <div className="flex justify-between rounded-md border px-4 py-3">
+                      <div className="flex items-center gap-4 text-sm">
+                        <div className="flex flex-col">
+                          <span className="inline-block max-w-[300px] text-sm font-semibold">
+                            {truncateFileName(
+                              defaultValues?.document_name ?? '-',
+                              30
+                            )}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <FormField
+                  control={form.control}
+                  name="document_path"
+                  render={() => {
+                    return (
+                      <FormItem>
+                        <FormLabel>Document *</FormLabel>
+                        <FormControl>
+                          <FileUpload
+                            accept={{
+                              'application/pdf': ['.pdf']
+                            }}
+                            maxFiles={1}
+                            maxSize={10}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    );
+                  }}
+                />
+              )}
             </div>
             <div>
               <FormField
@@ -130,7 +183,7 @@ const FormModal = ({
                       <FormControl>
                         <Input
                           placeholder="Document Name"
-                          disabled
+                          disabled={mode === 'create'}
                           {...field}
                         />
                       </FormControl>
@@ -140,6 +193,25 @@ const FormModal = ({
                 }}
               />
             </div>
+            {mode === 'edit' ? (
+              <div>
+                <FormField
+                  control={form.control}
+                  name="portal_id"
+                  render={({ field }) => {
+                    return (
+                      <FormItem>
+                        <FormLabel>Portal ID</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Portal ID" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    );
+                  }}
+                />
+              </div>
+            ) : null}
 
             <DialogFooter className="mt-2 sm:justify-start">
               <Button type="submit" className="w-full" disabled={loading}>

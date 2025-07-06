@@ -25,15 +25,11 @@ const useFilesPage = () => {
     setData(data);
   };
 
-  // Handle query errors
   useEffect(() => {
     if (query.error) {
       toast({
         title: 'Failed to fetch documents',
-        description:
-          (query.error as any)?.response?.data?.message ||
-          (query.error as any)?.message ||
-          'An unexpected error occurred',
+        description: query.error?.message || 'An unexpected error occurred',
         variant: 'destructive'
       });
     }
@@ -72,7 +68,7 @@ const getColumns = (
     header: 'document name',
     cell: ({ row }) => (
       <div className="flex flex-col">
-        <span>{row.original.document_name?.split('.')[0]}</span>
+        <span>{row.original.document_name?.split('.pdf')[0]}</span>
         <span className="font-semibold text-gray-400">PDF</span>
       </div>
     )
@@ -170,7 +166,7 @@ const FilesPage = () => {
       <FilesPageModals
         data={data}
         modal={modal}
-        setModal={(modal) => setModal(modal, null)}
+        setModal={(modal) => setModal(modal, data)}
       />
     </div>
   );
