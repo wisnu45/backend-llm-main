@@ -156,28 +156,34 @@ jobs:
 
           echo "Deployment Status: $DEPLOY_STATUS"
 
+          # Escape special characters for JSON
+          COMMIT_MESSAGE=$(echo '${{ github.event.head_commit.message }}' | sed 's/"/\\"/g' | sed "s/'/\\'/g" | tr -d '\n\r')
+          AUTHOR=$(echo '${{ github.actor }}' | sed 's/"/\\"/g')
+          REPOSITORY=$(echo '${{ github.repository }}' | sed 's/"/\\"/g')
+          BRANCH=$(echo '${{ github.ref_name }}' | sed 's/"/\\"/g')
+
           curl -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
             -H "Content-Type: application/json" \
-            -d '{
-              "chat_id": "${{ secrets.TELEGRAM_CHAT_ID }}",
-              "text": "'$DEPLOY_EMOJI' *Frontend Push Detected!*\nRepository: ${{ github.repository }}\nBranch: ${{ github.ref_name }}\nCommit: ${{ github.event.head_commit.message }}\nAuthor: ${{ github.actor }}\nStatus: '$DEPLOY_STATUS'",
-              "parse_mode": "Markdown",
-              "disable_web_page_preview": true,
-              "reply_markup": {
-                "inline_keyboard": [
+            -d "{
+              \"chat_id\": \"${{ secrets.TELEGRAM_CHAT_ID }}\",
+              \"text\": \"$DEPLOY_EMOJI *Frontend Push Detected!*\\nRepository: $REPOSITORY\\nBranch: $BRANCH\\nCommit: $COMMIT_MESSAGE\\nAuthor: $AUTHOR\\nStatus: $DEPLOY_STATUS\",
+              \"parse_mode\": \"Markdown\",
+              \"disable_web_page_preview\": true,
+              \"reply_markup\": {
+                \"inline_keyboard\": [
                   [
                     {
-                      "text": "📋 View Changes",
-                      "url": "${{ github.event.compare }}"
+                      \"text\": \"📋 View Changes\",
+                      \"url\": \"${{ github.event.compare }}\"
                     },
                     {
-                      "text": "📂 Repository",
-                      "url": "${{ github.event.repository.html_url }}"
+                      \"text\": \"📂 Repository\",
+                      \"url\": \"${{ github.event.repository.html_url }}\"
                     }
                   ]
                 ]
               }
-            }'
+            }"
 
   deploy:
     runs-on: ubuntu-latest
@@ -222,28 +228,33 @@ jobs:
       - name: Send Deployment Result
         run: |
           if [ "${{ needs.deploy.result }}" == "success" ]; then
-            STATUS="✅ *Frontend Deployment Successful!*"
+            STATUS="✅ Frontend Deployment Successful!"
             EMOJI="✅"
           else
-            STATUS="❌ *Frontend Deployment Failed!*"
+            STATUS="❌ Frontend Deployment Failed!"
             EMOJI="❌"
           fi
 
+          # Escape special characters for JSON
+          COMMIT_MESSAGE=$(echo '${{ github.event.head_commit.message }}' | sed 's/"/\\"/g' | sed "s/'/\\'/g" | tr -d '\n\r')
+          REPOSITORY=$(echo '${{ github.repository }}' | sed 's/"/\\"/g')
+          BRANCH=$(echo '${{ github.ref_name }}' | sed 's/"/\\"/g')
+
           curl -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
             -H "Content-Type: application/json" \
-            -d '{
-              "chat_id": "${{ secrets.TELEGRAM_CHAT_ID }}",
-              "text": "'$EMOJI' '$STATUS'\nRepository: ${{ github.repository }}\nBranch: ${{ github.ref_name }}\nCommit: ${{ github.event.head_commit.message }}",
-              "parse_mode": "Markdown",
-              "disable_web_page_preview": true,
-              "reply_markup": {
-                "inline_keyboard": [
+            -d "{
+              \"chat_id\": \"${{ secrets.TELEGRAM_CHAT_ID }}\",
+              \"text\": \"$EMOJI *$STATUS*\\nRepository: $REPOSITORY\\nBranch: $BRANCH\\nCommit: $COMMIT_MESSAGE\",
+              \"parse_mode\": \"Markdown\",
+              \"disable_web_page_preview\": true,
+              \"reply_markup\": {
+                \"inline_keyboard\": [
                   [
                     {
-                      "text": "📊 View Workflow",
-                      "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+                      \"text\": \"📊 View Workflow\",
+                      \"url\": \"${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\"
                     }
                   ]
                 ]
               }
-            }'
+            }"
