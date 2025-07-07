@@ -21,7 +21,6 @@ export const ChatItem = ({
   const sourceDocumen: Item[] = sourceDocuments
     ? JSON.parse(sourceDocuments)
     : [];
-  console.log('CEK sourceDocuments', JSON.parse(sourceDocuments));
 
   return (
     <div className="mb-10 space-y-4">
