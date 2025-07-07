@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import {
   FileTextIcon,
   HamburgerMenuIcon,
@@ -16,8 +17,8 @@ type TRecentChats = {
 };
 
 const Sidebar = () => {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const query = useGetFiles();
-
   const dataResult = query.data?.data as TRecentChats[] | undefined;
   const location = useLocation();
 
@@ -26,79 +27,101 @@ const Sidebar = () => {
     window.location.href = '/auth/signin';
   };
 
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
+
   return (
-    <aside className="flex w-[296px] flex-col gap-1 bg-[#D2D2D2] p-6">
+    <aside
+      className={`flex flex-col gap-1 bg-[#D2D2D2] p-6 
+      ${isSidebarOpen ? 'w-[296px]' : 'w-0 overflow-hidden'} 
+      transition-all duration-300 ease-in-out`}
+    >
       <div>
-        <button className="flex h-8 w-8 items-center justify-center rounded-lg hover:bg-gray-400/20">
+        <button
+          className="flex h-8 w-8 items-center justify-center rounded-lg hover:bg-gray-400/20"
+          onClick={toggleSidebar}
+        >
           <HamburgerMenuIcon className="h-4 text-gray-800" />
         </button>
 
-        <UserCard name="Darlene Robertson" id="#12392832" />
+        {isSidebarOpen && (
+          <>
+            <UserCard name="Darlene Robertson" id="#12392832" />
 
-        <Link
-          to="/new/chat"
-          className="mt-2 flex w-full items-center gap-2 rounded-lg p-2 text-left hover:bg-gray-400/20"
-        >
-          <PlusIcon className="text-gray-800" />
-          <span className="text-gradient-primary font-semibold ">New Chat</span>
-        </Link>
+            <Link
+              to="/new/chat"
+              className="mt-2 flex w-full items-center gap-2 rounded-lg p-2 text-left hover:bg-gray-400/20"
+            >
+              <PlusIcon className="text-gray-800" />
+              <span className="text-gradient-primary font-semibold ">
+                New Chat
+              </span>
+            </Link>
 
-        <Link
-          to="/new/files"
-          className="flex items-center justify-between rounded-lg p-2 text-sm text-gray-700 hover:bg-gray-400/20"
-        >
-          <div className="flex items-center gap-2">
-            <FileTextIcon className="font-bold" />
-            <span className="truncate font-semibold">Document File</span>
+            <Link
+              to="/new/files"
+              className="flex items-center justify-between rounded-lg p-2 text-sm text-gray-700 hover:bg-gray-400/20"
+            >
+              <div className="flex items-center gap-2">
+                <FileTextIcon className="font-bold" />
+                <span className="truncate font-semibold">Document File</span>
+              </div>
+            </Link>
+          </>
+        )}
+      </div>
+
+      {isSidebarOpen && (
+        <>
+          <h2 className="mb-2 p-2 text-xs font-semibold uppercase tracking-wider text-gray-500">
+            Recent Chat
+          </h2>
+
+          <ScrollArea className="flex-grow">
+            <nav>
+              <ul>
+                {Array.isArray(dataResult) && dataResult.length > 0 ? (
+                  dataResult.map((chat: TRecentChats) => (
+                    <li key={chat.session_id}>
+                      <Link
+                        to={`/new/chat/${chat.session_id}`}
+                        className={`flex items-center justify-between rounded-lg p-2 text-sm hover:bg-gray-400/20
+                          ${location.pathname === `/new/chat/${chat.session_id}` ? 'bg-gray-400/40 text-black' : 'text-gray-700'}
+                        `}
+                      >
+                        <span className="w-[65%] truncate">
+                          {chat.title || 'Untitled Chat'}
+                        </span>
+                      </Link>
+                    </li>
+                  ))
+                ) : (
+                  <li className="p-2 text-sm text-gray-500">No recent chats</li>
+                )}
+              </ul>
+            </nav>
+          </ScrollArea>
+
+          <div className="mt-auto">
+            <a
+              href="#"
+              className="flex items-center rounded-lg p-2 text-sm text-gray-600 hover:bg-neutral-300/60"
+            >
+              <TimerIcon className="mr-3 text-lg" />
+              <span>See Full Chat History</span>
+            </a>
+            <div className="mt-auto">
+              <button
+                onClick={handleLogout}
+                className="mt-4 flex w-full items-center gap-3 rounded-lg bg-slate-400 p-3 text-sm text-blue-600 hover:bg-[#E0E0E0] "
+              >
+                <span className="w-full text-center font-semibold">Logout</span>
+              </button>
+            </div>
           </div>
-        </Link>
-      </div>
-
-      <h2 className="mb-2 p-2 text-xs font-semibold uppercase tracking-wider text-gray-500">
-        Recent Chat
-      </h2>
-
-      <ScrollArea className="flex-grow">
-        <nav>
-          <ul>
-            {Array.isArray(dataResult) && dataResult.length > 0 ? (
-              dataResult.map((chat: TRecentChats) => (
-                <li key={chat.session_id}>
-                  <Link
-                    to={`/new/chat/${chat.session_id}`}
-                    className={`flex items-center justify-between rounded-lg p-2 text-sm hover:bg-gray-400/20
-                      ${location.pathname === `/new/chat/${chat.session_id}` ? 'bg-gray-400/40 text-black' : 'text-gray-700'}
-                    `}
-                  >
-                    <span className="w-[65%] truncate">
-                      {chat.title || 'Untitled Chat'}
-                    </span>
-                  </Link>
-                </li>
-              ))
-            ) : (
-              <li className="p-2 text-sm text-gray-500">No recent chats</li>
-            )}
-          </ul>
-        </nav>
-      </ScrollArea>
-      <div className="mt-auto">
-        <a
-          href="#"
-          className="flex items-center rounded-lg p-2 text-sm text-gray-600 hover:bg-neutral-300/60"
-        >
-          <TimerIcon className="mr-3 text-lg" />
-          <span>See Full Chat History</span>
-        </a>
-        <div className="mt-auto">
-          <button
-            onClick={handleLogout}
-            className="mt-4 flex w-full items-center gap-3 rounded-lg bg-slate-400 p-3 text-sm text-blue-600 hover:bg-[#E0E0E0] "
-          >
-            <span className="w-full text-center font-semibold">Logout</span>
-          </button>
-        </div>
-      </div>
+        </>
+      )}
     </aside>
   );
 };
