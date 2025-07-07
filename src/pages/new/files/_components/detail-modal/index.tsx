@@ -7,23 +7,14 @@ import {
   DialogTitle
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Link } from 'react-router-dom';
-import { Link1Icon } from '@radix-ui/react-icons';
-
-type TDetail = {
-  document_link: string;
-  document_name: string;
-  description: string;
-  created_at: string;
-  updated_at: string;
-};
+import { TDocItem } from '@/api/document/type';
 
 interface Props {
   open?: boolean;
   onOpenChange: () => void;
-  data?: TDetail;
-  onEdit: (data?: TDetail) => void;
-  onDelete: (data?: TDetail) => void;
+  data?: TDocItem;
+  onEdit: (data?: TDocItem) => void;
+  onDelete: (data?: TDocItem) => void;
 }
 
 const DetailModal = ({ onEdit, onDelete, data, open, onOpenChange }: Props) => {
@@ -44,16 +35,15 @@ const DetailModal = ({ onEdit, onDelete, data, open, onOpenChange }: Props) => {
         <div className="flex flex-col gap-3">
           <div>
             <span className="mb-1 block text-sm font-semibold text-gray-500">
-              Document
+              File ID
             </span>
-            <Link
-              to={data?.document_link || ''}
-              target="_blank"
-              className="flex items-center gap-2 text-blue-600 transition-colors duration-200 hover:text-blue-800"
-            >
-              <Link1Icon />
-              <span className="underline">Lihat File</span>
-            </Link>
+            <p className="text-base text-gray-800">{data?.id ?? '-'}</p>
+          </div>
+          <div>
+            <span className="mb-1 block text-sm font-semibold text-gray-500">
+              Portal ID
+            </span>
+            <p className="text-base text-gray-800">{data?.portal_id ?? '-'}</p>
           </div>
 
           <div>
@@ -62,15 +52,6 @@ const DetailModal = ({ onEdit, onDelete, data, open, onOpenChange }: Props) => {
             </span>
             <p className="text-base text-gray-800">
               {data?.document_name ?? '-'}
-            </p>
-          </div>
-
-          <div>
-            <span className="mb-1 block text-sm font-semibold text-gray-500">
-              Description
-            </span>
-            <p className="text-base text-gray-800">
-              {data?.description ?? '-'}
             </p>
           </div>
 
@@ -86,6 +67,7 @@ const DetailModal = ({ onEdit, onDelete, data, open, onOpenChange }: Props) => {
             </span>
             <p className="text-base text-gray-800">{data?.updated_at ?? '-'}</p>
           </div>
+
           <DialogFooter className="mt-2 sm:justify-start">
             <Button
               type="submit"

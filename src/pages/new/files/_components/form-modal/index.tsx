@@ -19,18 +19,30 @@ import {
   FormLabel,
   FormMessage
 } from '@/components/ui/form';
-import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { useFiles } from '@/hooks/use-files';
+import { TRequestCreateDocument } from '@/api/document/type';
+import { Loader2 } from 'lucide-react';
+import { truncateFileName } from '@/lib/utils';
 
 interface Props {
+  loading?: boolean;
   open?: boolean;
   onOpenChange: () => void;
   mode: 'create' | 'edit';
   defaultValues?: Partial<TDocumentFormData>;
+  onSubmit: (data: TRequestCreateDocument) => void;
 }
 
-const FormModal = ({ defaultValues, open, onOpenChange, mode }: Props) => {
+const FormModal = ({
+  defaultValues,
+  open,
+  onOpenChange,
+  onSubmit,
+  mode,
+  loading
+}: Props) => {
   const metaMap: Record<Props['mode'], { title: string; desc: string }> = {
     create: {
       title: 'Add New File',
@@ -41,26 +53,60 @@ const FormModal = ({ defaultValues, open, onOpenChange, mode }: Props) => {
       desc: 'Edit document used in AI model training.'
     }
   };
+  const [editDoc, setEditDoc] = useState(true);
 
   const form = useForm<TDocumentFormData>({
     mode: 'onChange',
     resolver: zodResolver(DocumentSchema)
   });
 
-  const handleSubmit = (data: TDocumentFormData) => {
-    console.log(data);
-  };
+  const { files } = useFiles();
 
-  console.log({
-    err: form.formState.errors
-  });
+  const handleSubmit = (data: TDocumentFormData) => {
+    const file = files[0]?.file;
+
+    const formData = new FormData();
+
+    if (file) {
+      formData.append('file', file);
+      formData.append('metadata', 'UPLOAD');
+    }
+
+    if (data.portal_id) {
+      formData.append('portal_id', data.portal_id);
+    }
+
+    if (data.document_name) {
+      formData.append('document_name', data.document_name);
+    }
+
+    onSubmit(formData);
+  };
 
   useEffect(() => {
     form.reset(defaultValues);
   }, []);
 
+  useEffect(() => {
+    const file = files?.[0] || [];
+    if (!file.file) return;
+
+    form.setValue('document_path', file?.file?.name);
+    form.setValue('document_name', file?.file?.name?.split('.')[0]);
+  }, [files, form]);
+
+  console.log(form.formState.errors);
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog
+      open={open}
+      onOpenChange={() => {
+        if (!open) {
+          setEditDoc(true);
+        }
+        onOpenChange();
+      }}
+    >
       <DialogContent
         className="no-scrollbar sm:max-w-md"
         onInteractOutside={(e) => e.preventDefault()}
@@ -76,27 +122,55 @@ const FormModal = ({ defaultValues, open, onOpenChange, mode }: Props) => {
             className="flex flex-col gap-2"
           >
             <div>
-              <FormField
-                control={form.control}
-                name="document_path"
-                render={() => {
-                  return (
-                    <FormItem>
-                      <FormLabel>Document *</FormLabel>
-                      <FormControl>
-                        <FileUpload
-                          accept={{
-                            'application/pdf': ['.pdf']
-                          }}
-                          maxFiles={1}
-                          maxSize={10}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  );
-                }}
-              />
+              {mode === 'edit' && editDoc ? (
+                <div>
+                  <div className="flex items-end justify-between pb-1 pt-3">
+                    <div className="text-sm font-semibold">File accepted</div>
+                    <div
+                      className="text-sm hover:cursor-pointer hover:text-destructive"
+                      onClick={() => setEditDoc(false)}
+                    >
+                      Clear
+                    </div>
+                  </div>
+                  <div className="flex flex-col justify-center gap-2">
+                    <div className="flex justify-between rounded-md border px-4 py-3">
+                      <div className="flex items-center gap-4 text-sm">
+                        <div className="flex flex-col">
+                          <span className="inline-block max-w-[300px] text-sm font-semibold">
+                            {truncateFileName(
+                              defaultValues?.document_name ?? '-',
+                              30
+                            )}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <FormField
+                  control={form.control}
+                  name="document_path"
+                  render={() => {
+                    return (
+                      <FormItem>
+                        <FormLabel>Document *</FormLabel>
+                        <FormControl>
+                          <FileUpload
+                            accept={{
+                              'application/pdf': ['.pdf']
+                            }}
+                            maxFiles={1}
+                            maxSize={10}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    );
+                  }}
+                />
+              )}
             </div>
             <div>
               <FormField
@@ -107,7 +181,11 @@ const FormModal = ({ defaultValues, open, onOpenChange, mode }: Props) => {
                     <FormItem>
                       <FormLabel>Document Name *</FormLabel>
                       <FormControl>
-                        <Input placeholder="Document Name" {...field} />
+                        <Input
+                          placeholder="Document Name"
+                          disabled={mode === 'create'}
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -115,30 +193,36 @@ const FormModal = ({ defaultValues, open, onOpenChange, mode }: Props) => {
                 }}
               />
             </div>
+            {mode === 'edit' ? (
+              <div>
+                <FormField
+                  control={form.control}
+                  name="portal_id"
+                  render={({ field }) => {
+                    return (
+                      <FormItem>
+                        <FormLabel>Portal ID</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Portal ID" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    );
+                  }}
+                />
+              </div>
+            ) : null}
 
-            <div>
-              <FormField
-                control={form.control}
-                name="description"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Description</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        placeholder="File description"
-                        className="resize-none"
-                        rows={6}
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
             <DialogFooter className="mt-2 sm:justify-start">
-              <Button type="submit" className="w-full">
-                Save
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  'Save'
+                )}
               </Button>
             </DialogFooter>
           </form>

@@ -1,44 +1,82 @@
 import FormModal from './form-modal';
 import DetailModal from './detail-modal';
 import DeleteModal from './delete-modal';
+import useCreateDocument from '../_hooks/create-document';
+import { TDocItem } from '@/api/document/type';
+import useDeleteDocument from '../_hooks/delete-document';
+import { useFiles } from '@/hooks/use-files';
+import useGetDetailDocument from '../_hooks/get-detail-document';
+import useEditDocument from '../_hooks/edit-document';
+import { useEffect } from 'react';
 
 type TModal = 'delete' | 'edit' | 'create' | 'detail' | null;
 
 interface IFilesPageModals {
   modal: TModal;
   setModal: (modal: TModal) => void;
+  data: TDocItem | null;
 }
 
-const FilesPageModals = ({ modal, setModal }: IFilesPageModals) => {
+const FilesPageModals = ({ modal, setModal, data }: IFilesPageModals) => {
+  const createMutation = useCreateDocument();
+  const editMutation = useEditDocument(data?.id!);
+  const deleteMutation = useDeleteDocument();
+  const detailQuery = useGetDetailDocument(data?.id);
+  const { setFiles } = useFiles();
+
+  useEffect(() => {
+    if (modal && modal !== 'create') {
+      detailQuery.refetch();
+    }
+  }, [modal, detailQuery]);
+
   return (
     <>
       <FormModal
         open={modal === 'create'}
         mode="create"
-        onOpenChange={() => setModal(null)}
+        loading={createMutation.isPending}
+        onOpenChange={() => {
+          setModal(null);
+          setFiles([]);
+        }}
+        onSubmit={(data) => {
+          createMutation.mutate(data, {
+            onSuccess: () => {
+              setModal(null);
+              setFiles([]);
+            }
+          });
+        }}
       />
       <FormModal
+        key={detailQuery.data?.data.id}
         open={modal === 'edit'}
         mode="edit"
+        loading={editMutation.isPending}
         onOpenChange={() => setModal(null)}
+        onSubmit={(data) => {
+          editMutation.mutate(data, {
+            onSuccess: () => {
+              setModal(null);
+              setFiles([]);
+            }
+          });
+        }}
         defaultValues={{
-          document_name: 'Aturan Karyawan',
-          description: 'Dokumen yang berisi aturan-aturan karyawan'
+          document_name: detailQuery.data?.data.document_name,
+          document_path: detailQuery.data?.data.document_name,
+          portal_id: detailQuery.data?.data.portal_id ?? ''
         }}
       />
 
       <DetailModal
         open={modal === 'detail'}
         onOpenChange={() => setModal(null)}
-        data={{
-          document_link: 'https://github.com/oemahsolution/dashboard-llm',
-          document_name: 'Undang-undang karyawan',
-          description:
-            'Berisi aturan-aturan yang harus diikuti oleh karyawan, alur-alur peminjaman barang, informasi gaji, dll.',
-          created_at: '2025-06-27 15:30 PM',
-          updated_at: '2025-06-27 15:30 PM'
+        data={detailQuery.data?.data}
+        onDelete={() => {
+          setModal('delete');
         }}
-        onDelete={() => {}}
         onEdit={() => {
           setModal('edit');
         }}
@@ -46,8 +84,22 @@ const FilesPageModals = ({ modal, setModal }: IFilesPageModals) => {
 
       <DeleteModal
         open={modal === 'delete'}
-        data={{ document_name: 'Undang-undang Karyawan' }}
-        onDelete={() => setModal(null)}
+        data={{
+          document_name:
+            detailQuery.data?.data.document_name || data?.document_name
+        }}
+        loading={deleteMutation.isPending}
+        onDelete={() => {
+          const id = detailQuery.data?.data.id || data?.id;
+          deleteMutation.mutate(
+            { id: id! },
+            {
+              onSuccess: () => {
+                setModal(null);
+              }
+            }
+          );
+        }}
         onOpenChange={() => setModal(null)}
       />
     </>
