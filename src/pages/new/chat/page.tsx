@@ -2,10 +2,8 @@ import {
   ArrowRightIcon,
   ChatBubbleIcon,
   EnvelopeClosedIcon,
-  ImageIcon,
   MixerHorizontalIcon,
   PersonIcon,
-  PlusCircledIcon,
   ReloadIcon
 } from '@radix-ui/react-icons';
 import { SetStateAction, useEffect, useRef, useState } from 'react';
@@ -157,10 +155,10 @@ const ChatPage = () => {
         <div className="mt-4 flex items-center justify-between text-sm text-gray-800">
           <div className="flex items-center gap-6">
             <button className="flex items-center gap-1 transition hover:text-purple-600">
-              <PlusCircledIcon /> Add attachment
+              {/* <PlusCircledIcon /> Add attachment */}
             </button>
             <button className="flex items-center gap-1 transition hover:text-purple-600">
-              <ImageIcon /> Use image
+              {/* <ImageIcon /> Use image */}
             </button>
           </div>
 

@@ -46,7 +46,8 @@ const useFilesPage = () => {
 };
 
 const getColumns = (
-  setModal: (modal: TModal, data: TDocItem) => void
+  setModal: (modal: TModal, data: TDocItem) => void,
+  tab: string
 ): ColumnDef<TDocItem>[] => [
   {
     accessorKey: 'id',
@@ -58,11 +59,15 @@ const getColumns = (
     header: 'file id',
     cell: ({ row }) => <div className="max-w-[150px]">{row.getValue('id')}</div>
   },
-  {
-    accessorKey: 'portal_id',
-    header: 'PORTAL ID',
-    cell: ({ row }) => <div>{row.getValue('portal_id') ?? '-'}</div>
-  },
+  ...(tab !== 'metadata'
+    ? [
+        {
+          accessorKey: 'portal_id',
+          header: 'PORTAL ID',
+          cell: ({ row }) => <div>{row.getValue('portal_id') ?? '-'}</div>
+        }
+      ]
+    : []),
   {
     id: 'document-info',
     header: 'document name',
@@ -87,24 +92,6 @@ const getColumns = (
           '-'}
       </div>
     )
-  },
-  {
-    accessorKey: 'metaData',
-    header: '',
-    cell: ({ row }) => {
-      const isMetaDocument = row.original.metadata === 'Meta Data Document';
-      const color = isMetaDocument ? '#5C47DB' : '#20AB4A';
-
-      return (
-        <div>
-          <Badge
-            className={`bg-[${color}]/10 text-[${color}] hover:bg-[${color}/15]`}
-          >
-            TODO
-          </Badge>
-        </div>
-      );
-    }
   },
   {
     header: 'Action',
@@ -135,7 +122,27 @@ const getColumns = (
 
 const FilesPage = () => {
   const { modal, setModal, data, tab, setTab, query } = useFilesPage();
-  const columns = getColumns(setModal);
+
+  const columns = getColumns(setModal, tab);
+
+  const filteredData =
+    query.data?.data
+      .sort(
+        (a, b) =>
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      )
+      .filter((item) => {
+        switch (tab) {
+          case 'all':
+            return true;
+          case 'metadata':
+            return item.portal_id;
+          case 'upload':
+            return !item.portal_id;
+          default:
+            return true;
+        }
+      }) || [];
 
   return (
     <div>
@@ -156,7 +163,7 @@ const FilesPage = () => {
             <DataTable
               pageCount={10}
               loading={query.isLoading}
-              data={query.data?.data || []}
+              data={filteredData || []}
               columns={columns}
             />
           </Suspense>
