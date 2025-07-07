@@ -1,4 +1,4 @@
-name: Notif Push Frontend
+name: Frontend Notification
 
 on:
   push:
@@ -9,13 +9,15 @@ jobs:
   notify:
     runs-on: ubuntu-latest
     steps:
-      - name: Send Telegram Message
+      - name: Send Telegram Notification
         run: |
+          # Escape special characters for JSON
           COMMIT_MESSAGE=$(echo '${{ github.event.head_commit.message }}' | sed 's/"/\\"/g' | sed "s/'/\\'/g" | tr -d '\n\r')
           AUTHOR=$(echo '${{ github.actor }}' | sed 's/"/\\"/g')
           REPOSITORY=$(echo '${{ github.repository }}' | sed 's/"/\\"/g')
           BRANCH=$(echo '${{ github.ref_name }}' | sed 's/"/\\"/g')
 
+          # Prepare message thread ID if specified
           THREAD_ID_PARAM=""
           if [ -n "${{ secrets.TELEGRAM_THREAD_ID }}" ]; then
             THREAD_ID_PARAM=", \"message_thread_id\": \"${{ secrets.TELEGRAM_THREAD_ID }}\""
@@ -23,4 +25,23 @@ jobs:
 
           curl -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
             -H "Content-Type: application/json" \
-            -d "{\n  \"chat_id\": \"${{ secrets.TELEGRAM_CHAT_ID }}\"$THREAD_ID_PARAM,\n  \"text\": \"*Frontend Push Detected!*\\nRepository: $REPOSITORY\\nBranch: $BRANCH\\nCommit: $COMMIT_MESSAGE\\nAuthor: $AUTHOR\",\n  \"parse_mode\": \"Markdown\",\n  \"disable_web_page_preview\": true,\n  \"reply_markup\": {\n    \"inline_keyboard\": [\n      [\n        {\n          \"text\": \"📋 View Changes\",\n          \"url\": \"${{ github.event.compare }}\"\n        },\n        {\n          \"text\": \"📂 Repository\",\n          \"url\": \"${{ github.event.repository.html_url }}\"\n        }\n      ]\n    ]\n  }\n}"
+            -d "{
+              \"chat_id\": \"${{ secrets.TELEGRAM_CHAT_ID }}\"$THREAD_ID_PARAM,
+              \"text\": \"🚀 *Frontend Push Detected!*\\nRepository: $REPOSITORY\\nBranch: $BRANCH\\nCommit: $COMMIT_MESSAGE\\nAuthor: $AUTHOR\",
+              \"parse_mode\": \"Markdown\",
+              \"disable_web_page_preview\": true,
+              \"reply_markup\": {
+                \"inline_keyboard\": [
+                  [
+                    {
+                      \"text\": \"📋 View Changes\",
+                      \"url\": \"${{ github.event.compare }}\"
+                    },
+                    {
+                      \"text\": \"📂 Repository\",
+                      \"url\": \"${{ github.event.repository.html_url }}\"
+                    }
+                  ]
+                ]
+              }
+            }"
