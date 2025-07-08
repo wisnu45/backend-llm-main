@@ -104,6 +104,11 @@ const Sidebar = () => {
                         className={`flex items-center justify-between rounded-lg p-2 text-sm hover:bg-gray-400/20
                       ${location.pathname === `/new/chat/${chat.session_id}` ? 'bg-gray-400/40 text-black' : 'text-gray-700'}
                     `}
+                        onClick={() => {
+                          if (window.innerWidth < 768) {
+                            setIsSidebarOpen(false);
+                          }
+                        }}
                       >
                         <span className="w-[65%] truncate">
                           {chat.title || 'Untitled Chat'}
