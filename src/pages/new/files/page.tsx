@@ -59,7 +59,7 @@ const getColumns = (
     header: 'file id',
     cell: ({ row }) => <div className="max-w-[150px]">{row.getValue('id')}</div>
   },
-  ...(tab !== 'metadata'
+  ...(tab !== 'upload'
     ? [
         {
           accessorKey: 'portal_id',

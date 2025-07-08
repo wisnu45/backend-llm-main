@@ -4,7 +4,7 @@ import {
   HamburgerMenuIcon,
   PlusIcon,
   TimerIcon,
-  PauseIcon
+  ExitIcon
 } from '@radix-ui/react-icons';
 import { Link, useLocation } from 'react-router-dom';
 import { useGetFiles } from './_hook/use-get-history-chat';
@@ -155,7 +155,7 @@ const Sidebar = ({ setShowModal }) => {
           {isSidebarOpen ? (
             <span className="w-full text-center font-semibold">Logout</span>
           ) : (
-            <PauseIcon className="h-6 w-6 text-gray-700" />
+            <ExitIcon className="h-6 w-6 text-gray-700" />
           )}
         </button>
       </div>
