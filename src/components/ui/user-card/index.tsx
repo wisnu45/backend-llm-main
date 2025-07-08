@@ -6,7 +6,7 @@ interface Props {
 
 function UserCard({ name, id, avatarSrc }: Props) {
   return (
-    <div className="relative flex h-40 w-60 flex-col justify-between overflow-hidden rounded-xl bg-gray-600 p-4">
+    <div className="relative m-2 flex h-36 w-56 flex-col justify-between overflow-hidden rounded-xl bg-gray-600 p-4">
       <div className="flex items-center space-x-4">
         <img
           src={avatarSrc || `https://ui-avatars.com/api/?name=${name}`}

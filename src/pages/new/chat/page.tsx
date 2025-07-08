@@ -104,7 +104,7 @@ const ChatPage = () => {
       {loading ? (
         <Loader />
       ) : chat && !loading ? (
-        <ScrollArea className="flex-1" ref={scrollAreaRef}>
+        <ScrollArea className="scrollbar-hide flex-1" ref={scrollAreaRef}>
           <div className="min-h-full">
             {query?.data?.data?.map((message, index) => (
               <ChatItem
@@ -156,6 +156,13 @@ const ChatPage = () => {
           maxLength={1000}
           value={text}
           onChange={handleChange}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+              e.preventDefault();
+              setText('');
+              handleClick();
+            }
+          }}
         />
 
         <div className="mt-4 flex items-center justify-between text-sm text-gray-800">

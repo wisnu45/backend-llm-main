@@ -55,8 +55,8 @@ const DetailPage = () => {
 
   return (
     <>
-      <ScrollArea className="flex-1">
-        <div className="mx-auto min-h-full w-[95%]">
+      <ScrollArea className="scrollbar-hide flex-1">
+        <div className="mx-auto min-h-full w-[95%] ">
           {query.isLoading && <Loader />}
           {query?.data?.data?.map((message, index) => {
             const isLast = index === (query?.data?.data?.length ?? 0) - 1;
@@ -103,6 +103,13 @@ const DetailPage = () => {
           maxLength={1000}
           value={text}
           onChange={handleChange}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+              e.preventDefault();
+              setText('');
+              handleClick();
+            }
+          }}
         />
 
         <div className="mt-4 flex items-center justify-between text-sm text-gray-800">

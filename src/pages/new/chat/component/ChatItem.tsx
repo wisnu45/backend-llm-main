@@ -26,13 +26,13 @@ export const ChatItem = ({
   const [isCopied, setIsCopied] = useState(false);
 
   return (
-    <div className="mb-10 space-y-4">
+    <div className="mb-10 space-y-4 ">
       <div className="flex justify-end">
         <div className="rounded-xl bg-gray-200 px-4 py-2 text-sm text-gray-900">
           {question}
         </div>
       </div>
-      <div className="col-auto flex flex-col items-start space-y-3">
+      <div className="col-auto flex flex-col items-start space-y-3 overflow-hidden">
         <div>
           <ReactMarkdown
             remarkPlugins={[remarkGfm]}

@@ -8,7 +8,6 @@ import {
 } from '@radix-ui/react-icons';
 import { Link, useLocation } from 'react-router-dom';
 import { useGetFiles } from './_hook/use-get-history-chat';
-import { SessionToken } from '@/lib/cookies';
 import UserCard from '../user-card';
 import { ScrollArea } from '../scroll-area';
 
@@ -17,16 +16,11 @@ type TRecentChats = {
   title: string;
 };
 
-const Sidebar = () => {
+const Sidebar = ({ setShowModal }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const query = useGetFiles();
   const dataResult = query.data?.data as TRecentChats[] | undefined;
   const location = useLocation();
-
-  const handleLogout = () => {
-    SessionToken.remove();
-    window.location.href = '/auth/signin';
-  };
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
@@ -50,7 +44,7 @@ const Sidebar = () => {
   return (
     <aside
       className={`flex flex-col gap-1 bg-[#D2D2D2] p-2
-        ${isSidebarOpen ? 'w-[296px]' : 'w-[50px]'} 
+        ${isSidebarOpen ? 'w-[255px]' : 'w-[50px]'} 
         duration-[700ms] ease-[cubic-bezier(0.25, 0.8, 0.25, 1)] transform transition-all`}
     >
       <div>
@@ -61,7 +55,7 @@ const Sidebar = () => {
           <HamburgerMenuIcon className="h-4 text-gray-800" />
         </button>
         {isSidebarOpen && (
-          <div className="translate-x-0 transform transition-transform duration-300  ease-in-out">
+          <div className="translate-x-0 transform transition-transform duration-300  ease-in-out ">
             <UserCard name="Pengguna" id="#12392832" />
           </div>
         )}
@@ -155,7 +149,7 @@ const Sidebar = () => {
           )}
         </a>
         <button
-          onClick={handleLogout}
+          onClick={() => setShowModal(true)}
           className="mt-4 flex w-full items-center gap-3 rounded-lg bg-slate-400 p-3 text-sm text-blue-600 hover:bg-[#E0E0E0]"
         >
           {isSidebarOpen ? (
