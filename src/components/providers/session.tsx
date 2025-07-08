@@ -84,27 +84,6 @@ const SessionProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
       setStatus('unauthenticated');
       throw error;
     }
-
-    // loginMutation.mutate(payload, {
-    //   onSuccess: (res) => {
-    //     const authHeader = res.authorization;
-    //     const token = authHeader.replace('Basic ', '');
-    //     setSessionData({
-    //       access_token: token
-    //       // user: res.data.user
-    //     });
-    //     SessionToken.set({ access_token: token });
-
-    //     setStatus('authenticated');
-
-    //     // SessionUser.set(res.data);
-    //   },
-    //   onError: (error: any) => {
-    //     setStatus('unauthenticated');
-    //     console.log('MASUK ERROR', error?.response?.data?.message || error.message);
-    //     setErrorMessage(error?.response?.data?.message || error.message);
-    //   }
-    // });
   };
 
   const signout = () => {
