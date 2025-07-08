@@ -2,6 +2,7 @@ import { Suspense, useState, useEffect } from 'react';
 import { ColumnDef } from '@tanstack/react-table';
 import { DataTable } from '@/components/shared/data-table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { LoaderCircle } from '@/components/shared/loader';
 import { TDocItem } from '@/api/document/type';
 import useGetListDocument from './_hooks/get-list-document';
@@ -179,20 +180,20 @@ const FilesPage = () => {
           setTab(val);
         }}
       >
-        <TabsList className="flex flex-wrap justify-start sm:flex-row sm:space-x-4">
-          <TabsTrigger value="all" className="mb-2 w-full sm:mb-0 sm:w-auto">
-            All Document Files
-          </TabsTrigger>
-          <TabsTrigger
-            value="metadata"
-            className="mb-2 w-full sm:mb-0 sm:w-auto"
-          >
-            Metadata Document
-          </TabsTrigger>
-          <TabsTrigger value="upload" className="mb-2 w-full sm:mb-0 sm:w-auto">
-            Upload Document
-          </TabsTrigger>
-        </TabsList>
+        <ScrollArea className="w-full">
+          <TabsList className="flex w-max min-w-full flex-row space-x-4">
+            <TabsTrigger value="all" className="w-full sm:w-auto">
+              All Document Files
+            </TabsTrigger>
+            <TabsTrigger value="metadata" className="w-full sm:w-auto">
+              Metadata Document
+            </TabsTrigger>
+            <TabsTrigger value="upload" className="w-full sm:w-auto">
+              Upload Document
+            </TabsTrigger>
+          </TabsList>
+          <ScrollBar orientation="horizontal" />
+        </ScrollArea>
         <TabsContent value={tab}>
           <Suspense fallback={<LoaderCircle />}>
             <DataTable

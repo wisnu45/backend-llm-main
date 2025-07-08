@@ -1,9 +1,5 @@
 import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu';
-import { ChevronDownIcon, MagnifyingGlassIcon } from '@radix-ui/react-icons';
+import { MagnifyingGlassIcon } from '@radix-ui/react-icons';
 
 type TModal = 'delete' | 'edit' | 'create' | 'detail' | null;
 
@@ -38,7 +34,8 @@ const FilesPageHeader = ({ setModal, setInput }: IFilesPageHeader) => {
             <MagnifyingGlassIcon className="h-5 w-5 text-gray-500" />
           </button>
         </div>
-
+        {/* TODO: waiting for confirm */}
+        {/*
         <div className="flex-1 sm:w-auto">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -49,6 +46,7 @@ const FilesPageHeader = ({ setModal, setInput }: IFilesPageHeader) => {
             </DropdownMenuTrigger>
           </DropdownMenu>
         </div>
+        */}
 
         <Button
           className="w-full bg-green-500 hover:bg-green-600 sm:w-auto"

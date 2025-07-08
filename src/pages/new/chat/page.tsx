@@ -117,7 +117,7 @@ const ChatPage = () => {
           </div>
         </ScrollArea>
       ) : (
-        <div className="mx-auto max-w-4xl">
+        <div className="mx-auto w-full md:max-w-4xl">
           <h2 className="text-gradient-light text-4xl font-bold">
             Hi there, Marvin
           </h2>
@@ -128,14 +128,36 @@ const ChatPage = () => {
             Use one of the most common prompts below or use your own to begin
           </p>
 
-          <div className="mt-8 grid grid-cols-1 gap-4 text-left md:grid-cols-4">
+          {/* Mobile: horizontal scroll, Desktop: grid */}
+          <div className="mt-8 block md:hidden">
+            <ScrollArea className="w-full max-w-full overflow-x-auto">
+              <div className="flex min-w-max gap-4">
+                {promptSuggestions.map((prompt, index) => (
+                  <div
+                    key={index}
+                    onClick={() => handleClickItem(prompt.text)}
+                    className="flex min-h-20 w-40 cursor-pointer flex-col items-start rounded-md border border-gray-200 p-2 hover:bg-gray-50 md:rounded-lg md:p-4"
+                  >
+                    <p className="flex-1 text-xs text-gray-700 md:text-sm">
+                      {prompt.text}
+                    </p>
+                    {prompt.icon}
+                  </div>
+                ))}
+              </div>
+            </ScrollArea>
+          </div>
+          {/* Desktop: grid layout */}
+          <div className="mt-8 hidden grid-cols-1 gap-4 text-left md:grid md:grid-cols-4">
             {promptSuggestions.map((prompt, index) => (
               <div
                 key={index}
                 onClick={() => handleClickItem(prompt.text)}
-                className="flex min-h-32 cursor-pointer flex-col items-start rounded-lg border border-gray-200 p-4 hover:bg-gray-50"
+                className="flex min-h-20 min-w-[90px] cursor-pointer flex-col items-start rounded-md border border-gray-200 p-2 hover:bg-gray-50 md:min-h-32 md:min-w-[120px] md:rounded-lg md:p-4"
               >
-                <p className="flex-1 text-sm text-gray-700">{prompt.text}</p>
+                <p className="flex-1 text-xs text-gray-700 md:text-sm">
+                  {prompt.text}
+                </p>
                 {prompt.icon}
               </div>
             ))}
