@@ -56,55 +56,8 @@ const DetailPage = () => {
   return (
     <>
       <ScrollArea className="flex-1">
-        <div className="mx-auto min-h-full w-[80%]">
-          {/* {chat.messages.map((message) => (
-            <div
-              className={`flex w-full p-4 ${message.isUser ? 'justify-end' : 'justify-start'}`}
-            >
-              <div className={`flex gap-4`}>
-                {!message.isUser ? (
-                  <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-md border border-gray-200 bg-white">
-                    <img src="/icons/logo-short.png" />
-                  </div>
-                ) : null}
-                <div
-                  className={`rounded-2xl ${
-                    message.isUser && 'rounded-br-md bg-[#D9D9D9] px-4 py-3'
-                  }`}
-                >
-                  <p className="whitespace-pre-wrap text-sm leading-relaxed">
-                    {message.text}
-                  </p>
-                </div>
-              </div>
-            </div>
-          ))}
-
-          {loading && (
-            <div className="flex w-full justify-start p-4">
-              <div className="flex max-w-[70%] gap-3">
-                <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-md border border-gray-200 bg-white">
-                  <img src="/icons/logo-short.png" />
-                </div>
-                <div className="rounded-2xl rounded-bl-md  px-4 py-3">
-                  <div className="flex space-x-1">
-                    <div className="h-2 w-2 animate-bounce rounded-full bg-gray-400"></div>
-                    <div
-                      className="h-2 w-2 animate-bounce rounded-full bg-gray-400"
-                      style={{ animationDelay: '0.1s' }}
-                    ></div>
-                    <div
-                      className="h-2 w-2 animate-bounce rounded-full bg-gray-400"
-                      style={{ animationDelay: '0.2s' }}
-                    ></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-           */}
+        <div className="mx-auto min-h-full w-[95%]">
           {query.isLoading && <Loader />}
-
           {query?.data?.data?.map((message, index) => {
             const isLast = index === (query?.data?.data?.length ?? 0) - 1;
             return (
@@ -120,7 +73,7 @@ const DetailPage = () => {
           })}
           {loading && (
             <div className="flex w-full justify-start p-4" ref={scrollAreaRef}>
-              <div className="flex max-w-[70%] gap-3">
+              <div className="flex max-w-[100%] gap-3">
                 <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-md border border-gray-200 bg-white">
                   <img src="/icons/logo-short.png" />
                 </div>
@@ -142,7 +95,7 @@ const DetailPage = () => {
           )}
         </div>
       </ScrollArea>
-      <div className="mx-auto w-[80%] rounded-xl border border-gray-300 bg-white p-4">
+      <div className="mx-auto w-[100%] rounded-xl border border-gray-300 bg-white p-4">
         <textarea
           className="w-full resize-none border-none text-sm outline-none placeholder:text-gray-400"
           rows={4}

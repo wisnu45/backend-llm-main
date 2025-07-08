@@ -179,10 +179,19 @@ const FilesPage = () => {
           setTab(val);
         }}
       >
-        <TabsList>
-          <TabsTrigger value="all">All Document Files</TabsTrigger>
-          <TabsTrigger value="metadata">Metadata Document</TabsTrigger>
-          <TabsTrigger value="upload">Upload Document</TabsTrigger>
+        <TabsList className="flex flex-wrap justify-start sm:flex-row sm:space-x-4">
+          <TabsTrigger value="all" className="mb-2 w-full sm:mb-0 sm:w-auto">
+            All Document Files
+          </TabsTrigger>
+          <TabsTrigger
+            value="metadata"
+            className="mb-2 w-full sm:mb-0 sm:w-auto"
+          >
+            Metadata Document
+          </TabsTrigger>
+          <TabsTrigger value="upload" className="mb-2 w-full sm:mb-0 sm:w-auto">
+            Upload Document
+          </TabsTrigger>
         </TabsList>
         <TabsContent value={tab}>
           <Suspense fallback={<LoaderCircle />}>

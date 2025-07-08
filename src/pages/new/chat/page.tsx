@@ -100,7 +100,7 @@ const ChatPage = () => {
   }, []);
 
   return (
-    <div className="mx-auto flex w-full max-w-4xl flex-1 flex-col items-center justify-center text-left">
+    <div className="mx-auto flex w-full  flex-1 flex-col items-center justify-center text-left">
       {loading ? (
         <Loader />
       ) : chat && !loading ? (
