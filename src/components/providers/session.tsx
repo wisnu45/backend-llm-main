@@ -1,6 +1,6 @@
 import { TLoginRequest, TLoginResponse } from '@/api/auth/type';
 import { useEffect, useState, createContext, useContext } from 'react';
-import { useNavigate } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 import { SessionToken } from '@/lib/cookies';
 import { SessionUser } from '@/lib/local-storage';
 import { useLogin } from '@/hooks/auth/use-login';
