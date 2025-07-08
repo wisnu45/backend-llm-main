@@ -1,7 +1,6 @@
 import { Suspense, useState, useEffect } from 'react';
 import { ColumnDef } from '@tanstack/react-table';
 import { DataTable } from '@/components/shared/data-table';
-import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { LoaderCircle } from '@/components/shared/loader';
 import { TDocItem } from '@/api/document/type';
@@ -11,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { toast } from '@/components/ui/use-toast';
 import FilesPageHeader from './_components/files-page-header';
 import FilesPageModals from './_components/files-page-modals';
+import { useDebounce } from 'use-debounce';
 
 type TModal = 'delete' | 'edit' | 'create' | 'detail' | null;
 
@@ -125,28 +125,54 @@ const FilesPage = () => {
 
   const columns = getColumns(setModal, tab);
 
-  const filteredData =
-    query.data?.data
-      .sort(
-        (a, b) =>
-          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-      )
-      .filter((item) => {
-        switch (tab) {
-          case 'all':
-            return true;
-          case 'metadata':
-            return item.portal_id;
-          case 'upload':
-            return !item.portal_id;
-          default:
-            return true;
-        }
-      }) || [];
+  const [textSearch, setTextSearch] = useState<string>('');
+
+  const [debouncedValue] = useDebounce(textSearch, 1000);
+
+  const setInput = (value: React.ChangeEvent<HTMLInputElement>) => {
+    setTextSearch(value.target.value);
+  };
+
+  const filterAndSortData = (
+    data: TDocItem[] | undefined,
+    tab: string,
+    debouncedValue: string
+  ): TDocItem[] => {
+    return (
+      data
+        ?.sort(
+          (a: TDocItem, b: TDocItem) =>
+            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        )
+        ?.filter((item: TDocItem) => {
+          switch (tab) {
+            case 'all':
+              return true;
+            case 'metadata':
+              return item.portal_id;
+            case 'upload':
+              return !item.portal_id;
+            default:
+              return true;
+          }
+        })
+        ?.filter((item: TDocItem) => {
+          if (debouncedValue) {
+            return item.document_name
+              .toLowerCase()
+              .includes(debouncedValue.toLowerCase());
+          }
+          return true;
+        }) || []
+    );
+  };
 
   return (
     <div>
-      <FilesPageHeader setModal={(modal) => setModal(modal, null)} />
+      <FilesPageHeader
+        setModal={(modal) => setModal(modal, null)}
+        setInput={setInput}
+      />
       <Tabs
         defaultValue="all"
         onValueChange={(val) => {
@@ -163,7 +189,9 @@ const FilesPage = () => {
             <DataTable
               pageCount={10}
               loading={query.isLoading}
-              data={filteredData || []}
+              data={
+                filterAndSortData(query.data?.data, tab, debouncedValue) || []
+              }
               columns={columns}
             />
           </Suspense>

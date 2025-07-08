@@ -9,9 +9,10 @@ type TModal = 'delete' | 'edit' | 'create' | 'detail' | null;
 
 interface IFilesPageHeader {
   setModal: (modal: TModal) => void;
+  setInput: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-const FilesPageHeader = ({ setModal }: IFilesPageHeader) => {
+const FilesPageHeader = ({ setModal, setInput }: IFilesPageHeader) => {
   return (
     <>
       <div className="mb-8 flex items-center justify-between">
@@ -26,6 +27,7 @@ const FilesPageHeader = ({ setModal }: IFilesPageHeader) => {
           <input
             type="text"
             placeholder="Search"
+            onChange={setInput}
             className="w-64 rounded-l-lg px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <button className="rounded-r-lg border-l border-gray-300 bg-gray-50 p-2 hover:bg-gray-100">

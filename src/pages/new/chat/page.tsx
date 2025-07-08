@@ -13,6 +13,8 @@ import { useGetDetailHistory } from './_hook/use-get-history-chat';
 import { ScrollArea } from '@radix-ui/react-scroll-area';
 import { ChatItem } from './component/ChatItem';
 import { Loader } from './component/Loader';
+import { useNavigate } from 'react-router-dom';
+import { useGetFiles } from '@/components/ui/sidebar/_hook/use-get-history-chat';
 
 type ChatResult = {
   data?: {
@@ -48,6 +50,8 @@ const ChatPage = () => {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const mutation = useCreateChat();
   const createNewChat = useCreateNewChat();
+  const navigate = useNavigate();
+  const currentPath = window.location.pathname;
 
   const payload = {
     question: text,
@@ -58,6 +62,7 @@ const ChatPage = () => {
     setText(e.target.value);
   };
   const query = useGetDetailHistory({ session_id: sessionId || '' });
+  const queryHistorySideBar = useGetFiles();
   const handleClickItem = (item: SetStateAction<string>) => {
     setText(item);
   };
@@ -73,6 +78,8 @@ const ChatPage = () => {
         });
         setText('');
         query.refetch();
+        queryHistorySideBar.refetch();
+        navigate(`${currentPath}/${sessionId}`);
       },
       onError: () => {
         setLoading(false);
@@ -97,7 +104,6 @@ const ChatPage = () => {
       {loading ? (
         <Loader />
       ) : chat && !loading ? (
-        // <div dangerouslySetInnerHTML={{ __html: chat?.data?.answer ?? '' }} />
         <ScrollArea className="flex-1" ref={scrollAreaRef}>
           <div className="min-h-full">
             {query?.data?.data?.map((message, index) => (

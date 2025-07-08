@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   FileTextIcon,
   HamburgerMenuIcon,
@@ -31,11 +31,27 @@ const Sidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth > 760) {
+        setIsSidebarOpen(true);
+      } else {
+        setIsSidebarOpen(false);
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    handleResize();
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+
   return (
     <aside
-      className={`flex flex-col gap-1 bg-[#D2D2D2] p-6 
-      ${isSidebarOpen ? 'w-[296px]' : 'w-0 overflow-hidden'} 
-      transition-all duration-300 ease-in-out`}
+      className={`flex flex-col gap-1 bg-[#D2D2D2] p-2 
+    ${isSidebarOpen ? 'w-[296px] overflow-visible' : 'w-[50px] overflow-hidden'} 
+    transition-all duration-300 ease-in-out
+    `}
     >
       <div>
         <button
@@ -47,14 +63,14 @@ const Sidebar = () => {
 
         {isSidebarOpen && (
           <>
-            <UserCard name="Darlene Robertson" id="#12392832" />
+            <UserCard name="Pengguna" id="#12392832" />
 
             <Link
               to="/new/chat"
               className="mt-2 flex w-full items-center gap-2 rounded-lg p-2 text-left hover:bg-gray-400/20"
             >
               <PlusIcon className="text-gray-800" />
-              <span className="text-gradient-primary font-semibold ">
+              <span className="text-gradient-primary font-semibold">
                 New Chat
               </span>
             </Link>
@@ -71,7 +87,6 @@ const Sidebar = () => {
           </>
         )}
       </div>
-
       {isSidebarOpen && (
         <>
           <h2 className="mb-2 p-2 text-xs font-semibold uppercase tracking-wider text-gray-500">
@@ -87,8 +102,8 @@ const Sidebar = () => {
                       <Link
                         to={`/new/chat/${chat.session_id}`}
                         className={`flex items-center justify-between rounded-lg p-2 text-sm hover:bg-gray-400/20
-                          ${location.pathname === `/new/chat/${chat.session_id}` ? 'bg-gray-400/40 text-black' : 'text-gray-700'}
-                        `}
+                      ${location.pathname === `/new/chat/${chat.session_id}` ? 'bg-gray-400/40 text-black' : 'text-gray-700'}
+                    `}
                       >
                         <span className="w-[65%] truncate">
                           {chat.title || 'Untitled Chat'}
@@ -114,7 +129,7 @@ const Sidebar = () => {
             <div className="mt-auto">
               <button
                 onClick={handleLogout}
-                className="mt-4 flex w-full items-center gap-3 rounded-lg bg-slate-400 p-3 text-sm text-blue-600 hover:bg-[#E0E0E0] "
+                className="mt-4 flex w-full items-center gap-3 rounded-lg bg-slate-400 p-3 text-sm text-blue-600 hover:bg-[#E0E0E0]"
               >
                 <span className="w-full text-center font-semibold">Logout</span>
               </button>
