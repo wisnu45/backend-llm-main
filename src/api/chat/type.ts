@@ -50,6 +50,8 @@ export interface Daum {
   session_id: string;
   user_id: string;
   source_documents: string;
+  file_links: string[];
+  data?: Daum[];
 }
 
 export interface TGetDetailHistoryData {

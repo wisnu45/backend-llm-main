@@ -107,12 +107,7 @@ const ChatPage = () => {
         <ScrollArea className="scrollbar-hide flex-1" ref={scrollAreaRef}>
           <div className="min-h-full">
             {query?.data?.data?.map((message, index) => (
-              <ChatItem
-                key={index}
-                question={message.question}
-                answer={message.answer}
-                sourceDocuments={message.source_documents}
-              />
+              <ChatItem key={index} data={message} />
             ))}
           </div>
         </ScrollArea>

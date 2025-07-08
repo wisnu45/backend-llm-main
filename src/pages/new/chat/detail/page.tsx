@@ -62,12 +62,7 @@ const DetailPage = () => {
             const isLast = index === (query?.data?.data?.length ?? 0) - 1;
             return (
               <div ref={isLast && !loading ? scrollAreaRef : null} key={index}>
-                <ChatItem
-                  key={index}
-                  question={message.question}
-                  answer={message.answer}
-                  sourceDocuments={message.source_documents}
-                />
+                <ChatItem key={index} data={message} />
               </div>
             );
           })}

@@ -2,34 +2,20 @@ import { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { CheckIcon } from '@radix-ui/react-icons';
-
 interface Item {
   content: string;
-  metadata: {
-    page: number;
-    source: string;
-  };
+  filename: string;
+  download_url: string;
 }
 
-export const ChatItem = ({
-  question,
-  answer,
-  sourceDocuments
-}: {
-  question: string;
-  answer: string;
-  sourceDocuments: string;
-}) => {
-  const sourceDocumen: Item[] = sourceDocuments
-    ? JSON.parse(sourceDocuments)
-    : [];
+export const ChatItem = ({ data }) => {
   const [isCopied, setIsCopied] = useState(false);
 
   return (
     <div className="mb-10 space-y-4 ">
       <div className="flex justify-end">
         <div className="rounded-xl bg-gray-200 px-4 py-2 text-sm text-gray-900">
-          {question}
+          {data.question}
         </div>
       </div>
       <div className="col-auto flex flex-col items-start space-y-3 overflow-hidden">
@@ -38,25 +24,35 @@ export const ChatItem = ({
             remarkPlugins={[remarkGfm]}
             className="prose prose-sm max-w-full space-y-4 break-words text-justify"
           >
-            {answer}
+            {data.answer}
           </ReactMarkdown>
           {/* <Markdown >{answer}</Markdown> */}
         </div>
-        {sourceDocumen.length ? (
+        {data?.file_links.length ? (
           <div className=" w-full">
             <hr className="mb-2 w-full border-t-4 border-[#C4C4C480]" />
             <div className="font-bold">Referensi Sumber:</div>
-            {sourceDocumen?.map((item: Item, index: number) => (
-              <div key={item.metadata.source} className="text-blue-400">
-                {index + 1}. {item.metadata.source}
-              </div>
-            ))}
+            {data?.file_links?.map((item: Item, index: number) => {
+              const download_url: string = item.download_url;
+              return (
+                <div
+                  key={item.filename}
+                  className="cursor-pointer text-blue-400"
+                  onClick={() => {
+                    window.location.href = download_url;
+                    window.open(download_url, '_blank');
+                  }}
+                >
+                  {index + 1}. {item?.filename}
+                </div>
+              );
+            })}
           </div>
         ) : (
           <IconBar
             setIsCopied={setIsCopied}
             isCopied={isCopied}
-            text={answer}
+            text={data.answer}
           />
         )}
       </div>
