@@ -1,9 +1,5 @@
 import { ScrollArea } from '@/components/ui/scroll-area';
-import {
-  ArrowRightIcon,
-  ImageIcon,
-  PlusCircledIcon
-} from '@radix-ui/react-icons';
+import { ArrowRightIcon } from '@radix-ui/react-icons';
 import { useEffect, useRef, useState } from 'react';
 import { useGetDetailHistory } from '../_hook/use-get-history-chat';
 import { useParams } from 'react-router-dom';
@@ -112,7 +108,7 @@ const DetailPage = () => {
           {query?.data?.data?.map((message, index) => {
             const isLast = index === (query?.data?.data?.length ?? 0) - 1;
             return (
-              <div ref={isLast && !loading ? scrollAreaRef : null}>
+              <div ref={isLast && !loading ? scrollAreaRef : null} key={index}>
                 <ChatItem
                   key={index}
                   question={message.question}

@@ -95,8 +95,6 @@ const FormModal = ({
     form.setValue('document_name', file?.file?.name?.split('.')[0]);
   }, [files, form]);
 
-  console.log(form.formState.errors);
-
   return (
     <Dialog
       open={open}
