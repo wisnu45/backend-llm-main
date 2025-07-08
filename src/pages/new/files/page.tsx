@@ -96,28 +96,31 @@ const getColumns = (
   },
   {
     header: 'Action',
-    cell: ({ row }) => (
-      <div>
-        <Button
-          variant="ghost"
-          onClick={() => setModal('detail', row.original)}
-        >
-          View
-        </Button>
-        <Button variant="ghost" onClick={() => setModal('edit', row.original)}>
-          Edit
-        </Button>
-        <Button
-          className={
-            row.original.metadata === 'Meta Data Document' ? 'hidden' : ''
-          }
-          variant="ghost"
-          onClick={() => setModal('delete', row.original)}
-        >
-          Delete
-        </Button>
-      </div>
-    )
+    cell: ({ row }) => {
+      return (
+        <div>
+          <Button
+            variant="ghost"
+            onClick={() => setModal('detail', row.original)}
+          >
+            View
+          </Button>
+          <Button
+            variant="ghost"
+            onClick={() => setModal('edit', row.original)}
+          >
+            Edit
+          </Button>
+          <Button
+            className={row.original.portal_id ? 'hidden' : ''}
+            variant="ghost"
+            onClick={() => setModal('delete', row.original)}
+          >
+            Delete
+          </Button>
+        </div>
+      );
+    }
   }
 ];
 

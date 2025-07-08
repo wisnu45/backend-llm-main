@@ -45,7 +45,7 @@ const Sidebar = ({ setShowModal }) => {
     <aside
       className={`flex flex-col gap-1 bg-[#D2D2D2] p-2
         ${isSidebarOpen ? 'w-[255px]' : 'w-[50px]'} 
-        duration-[700ms] ease-[cubic-bezier(0.25, 0.8, 0.25, 1)] transform transition-all`}
+        duration-700ms ease-[cubic-bezier(0.25, 0.8, 0.25, 1)] transform transition-all`}
     >
       <div>
         <button
@@ -89,7 +89,7 @@ const Sidebar = ({ setShowModal }) => {
         </Link>
       </div>
       <div
-        className={`duration-[700ms] ease-[cubic-bezier(0.25, 0.8, 0.25, 1)] transform transition-all 
+        className={`safelist ease-[cubic-bezier(0.25, 0.8, 0.25, 1)] transform transition-all 
         ${isSidebarOpen ? 'scale-100 opacity-100' : 'scale-90 opacity-0'}`}
       >
         {isSidebarOpen && (
