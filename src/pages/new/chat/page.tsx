@@ -10,11 +10,11 @@ import { SetStateAction, useEffect, useRef, useState } from 'react';
 import useCreateChat from './_hook/use-create-chat';
 import useCreateNewChat from './_hook/use-create-new-chat';
 import { useGetDetailHistory } from './_hook/use-get-history-chat';
-import { ScrollArea } from '@radix-ui/react-scroll-area';
 import { ChatItem } from './component/ChatItem';
 import { Loader } from './component/Loader';
 import { useNavigate } from 'react-router-dom';
 import { useGetFiles } from '@/components/ui/sidebar/_hook/use-get-history-chat';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 
 type ChatResult = {
   data?: {
@@ -100,7 +100,7 @@ const ChatPage = () => {
   }, []);
 
   return (
-    <div className="mx-auto flex w-full  flex-1 flex-col items-center justify-center text-left">
+    <div className="mx-auto flex w-full flex-1 flex-col items-center justify-center text-left md:max-w-4xl">
       {loading ? (
         <Loader />
       ) : chat && !loading ? (
@@ -112,63 +112,45 @@ const ChatPage = () => {
           </div>
         </ScrollArea>
       ) : (
-        <div className="mx-auto w-full md:max-w-4xl">
-          <h2 className="text-gradient-light text-4xl font-bold">
+        <div className="w-full">
+          <h2 className="text-gradient-light text-2xl font-bold md:text-4xl">
             Hi there, Marvin
           </h2>
-          <h3 className="text-gradient-light mt-2 text-4xl font-bold">
+          <h3 className="text-gradient-light mt-1 text-2xl font-bold md:mt-2 md:text-4xl">
             What would you like to know?
           </h3>
-          <p className="mt-6 text-gray-500">
+          <p className="mt-2 text-gray-500 md:mt-6">
             Use one of the most common prompts below or use your own to begin
           </p>
 
-          {/* Mobile: horizontal scroll, Desktop: grid */}
-          <div className="mt-8 block md:hidden">
-            <ScrollArea className="w-full max-w-full overflow-x-auto">
-              <div className="flex min-w-max gap-4">
-                {promptSuggestions.map((prompt, index) => (
-                  <div
-                    key={index}
-                    onClick={() => handleClickItem(prompt.text)}
-                    className="flex min-h-20 w-40 cursor-pointer flex-col items-start rounded-md border border-gray-200 p-2 hover:bg-gray-50 md:rounded-lg md:p-4"
-                  >
-                    <p className="flex-1 text-xs text-gray-700 md:text-sm">
-                      {prompt.text}
-                    </p>
-                    {prompt.icon}
-                  </div>
-                ))}
-              </div>
-            </ScrollArea>
-          </div>
-          {/* Desktop: grid layout */}
-          <div className="mt-8 hidden grid-cols-1 gap-4 text-left md:grid md:grid-cols-4">
-            {promptSuggestions.map((prompt, index) => (
-              <div
-                key={index}
-                onClick={() => handleClickItem(prompt.text)}
-                className="flex min-h-20 min-w-[90px] cursor-pointer flex-col items-start rounded-md border border-gray-200 p-2 hover:bg-gray-50 md:min-h-32 md:min-w-[120px] md:rounded-lg md:p-4"
-              >
-                <p className="flex-1 text-xs text-gray-700 md:text-sm">
-                  {prompt.text}
-                </p>
-                {prompt.icon}
-              </div>
-            ))}
-          </div>
-
-          <button className="mt-6 flex text-sm text-gray-600 hover:text-gray-900">
+          <ScrollArea className="mt-2 w-full overflow-x-auto md:mt-8">
+            <div className="flex w-max gap-4 py-2">
+              {promptSuggestions.map((prompt, index) => (
+                <div
+                  key={index}
+                  onClick={() => handleClickItem(prompt.text)}
+                  className="flex min-h-20 w-52 shrink-0 cursor-pointer flex-col items-start rounded-md border border-gray-200 p-2 hover:bg-gray-50 md:rounded-lg md:p-4"
+                >
+                  <p className="flex-1 text-xs text-gray-700 md:text-sm">
+                    {prompt.text}
+                  </p>
+                  {prompt.icon}
+                </div>
+              ))}
+            </div>
+            <ScrollBar orientation="horizontal" />
+          </ScrollArea>
+          <button className="mt-2 flex text-sm text-gray-600 hover:text-gray-900 md:mt-6">
             <ReloadIcon className="mr-2" />
             Refresh prompts
           </button>
         </div>
       )}
 
-      <div className="mt-16 w-full rounded-xl border border-gray-300 bg-white p-4">
+      <div className="mt-2 w-full rounded-xl border border-gray-300 bg-white p-3 md:mt-4 md:p-4">
         <textarea
           className="w-full resize-none border-none text-sm outline-none placeholder:text-gray-400"
-          rows={4}
+          rows={3}
           placeholder="Ask CombipharGPT whatever you want....."
           maxLength={1000}
           value={text}
