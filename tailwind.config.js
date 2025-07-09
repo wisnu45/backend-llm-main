@@ -74,7 +74,20 @@ export const theme = {
       'accordion-down': 'accordion-down 0.2s ease-out',
       'accordion-up': 'accordion-up 0.2s ease-out'
     },
-    safelist: ['duration-[700ms]']
+    safelist: ['hide-scrollbar', 'duration-[700ms]']
   }
 };
-export const plugins = [require('tailwindcss-animate')];
+export const plugins = [
+  require('tailwindcss-animate'),
+  function ({ addUtilities }) {
+    addUtilities({
+      '.hide-scrollbar': {
+        '&::-webkit-scrollbar': {
+          display: 'none'
+        },
+        'scrollbar-width': 'none',
+        '-ms-overflow-style': 'none'
+      }
+    });
+  }
+];

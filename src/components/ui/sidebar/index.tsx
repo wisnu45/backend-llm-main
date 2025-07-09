@@ -43,9 +43,9 @@ const Sidebar = ({ setShowModal }) => {
 
   return (
     <aside
-      className={`flex flex-col gap-1 bg-[#D2D2D2] p-2
-        ${isSidebarOpen ? 'w-[255px]' : 'w-[50px]'} 
-        duration-700ms ease-[cubic-bezier(0.25, 0.8, 0.25, 1)] transform transition-all`}
+      className={`flex h-screen flex-col bg-[#D2D2D2] p-2 
+    ${isSidebarOpen ? 'w-[255px]' : 'w-[50px]'} 
+    ease-[cubic-bezier(0.25, 0.8, 0.25, 1)] transition-all duration-700`}
     >
       <div>
         <button
@@ -55,7 +55,7 @@ const Sidebar = ({ setShowModal }) => {
           <HamburgerMenuIcon className="h-4 text-gray-800" />
         </button>
         {isSidebarOpen && (
-          <div className="translate-x-0 transform transition-transform duration-300  ease-in-out ">
+          <div className="transition-transform duration-300">
             <UserCard name="Pengguna" id="#12392832" />
           </div>
         )}
@@ -88,51 +88,45 @@ const Sidebar = ({ setShowModal }) => {
           )}
         </Link>
       </div>
-      <div
-        className={`safelist ease-[cubic-bezier(0.25, 0.8, 0.25, 1)] transform transition-all 
-        ${isSidebarOpen ? 'scale-100 opacity-100' : 'scale-90 opacity-0'}`}
-      >
-        {isSidebarOpen && (
-          <>
-            <h2 className="mb-2 p-2 text-xs font-semibold uppercase tracking-wider text-gray-500">
-              Recent Chat
-            </h2>
-
-            <ScrollArea className="flex-grow">
-              <nav>
-                <ul>
-                  {Array.isArray(dataResult) && dataResult.length > 0 ? (
-                    dataResult.map((chat: TRecentChats) => (
-                      <li key={chat.session_id}>
-                        <Link
-                          to={`/new/chat/${chat.session_id}`}
-                          className={`flex items-center justify-between rounded-lg p-2 text-sm hover:bg-gray-400/20
-                        ${location.pathname === `/new/chat/${chat.session_id}` ? 'bg-gray-400/40 text-black' : 'text-gray-700'}
-                      `}
-                          onClick={() => {
-                            if (window.innerWidth < 768) {
-                              setIsSidebarOpen(false);
-                            }
-                          }}
-                        >
-                          <span className="w-[65%] truncate">
-                            {chat.title || 'Untitled Chat'}
-                          </span>
-                        </Link>
-                      </li>
-                    ))
-                  ) : (
-                    <li className="p-2 text-sm text-gray-500">
-                      No recent chats
+      {isSidebarOpen && (
+        <div className="mt-2 flex-grow overflow-y-auto hide-scrollbar">
+          <h2 className="mb-2 p-2 text-xs font-semibold uppercase tracking-wider text-gray-500">
+            Recent Chat
+          </h2>
+          <ScrollArea className="pr-2">
+            <nav>
+              <ul>
+                {Array.isArray(dataResult) && dataResult.length > 0 ? (
+                  dataResult.map((chat: TRecentChats) => (
+                    <li key={chat.session_id}>
+                      <Link
+                        to={`/new/chat/${chat.session_id}`}
+                        className={`flex items-center justify-between rounded-lg p-2 text-sm hover:bg-gray-400/20 ${
+                          location.pathname === `/new/chat/${chat.session_id}`
+                            ? 'bg-gray-400/40 text-black'
+                            : 'text-gray-700'
+                        }`}
+                        onClick={() => {
+                          if (window.innerWidth < 768) {
+                            setIsSidebarOpen(false);
+                          }
+                        }}
+                      >
+                        <span className="w-[65%] truncate">
+                          {chat.title || 'Untitled Chat'}
+                        </span>
+                      </Link>
                     </li>
-                  )}
-                </ul>
-              </nav>
-            </ScrollArea>
-          </>
-        )}
-      </div>
-      <div className="mt-auto">
+                  ))
+                ) : (
+                  <li className="p-2 text-sm text-gray-500">No recent chats</li>
+                )}
+              </ul>
+            </nav>
+          </ScrollArea>
+        </div>
+      )}
+      <div className="mt-auto pt-4">
         <a
           href="#"
           className="flex items-center rounded-lg p-2 text-sm text-gray-600 hover:bg-neutral-300/60"
@@ -143,9 +137,7 @@ const Sidebar = ({ setShowModal }) => {
               <span>See Full Chat History</span>
             </>
           ) : (
-            <div>
-              <TimerIcon className="h-4 w-4 text-gray-700" />
-            </div>
+            <TimerIcon className="h-4 w-4 text-gray-700" />
           )}
         </a>
         <button
