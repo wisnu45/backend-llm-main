@@ -7,7 +7,7 @@ export type TDocItem = {
   deleted_at: string;
   document_name: string;
   id: string;
-  metadata: unknown;
+  metadata: Record<string, string>;
   portal_id: string | null;
   // missing
   updated_at: string;
