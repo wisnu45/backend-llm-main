@@ -91,7 +91,9 @@ const getColumns = (
         {
           accessorKey: 'portal_id',
           header: 'PORTAL ID',
-          cell: ({ row }) => <div>{row.getValue('portal_id') ?? '-'}</div>
+          cell: ({ row }) => (
+            <div className="min-w-28">{row.getValue('portal_id') ?? '-'}</div>
+          )
         }
       ]
     : []),
@@ -99,7 +101,7 @@ const getColumns = (
     id: 'document-info',
     header: 'document name',
     cell: ({ row }) => (
-      <div className="flex flex-col">
+      <div className="flex min-w-40 flex-col">
         <span>{row.original.document_name?.split('.pdf')[0]}</span>
         <span className="font-semibold text-gray-400">PDF</span>
       </div>
@@ -108,21 +110,46 @@ const getColumns = (
   {
     accessorKey: 'dateCreate',
     header: 'Data Create',
-    cell: ({ row }) => <div>{formatDate(row.original.created_at)}</div>
+    cell: ({ row }) => (
+      <div className="min-w-28">{formatDate(row.original.created_at)}</div>
+    )
   },
   {
     accessorKey: 'dateUpdate',
     header: 'Data Update',
     cell: ({ row }) => (
-      <div>
+      <div className="min-w-28">
         {(row.original.updated_at && formatDate(row.original.updated_at)) ||
           '-'}
       </div>
     )
   },
   {
+    accessorKey: 'metadata',
+    header: 'Data Update',
+    cell: ({ row }) => {
+      const isMetadata = row.original.portal_id;
+
+      return (
+        <div className="min-w-40">
+          {isMetadata ? (
+            <span className="inline-block rounded-lg bg-[#5C47DB]/10 px-2 py-1 text-[#5C47DB]">
+              Metadata Document
+            </span>
+          ) : (
+            <span className="inline-block rounded-lg bg-[#20AB4A]/10 px-2 py-1 text-[#20AB4A]">
+              Upload Document
+            </span>
+          )}
+        </div>
+      );
+    }
+  },
+  {
     header: 'Action',
     cell: ({ row }) => {
+      const isMetadata = Boolean(row.original.portal_id);
+
       return (
         <div>
           <Button
@@ -137,8 +164,9 @@ const getColumns = (
           >
             Edit
           </Button>
+
           <Button
-            className={row.original.portal_id ? 'hidden' : ''}
+            className={isMetadata ? 'hidden' : ''}
             variant="ghost"
             onClick={() => setModal('delete', row.original)}
           >

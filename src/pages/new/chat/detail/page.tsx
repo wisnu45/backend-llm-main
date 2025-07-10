@@ -2,7 +2,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { ArrowRightIcon } from '@radix-ui/react-icons';
 import { useEffect, useRef, useState } from 'react';
 import { useGetDetailHistory } from '../_hook/use-get-history-chat';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { ChatItem } from '../component/ChatItem';
 import useCreateChat from '../_hook/use-create-chat';
 import { Loader } from '../component/Loader';
@@ -12,6 +12,7 @@ const DetailPage = () => {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [text, setText] = useState('');
+  const navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setText(e.target.value);
@@ -19,6 +20,10 @@ const DetailPage = () => {
 
   const query = useGetDetailHistory({ session_id: chatId || '' });
   const mutation = useCreateChat();
+
+  if (!query.data?.data.length) {
+    navigate('/new/chat');
+  }
 
   const payload = {
     question: text,
