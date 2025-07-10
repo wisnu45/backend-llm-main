@@ -17,7 +17,7 @@ const FilesPageHeader = ({ setModal, setInput }: IFilesPageHeader) => {
             Document Files
           </h1>
           <p className="text-gray-600 sm:text-sm">
-            Organize all your document files here
+            Organize all your files document here
           </p>
         </div>
       </div>
