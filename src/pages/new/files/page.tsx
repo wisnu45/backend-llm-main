@@ -24,7 +24,7 @@ const useFilesPage = () => {
   const [pageSize, setPageSize] = useState(10);
   const [debouncedValue] = useDebounce(textSearch, 1000);
 
-  const [searchParams, setSearchParams] = useSearchParams(); // using useSearchParams
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const handleSetModal = (modal: TModal, data: TDocItem | null) => {
     setModal(modal);
@@ -41,6 +41,7 @@ const useFilesPage = () => {
     setPageIndex(pageFromURL);
     setPageSize(limitFromURL);
   }, [searchParams]);
+
   const query = useGetListDocument(debouncedValue, pageIndex, pageSize);
 
   const updateURLParams = (newPageIndex: number, newPageSize: number) => {
@@ -156,7 +157,6 @@ const FilesPage = () => {
     data,
     tab,
     setTab,
-    textSearch,
     setTextSearch,
     pageIndex,
     setPageIndex,

@@ -79,12 +79,6 @@ export function DataTable<TData, TValue>({
     manualFiltering: true
   });
 
-  const startItem = pageIndex * table.getState().pagination.pageSize + 1;
-  const endItem = Math.min(
-    startItem + table.getState().pagination.pageSize - 1,
-    table.getRowCount()
-  );
-
   return (
     <>
       <ScrollArea className="rounded-md border">
