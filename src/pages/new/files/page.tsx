@@ -8,10 +8,10 @@ import { TDocItem } from '@/api/document/type';
 import useGetListDocument from './_hooks/get-list-document';
 import { formatDate } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { toast } from '@/components/ui/use-toast';
 import FilesPageHeader from './_components/files-page-header';
 import FilesPageModals from './_components/files-page-modals';
 import { useDebounce } from 'use-debounce';
+import { useSearchParams } from 'react-router-dom'; // Import useSearchParams
 
 type TModal = 'delete' | 'edit' | 'create' | 'detail' | null;
 
@@ -19,22 +19,40 @@ const useFilesPage = () => {
   const [modal, setModal] = useState<TModal>(null);
   const [data, setData] = useState<TDocItem | null>(null);
   const [tab, setTab] = useState('all');
-  const query = useGetListDocument();
+  const [textSearch, setTextSearch] = useState<string>('');
+  const [pageIndex, setPageIndex] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
+  const [debouncedValue] = useDebounce(textSearch, 1000);
+
+  const [searchParams, setSearchParams] = useSearchParams(); // using useSearchParams
 
   const handleSetModal = (modal: TModal, data: TDocItem | null) => {
     setModal(modal);
     setData(data);
   };
+  const pageFromURL = searchParams.get('page')
+    ? Number(searchParams.get('page'))
+    : 0;
+  const limitFromURL = searchParams.get('limit')
+    ? Number(searchParams.get('limit'))
+    : 10;
 
   useEffect(() => {
-    if (query.error) {
-      toast({
-        title: 'Failed to fetch documents',
-        description: query.error?.message || 'An unexpected error occurred',
-        variant: 'destructive'
-      });
-    }
-  }, [query.error]);
+    setPageIndex(pageFromURL);
+    setPageSize(limitFromURL);
+  }, [searchParams]);
+  const query = useGetListDocument(debouncedValue, pageIndex, pageSize);
+
+  const updateURLParams = (newPageIndex: number, newPageSize: number) => {
+    setSearchParams({
+      page: newPageIndex.toString(),
+      limit: newPageSize.toString()
+    });
+  };
+
+  useEffect(() => {
+    setPageIndex(1);
+  }, [textSearch]);
 
   return {
     data,
@@ -42,7 +60,14 @@ const useFilesPage = () => {
     setModal: handleSetModal,
     tab,
     setTab,
-    query
+    textSearch,
+    setTextSearch,
+    pageIndex,
+    setPageIndex,
+    pageSize,
+    setPageSize,
+    query,
+    updateURLParams
   };
 };
 
@@ -125,50 +150,37 @@ const getColumns = (
 ];
 
 const FilesPage = () => {
-  const { modal, setModal, data, tab, setTab, query } = useFilesPage();
+  const {
+    modal,
+    setModal,
+    data,
+    tab,
+    setTab,
+    textSearch,
+    setTextSearch,
+    pageIndex,
+    setPageIndex,
+    pageSize,
+    setPageSize,
+    query,
+    updateURLParams
+  } = useFilesPage();
 
   const columns = getColumns(setModal, tab);
 
-  const [textSearch, setTextSearch] = useState<string>('');
-
-  const [debouncedValue] = useDebounce(textSearch, 1000);
-
   const setInput = (value: React.ChangeEvent<HTMLInputElement>) => {
+    setPageIndex(0);
     setTextSearch(value.target.value);
   };
 
-  const filterAndSortData = (
-    data: TDocItem[] | undefined,
-    tab: string,
-    debouncedValue: string
-  ): TDocItem[] => {
-    return (
-      data
-        ?.sort(
-          (a: TDocItem, b: TDocItem) =>
-            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-        )
-        ?.filter((item: TDocItem) => {
-          switch (tab) {
-            case 'all':
-              return true;
-            case 'metadata':
-              return item.portal_id;
-            case 'upload':
-              return !item.portal_id;
-            default:
-              return true;
-          }
-        })
-        ?.filter((item: TDocItem) => {
-          if (debouncedValue) {
-            return item.document_name
-              .toLowerCase()
-              .includes(debouncedValue.toLowerCase());
-          }
-          return true;
-        }) || []
-    );
+  const handlePageChange = (newPageIndex: number) => {
+    setPageIndex(newPageIndex);
+    updateURLParams(newPageIndex, pageSize);
+  };
+
+  const handlePageSizeChange = (newPageSize: number) => {
+    setPageSize(newPageSize);
+    updateURLParams(pageIndex, newPageSize);
   };
 
   return (
@@ -200,12 +212,15 @@ const FilesPage = () => {
         <TabsContent value={tab}>
           <Suspense fallback={<LoaderCircle />}>
             <DataTable
-              pageCount={10}
+              pageCount={query.data?.pagination?.total_pages || 0}
               loading={query.isLoading}
-              data={
-                filterAndSortData(query.data?.data, tab, debouncedValue) || []
-              }
+              data={query.data?.data || []}
               columns={columns}
+              pageSizeOptions={[10, 20, 30, 40, 50]}
+              setPageIndex={handlePageChange}
+              pageIndex={pageIndex}
+              setPageSize={handlePageSizeChange}
+              total={query.data?.pagination?.total || 0}
             />
           </Suspense>
         </TabsContent>

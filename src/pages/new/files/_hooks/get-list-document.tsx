@@ -3,11 +3,10 @@ import { useQuery } from '@tanstack/react-query';
 
 export const documentListQueryKey = 'get-document-list';
 
-const useGetListDocument = () => {
+const useGetListDocument = (search: string, page: number, limit: number) => {
   return useQuery({
-    queryKey: [documentListQueryKey],
-    queryFn: getDocs
+    queryKey: [documentListQueryKey, search, page, limit],
+    queryFn: () => getDocs(search, page, limit)
   });
 };
-
 export default useGetListDocument;

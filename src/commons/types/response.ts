@@ -4,6 +4,9 @@ import { Nullable } from './common';
 export type TResponse<T> = {
   message: string | null;
   data: T;
+  pageCount: number;
+  page: number;
+  pagination?: TPaginationInfo;
 };
 
 export type TPaginationInfo = {
@@ -12,6 +15,9 @@ export type TPaginationInfo = {
   totalPage: number;
   hasPreviousPage: boolean;
   hasNextPage: boolean;
+  page_size: number;
+  page: number;
+  total_pages: number;
 };
 
 export type TPagination<T = null> = {

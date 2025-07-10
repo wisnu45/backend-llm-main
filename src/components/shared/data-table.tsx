@@ -21,11 +21,10 @@ import {
   getCoreRowModel,
   getFilteredRowModel,
   getPaginationRowModel,
-  useReactTable
+  useReactTable,
+  PaginationState
 } from '@tanstack/react-table';
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
-import React from 'react';
-import { useSearchParams } from 'react-router-dom';
 import { LoaderCircle } from './loader';
 
 interface DataTableProps<TData, TValue> {
@@ -34,6 +33,10 @@ interface DataTableProps<TData, TValue> {
   loading: boolean;
   pageSizeOptions?: number[];
   pageCount: number;
+  pageIndex: number;
+  setPageIndex: (pageIndex: number) => void;
+  setPageSize: (pageSize: number) => void;
+  total: number;
 }
 
 export function DataTable<TData, TValue>({
@@ -41,34 +44,12 @@ export function DataTable<TData, TValue>({
   data,
   pageCount,
   loading,
-  pageSizeOptions = [10, 20, 30, 40, 50]
+  pageSizeOptions = [10, 20, 30, 40, 50],
+  pageIndex,
+  setPageIndex,
+  setPageSize,
+  total
 }: DataTableProps<TData, TValue>) {
-  const [searchParams, setSearchParams] = useSearchParams();
-  // Search params
-  const page = searchParams?.get('page') ?? '1';
-  const pageAsNumber = Number(page);
-  const fallbackPage =
-    isNaN(pageAsNumber) || pageAsNumber < 1 ? 1 : pageAsNumber;
-  const per_page = searchParams?.get('limit') ?? '10';
-  const perPageAsNumber = Number(per_page);
-  const fallbackPerPage = isNaN(perPageAsNumber) ? 10 : perPageAsNumber;
-
-  // Handle server-side pagination
-  const [{ pageIndex, pageSize }, setPagination] = React.useState({
-    pageIndex: fallbackPage - 1,
-    pageSize: fallbackPerPage
-  });
-
-  React.useEffect(() => {
-    // Update the URL with the new page number and limit
-    setSearchParams({
-      ...Object.fromEntries(searchParams), // Spread the existing search params
-      page: (pageIndex + 1).toString(), // Update the page number (assuming pageIndex is 0-based)
-      limit: pageSize.toString() // Update the limit
-    });
-    // if search is there setting filter value
-  }, [pageIndex, pageSize, searchParams, setSearchParams]);
-
   const table = useReactTable({
     data,
     columns,
@@ -76,13 +57,33 @@ export function DataTable<TData, TValue>({
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     state: {
-      pagination: { pageIndex, pageSize }
+      pagination: { pageIndex, pageSize: 10 } // Default page size
     },
-    onPaginationChange: setPagination,
+    onPaginationChange: (
+      updater: PaginationState | ((prev: PaginationState) => PaginationState)
+    ) => {
+      if (typeof updater === 'function') {
+        const newState = updater({
+          pageIndex,
+          pageSize: 10 // Default page size
+        });
+        setPageIndex(newState.pageIndex);
+        setPageSize(newState.pageSize);
+      } else {
+        setPageIndex(updater.pageIndex);
+        setPageSize(updater.pageSize);
+      }
+    },
     getPaginationRowModel: getPaginationRowModel(),
     manualPagination: true,
     manualFiltering: true
   });
+
+  const startItem = pageIndex * table.getState().pagination.pageSize + 1;
+  const endItem = Math.min(
+    startItem + table.getState().pagination.pageSize - 1,
+    table.getRowCount()
+  );
 
   return (
     <>
@@ -91,22 +92,20 @@ export function DataTable<TData, TValue>({
           <TableHeader className="bg-[#5C47DB]">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id} className="uppercase text-white">
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                    </TableHead>
-                  );
-                })}
+                {headerGroup.headers.map((header) => (
+                  <TableHead key={header.id} className="uppercase text-white">
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                  </TableHead>
+                ))}
               </TableRow>
             ))}
           </TableHeader>
-          <TableBody className=" bg-white">
+          <TableBody className="bg-white">
             <tr className="h-2" />
             {loading ? (
               <TableRow>
@@ -114,12 +113,9 @@ export function DataTable<TData, TValue>({
                   <LoaderCircle />
                 </TableCell>
               </TableRow>
-            ) : table.getRowModel().rows?.length ? (
+            ) : table.getRowModel().rows.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && 'selected'}
-                >
+                <TableRow key={row.id}>
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
                       {flexRender(
@@ -146,12 +142,11 @@ export function DataTable<TData, TValue>({
       </ScrollArea>
 
       <div className="mt-4 flex items-center justify-between rounded-lg bg-[#F8F8F8] px-4 py-3">
-        <div className="text-sm ">
-          Showing {table.getState().pagination.pageIndex + 1} to{' '}
-          {table.getPageCount()} of {table.getRowCount()} entries
+        <div className="text-sm">
+          Showing page {pageIndex} to {pageCount} of {total} entries
         </div>
         <div className="flex items-center space-x-2">
-          <span className="text-sm">The page you're on</span>
+          <span className="text-sm">Items per page</span>
           <Select
             value={`${table.getState().pagination.pageSize}`}
             onValueChange={(value: string) => {
@@ -159,7 +154,9 @@ export function DataTable<TData, TValue>({
             }}
           >
             <SelectTrigger className="h-8 w-[60px] bg-white">
-              <SelectValue placeholder={table.getState().pagination.pageSize} />
+              <SelectValue
+                placeholder={`${table.getState().pagination.pageSize}`}
+              />
             </SelectTrigger>
             <SelectContent side="top">
               {pageSizeOptions.map((pageSize) => (
@@ -174,8 +171,8 @@ export function DataTable<TData, TValue>({
               aria-label="Go to previous page"
               variant="outline"
               className="h-8 w-8 p-0"
-              onClick={() => table.previousPage()}
-              disabled={!table.getCanPreviousPage()}
+              onClick={() => setPageIndex(pageIndex - 1)}
+              disabled={pageIndex <= 0}
             >
               <ChevronLeftIcon className="h-4 w-4" aria-hidden="true" />
             </Button>
@@ -183,8 +180,8 @@ export function DataTable<TData, TValue>({
               aria-label="Go to next page"
               variant="outline"
               className="h-8 w-8 p-0"
-              onClick={() => table.nextPage()}
-              disabled={!table.getCanNextPage()}
+              onClick={() => setPageIndex(pageIndex + 1)}
+              disabled={pageIndex >= pageCount - 1}
             >
               <ChevronRightIcon className="h-4 w-4" aria-hidden="true" />
             </Button>

@@ -6,8 +6,18 @@ import {
 } from './type';
 import { TDefaultResponse } from '@/commons/types/response';
 
-export const getDocs = async (): Promise<TResponseListDocument> => {
-  const res = await api.get<TResponseListDocument>('/documents');
+export const getDocs = async (
+  search: string = '',
+  page: number = 1,
+  limit: number = 10
+): Promise<TResponseListDocument> => {
+  const res = await api.get<TResponseListDocument>('/documents', {
+    params: {
+      search,
+      page,
+      limit
+    }
+  });
   return res.data;
 };
 
