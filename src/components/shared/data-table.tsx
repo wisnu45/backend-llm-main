@@ -37,6 +37,7 @@ interface DataTableProps<TData, TValue> {
   setPageIndex: (pageIndex: number) => void;
   setPageSize: (pageSize: number) => void;
   total: number;
+  pageSize: number;
 }
 
 export function DataTable<TData, TValue>({
@@ -48,7 +49,8 @@ export function DataTable<TData, TValue>({
   pageIndex,
   setPageIndex,
   setPageSize,
-  total
+  total,
+  pageSize
 }: DataTableProps<TData, TValue>) {
   const table = useReactTable({
     data,
@@ -57,7 +59,7 @@ export function DataTable<TData, TValue>({
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     state: {
-      pagination: { pageIndex, pageSize: 10 } // Default page size
+      pagination: { pageIndex, pageSize: pageSize }
     },
     onPaginationChange: (
       updater: PaginationState | ((prev: PaginationState) => PaginationState)
@@ -65,7 +67,7 @@ export function DataTable<TData, TValue>({
       if (typeof updater === 'function') {
         const newState = updater({
           pageIndex,
-          pageSize: 10 // Default page size
+          pageSize: 10
         });
         setPageIndex(newState.pageIndex);
         setPageSize(newState.pageSize);
@@ -175,7 +177,7 @@ export function DataTable<TData, TValue>({
               variant="outline"
               className="h-8 w-8 p-0"
               onClick={() => setPageIndex(pageIndex + 1)}
-              disabled={pageIndex >= pageCount - 1}
+              disabled={pageIndex >= pageCount}
             >
               <ChevronRightIcon className="h-4 w-4" aria-hidden="true" />
             </Button>

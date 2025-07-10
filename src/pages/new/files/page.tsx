@@ -33,8 +33,8 @@ const useFilesPage = () => {
   const pageFromURL = searchParams.get('page')
     ? Number(searchParams.get('page'))
     : 0;
-  const limitFromURL = searchParams.get('limit')
-    ? Number(searchParams.get('limit'))
+  const limitFromURL = searchParams.get('page_size')
+    ? Number(searchParams.get('page_size'))
     : 10;
 
   useEffect(() => {
@@ -47,7 +47,8 @@ const useFilesPage = () => {
   const updateURLParams = (newPageIndex: number, newPageSize: number) => {
     setSearchParams({
       page: newPageIndex.toString(),
-      limit: newPageSize.toString()
+      page_size: newPageSize.toString(),
+      tab: 'all'
     });
   };
 
@@ -185,6 +186,7 @@ const FilesPage = () => {
     data,
     tab,
     setTab,
+    textSearch,
     setTextSearch,
     pageIndex,
     setPageIndex,
@@ -209,6 +211,42 @@ const FilesPage = () => {
   const handlePageSizeChange = (newPageSize: number) => {
     setPageSize(newPageSize);
     updateURLParams(pageIndex, newPageSize);
+  };
+
+  const [debouncedValue] = useDebounce(textSearch, 1000);
+
+  const filterAndSortData = (
+    data: TDocItem[] | undefined,
+    tab: string,
+    debouncedValue: string
+  ): TDocItem[] => {
+    return (
+      data
+        ?.sort(
+          (a: TDocItem, b: TDocItem) =>
+            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        )
+        ?.filter((item: TDocItem) => {
+          switch (tab) {
+            case 'all':
+              return true;
+            case 'metadata':
+              return item.portal_id;
+            case 'upload':
+              return !item.portal_id;
+            default:
+              return true;
+          }
+        })
+        ?.filter((item: TDocItem) => {
+          if (debouncedValue) {
+            return item.document_name
+              .toLowerCase()
+              .includes(debouncedValue.toLowerCase());
+          }
+          return true;
+        }) || []
+    );
   };
 
   return (
@@ -242,13 +280,17 @@ const FilesPage = () => {
             <DataTable
               pageCount={query.data?.pagination?.total_pages || 0}
               loading={query.isLoading}
-              data={query.data?.data || []}
+              // data={query.data?.data || []}
+              data={
+                filterAndSortData(query.data?.data, tab, debouncedValue) || []
+              }
               columns={columns}
               pageSizeOptions={[10, 20, 30, 40, 50]}
               setPageIndex={handlePageChange}
               pageIndex={pageIndex}
               setPageSize={handlePageSizeChange}
               total={query.data?.pagination?.total || 0}
+              pageSize={pageSize}
             />
           </Suspense>
         </TabsContent>

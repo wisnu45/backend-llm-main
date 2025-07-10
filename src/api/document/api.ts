@@ -9,13 +9,15 @@ import { TDefaultResponse } from '@/commons/types/response';
 export const getDocs = async (
   search: string = '',
   page: number = 1,
-  limit: number = 10
+  page_size: number = 10,
+  tab: string = 'all'
 ): Promise<TResponseListDocument> => {
   const res = await api.get<TResponseListDocument>('/documents', {
     params: {
       search,
       page,
-      limit
+      page_size,
+      tab
     }
   });
   return res.data;

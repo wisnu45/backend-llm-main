@@ -5,7 +5,7 @@ export interface CountTemuanInput {
 }
 export interface ListTemuanInput {
   page: number;
-  limit: number;
+  page_size: number;
   search?: string;
   filter?: {
     no_polisi?: string;
