@@ -1,11 +1,13 @@
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { ArrowRightIcon } from '@radix-ui/react-icons';
 import { useEffect, useRef, useState } from 'react';
 import { useGetDetailHistory } from '../_hook/use-get-history-chat';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ChatItem } from '../component/ChatItem';
 import useCreateChat from '../_hook/use-create-chat';
 import { Loader } from '../component/Loader';
+import InputData from '../component/InputData';
+
+type FileType = File;
 
 const DetailPage = () => {
   const { chatId } = useParams();
@@ -13,6 +15,8 @@ const DetailPage = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [text, setText] = useState('');
   const navigate = useNavigate();
+  const [isChecked, setIsChecked] = useState(false);
+  const [files, setFiles] = useState<FileType[]>([]);
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setText(e.target.value);
@@ -51,11 +55,42 @@ const DetailPage = () => {
         setLoading(false);
         setText('');
         query.refetch();
+        setFiles([]);
       },
       onError: () => {
         setLoading(false);
       }
     });
+  };
+
+  const handleCheckboxChange = () => {
+    setIsChecked(!isChecked);
+  };
+
+  const handleFileDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    if (e.dataTransfer && e.dataTransfer.files) {
+      const droppedFiles = Array.from(e.dataTransfer.files);
+      setFiles((prevFiles) => [...prevFiles, ...droppedFiles]);
+    } else {
+      console.error('Tidak ada file yang ditemukan pada drag-and-drop.');
+    }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFiles = e.target.files;
+    if (selectedFiles) {
+      const newFiles = Array.from(selectedFiles);
+      setFiles((prevFiles) => [...prevFiles, ...newFiles]);
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+  };
+
+  const removeFile = (index: number) => {
+    setFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
   };
 
   return (
@@ -95,44 +130,19 @@ const DetailPage = () => {
           )}
         </div>
       </ScrollArea>
-      <div className="mx-auto w-[100%] rounded-xl border border-gray-300 bg-white p-4">
-        <textarea
-          className="w-full resize-none border-none text-sm outline-none placeholder:text-gray-400"
-          rows={4}
-          placeholder="Ask CombipharGPT whatever you want....."
-          maxLength={1000}
-          value={text}
-          onChange={handleChange}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-              e.preventDefault();
-              setText('');
-              handleClick();
-            }
-          }}
-        />
-
-        <div className="mt-4 flex items-center justify-between text-sm text-gray-800">
-          <div className="flex items-center gap-6">
-            <button className="flex items-center gap-1 transition hover:text-purple-600">
-              {/* <PlusCircledIcon /> Add attachment */}
-            </button>
-            <button className="flex items-center gap-1 transition hover:text-purple-600">
-              {/* <ImageIcon /> Use image */}
-            </button>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <span className="text-sm text-gray-900">{text.length}/1000</span>
-            <button
-              onClick={handleClick}
-              className="flex h-8 w-8 items-center justify-center rounded-md bg-[#7051f8] text-white transition hover:bg-[#5b3de4]"
-            >
-              <ArrowRightIcon />
-            </button>
-          </div>
-        </div>
-      </div>
+      <InputData
+        handleFileDrop={handleFileDrop}
+        handleDragOver={handleDragOver}
+        files={files}
+        removeFile={removeFile}
+        text={text}
+        handleChange={handleChange}
+        handleFileChange={handleFileChange}
+        isChecked={isChecked}
+        setText={setText}
+        handleCheckboxChange={handleCheckboxChange}
+        handleClick={handleClick}
+      />
     </>
   );
 };
