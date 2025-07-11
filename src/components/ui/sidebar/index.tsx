@@ -21,10 +21,18 @@ const Sidebar = ({ setShowModal }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const query = useGetFiles();
   const dataResult = query.data?.data as TRecentChats[] | undefined;
+  const [topHeight, setTopHeight] = useState<number>();
   const location = useLocation();
   const documentSideBar = Cookies.get('username') === 'admin';
   const topRef = useRef<HTMLDivElement | null>(null);
-  const topHeight = topRef.current?.clientHeight;
+
+  useEffect(() => {
+    requestAnimationFrame(() => {
+      if (topRef.current) {
+        setTopHeight(topRef.current.clientHeight);
+      }
+    });
+  }, []);
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
