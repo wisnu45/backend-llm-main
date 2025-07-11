@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   FileTextIcon,
   HamburgerMenuIcon,
@@ -23,6 +23,8 @@ const Sidebar = ({ setShowModal }) => {
   const dataResult = query.data?.data as TRecentChats[] | undefined;
   const location = useLocation();
   const documentSideBar = Cookies.get('username') === 'admin';
+  const topRef = useRef<HTMLDivElement | null>(null);
+  const topHeight = topRef.current?.clientHeight;
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
@@ -49,6 +51,7 @@ const Sidebar = ({ setShowModal }) => {
         className={`ease-[cubic-bezier(0.25, 0.8, 0.25, 1)] transition-all duration-300 ${isSidebarOpen ? 'w-[272px]' : 'w-[50px]'} `}
       >
         <div
+          ref={topRef}
           className={`absolute left-0 right-0 top-0 w-full ${isSidebarOpen ? 'p-4' : 'p-2'} bg-[#D2D2D2]`}
         >
           <button
@@ -95,7 +98,9 @@ const Sidebar = ({ setShowModal }) => {
         </div>
 
         {isSidebarOpen && (
-          <div className="mb-[120px] mt-[284px] w-full flex-grow p-4 ">
+          <div
+            className={`mb-[120px] mt-[${topHeight}px] w-full flex-grow px-4 `}
+          >
             <h2 className="mb-2 p-2 text-xs font-semibold uppercase tracking-wider text-gray-500">
               Recent Chat
             </h2>
