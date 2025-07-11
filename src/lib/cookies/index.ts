@@ -16,5 +16,8 @@ export const SessionToken = {
     if (!token) return undefined;
     return token;
   },
-  remove: () => Cookies.remove('token')
+  remove: () => {
+    Cookies.remove('token');
+    Cookies.remove('username');
+  }
 };

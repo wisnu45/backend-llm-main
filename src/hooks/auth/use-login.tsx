@@ -11,7 +11,8 @@ export const useLogin = () => {
     mutationFn: login,
     onSuccess: (res) => {
       SessionToken.set({
-        access_token: res.authorization
+        access_token: res.authorization,
+        username: res.authorization
       });
       navigate('/new/chat', { replace: true });
     },
