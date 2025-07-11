@@ -10,6 +10,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useGetFiles } from './_hook/use-get-history-chat';
 import UserCard from '../user-card';
 import { ScrollArea } from '../scroll-area';
+import Cookies from 'js-cookie';
 
 type TRecentChats = {
   session_id: string;
@@ -21,6 +22,7 @@ const Sidebar = ({ setShowModal }) => {
   const query = useGetFiles();
   const dataResult = query.data?.data as TRecentChats[] | undefined;
   const location = useLocation();
+  const documentSideBar = Cookies.get('username') === 'admin';
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
@@ -74,19 +76,21 @@ const Sidebar = ({ setShowModal }) => {
             <PlusIcon className="text-gray-800" />
           )}
         </Link>
-        <Link
-          to="/new/files"
-          className="flex items-center justify-between rounded-lg p-2 text-sm text-gray-700 hover:bg-gray-400/20"
-        >
-          {isSidebarOpen ? (
-            <div className="flex gap-2">
+        {documentSideBar && (
+          <Link
+            to="/new/files"
+            className="flex items-center justify-between rounded-lg p-2 text-sm text-gray-700 hover:bg-gray-400/20"
+          >
+            {isSidebarOpen ? (
+              <div className="flex gap-2">
+                <FileTextIcon className="font-bold" />
+                <span className="truncate font-semibold">Document File</span>
+              </div>
+            ) : (
               <FileTextIcon className="font-bold" />
-              <span className="truncate font-semibold">Document File</span>
-            </div>
-          ) : (
-            <FileTextIcon className="font-bold" />
-          )}
-        </Link>
+            )}
+          </Link>
+        )}
       </div>
       {isSidebarOpen && (
         <div className="mt-2 flex-grow overflow-y-auto hide-scrollbar">

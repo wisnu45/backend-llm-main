@@ -8,6 +8,7 @@ export type TLoginResponse = {
   message: string;
   data: {
     token: string;
+    username: string;
     user: {
       id: string;
       fullname: string;
