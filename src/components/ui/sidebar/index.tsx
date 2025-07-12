@@ -11,6 +11,7 @@ import { useGetFiles } from './_hook/use-get-history-chat';
 import UserCard from '../user-card';
 import { ScrollArea } from '../scroll-area';
 import Cookies from 'js-cookie';
+import { Skeleton } from '../skeleton';
 
 type TRecentChats = {
   session_id: string;
@@ -117,29 +118,35 @@ const Sidebar = ({ setShowModal }) => {
             </h2>
             <nav>
               <ul>
-                {Array.isArray(dataResult) && dataResult.length > 0 ? (
-                  dataResult.map((chat: TRecentChats) => (
-                    <li key={chat.session_id}>
-                      <Link
-                        to={`/new/chat/${chat.session_id}`}
-                        className={`flex items-center justify-between rounded-lg p-2 text-sm hover:bg-gray-400/20 ${
-                          location.pathname === `/new/chat/${chat.session_id}`
-                            ? 'bg-gray-400/40 text-black'
-                            : 'text-gray-700'
-                        }`}
-                        onClick={() => {
-                          if (window.innerWidth < 768) {
-                            setIsSidebarOpen(false);
-                          }
-                        }}
-                      >
-                        <span className="truncate">
-                          {chat.title || 'Untitled Chat'}
-                        </span>
-                      </Link>
-                    </li>
-                  ))
-                ) : (
+                {query.isLoading && (
+                  <li>
+                    <Skeleton className="h-8 w-full" />
+                  </li>
+                )}
+                {Array.isArray(dataResult) && dataResult.length > 0
+                  ? dataResult.map((chat: TRecentChats) => (
+                      <li key={chat.session_id}>
+                        <Link
+                          to={`/new/chat/${chat.session_id}`}
+                          className={`flex items-center justify-between rounded-lg p-2 text-sm hover:bg-gray-400/20 ${
+                            location.pathname === `/new/chat/${chat.session_id}`
+                              ? 'bg-gray-400/40 text-black'
+                              : 'text-gray-700'
+                          }`}
+                          onClick={() => {
+                            if (window.innerWidth < 768) {
+                              setIsSidebarOpen(false);
+                            }
+                          }}
+                        >
+                          <span className="truncate">
+                            {chat.title || 'Untitled Chat'}
+                          </span>
+                        </Link>
+                      </li>
+                    ))
+                  : null}
+                {!query.isLoading && !dataResult?.length && (
                   <li className="p-2 text-sm text-gray-500">No recent chats</li>
                 )}
               </ul>
