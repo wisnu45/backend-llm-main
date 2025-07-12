@@ -6,8 +6,8 @@ import { ChatItem } from '../component/ChatItem';
 import useCreateChat from '../_hook/use-create-chat';
 import { Loader } from '../component/Loader';
 import InputData from '../component/InputData';
-
-type FileType = File;
+import { FileType, PromptPreview } from '../component/prompt-preview';
+import { ModernLoadingIndicator } from '../component/loading-indicator';
 
 const DetailPage = () => {
   const { chatId } = useParams();
@@ -17,6 +17,10 @@ const DetailPage = () => {
   const navigate = useNavigate();
   const [isChecked, setIsChecked] = useState(false);
   const [files, setFiles] = useState<FileType[]>([]);
+
+  const [previewPrompt, setPreviewPrompt] = useState<string>('');
+  const [previewFiles, setPreviewFiles] = useState<FileType[]>([]);
+  const [showPreview, setShowPreview] = useState<boolean>(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setText(e.target.value);
@@ -44,21 +48,31 @@ const DetailPage = () => {
         behavior: 'smooth'
       });
     }
-  }, [query.data?.data.length, loading]);
+  }, [query.data?.data.length, loading, showPreview]);
 
   const handleClick = () => {
     if (!text.trim()) return;
+
+    setPreviewPrompt(text);
+    setPreviewFiles([...files]);
+    setShowPreview(true);
     setLoading(true);
 
     mutation.mutate(payload, {
       onSuccess: () => {
         setLoading(false);
         setText('');
+        setShowPreview(false);
+        setPreviewPrompt('');
+        setPreviewFiles([]);
         query.refetch();
         setFiles([]);
       },
       onError: () => {
         setLoading(false);
+        setShowPreview(false);
+        setPreviewPrompt('');
+        setPreviewFiles([]);
       }
     });
   };
@@ -101,31 +115,24 @@ const DetailPage = () => {
           {query?.data?.data?.map((message, index) => {
             const isLast = index === (query?.data?.data?.length ?? 0) - 1;
             return (
-              <div ref={isLast && !loading ? scrollAreaRef : null} key={index}>
+              <div
+                ref={isLast && !loading && !showPreview ? scrollAreaRef : null}
+                key={index}
+              >
                 <ChatItem key={index} data={message} />
               </div>
             );
           })}
+
+          {showPreview && (
+            <div ref={scrollAreaRef}>
+              <PromptPreview text={previewPrompt} files={previewFiles} />
+            </div>
+          )}
+
           {loading && (
-            <div className="flex w-full justify-start p-4" ref={scrollAreaRef}>
-              <div className="flex max-w-[100%] gap-3">
-                <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-md border border-gray-200 bg-white">
-                  <img src="/icons/logo-short.png" />
-                </div>
-                <div className="rounded-2xl rounded-bl-md  px-4 py-3">
-                  <div className="flex space-x-1">
-                    <div className="h-2 w-2 animate-bounce rounded-full bg-gray-400"></div>
-                    <div
-                      className="h-2 w-2 animate-bounce rounded-full bg-gray-400"
-                      style={{ animationDelay: '0.1s' }}
-                    ></div>
-                    <div
-                      className="h-2 w-2 animate-bounce rounded-full bg-gray-400"
-                      style={{ animationDelay: '0.2s' }}
-                    ></div>
-                  </div>
-                </div>
-              </div>
+            <div ref={scrollAreaRef}>
+              <ModernLoadingIndicator />
             </div>
           )}
         </div>
