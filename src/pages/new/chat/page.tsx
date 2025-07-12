@@ -1,16 +1,12 @@
-import * as z from 'zod';
 import {
-  ArrowRightIcon,
   ChatBubbleIcon,
   EnvelopeClosedIcon,
   MixerHorizontalIcon,
   PersonIcon,
   ReloadIcon
 } from '@radix-ui/react-icons';
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Controller, useForm } from 'react-hook-form';
 
 import { useGetFiles } from '@/components/ui/sidebar/_hook/use-get-history-chat';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
@@ -20,6 +16,8 @@ import useCreateChat from './_hook/use-create-chat';
 import useCreateNewChat from './_hook/use-create-new-chat';
 import { PromptPreview, FileType } from './component/prompt-preview';
 import { ModernLoadingIndicator } from './component/loading-indicator';
+import InputDataWithForm from './component/InputDataWithForm';
+import { TChatFormData } from './detail/schema';
 
 const promptSuggestions = [
   {
@@ -40,19 +38,14 @@ const promptSuggestions = [
   }
 ];
 
-const schema = z.object({
-  chat: z.string().min(1)
-});
-
-type ChatData = z.infer<typeof schema>;
-
 const ChatPage = () => {
-  const refButton = useRef<HTMLButtonElement | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
-  const [files, setFiles] = useState<FileType[]>([]);
   const [previewPrompt, setPreviewPrompt] = useState<string>('');
   const [previewFiles, setPreviewFiles] = useState<FileType[]>([]);
   const [showPreview, setShowPreview] = useState<boolean>(false);
+  const [setPrompt, setSetPrompt] = useState<((prompt: string) => void) | null>(
+    null
+  );
 
   const mutation = useCreateChat();
   const createNewChat = useCreateNewChat();
@@ -61,24 +54,22 @@ const ChatPage = () => {
   const navigate = useNavigate();
   const currentPath = useLocation().pathname;
 
-  const form = useForm<ChatData>({
-    mode: 'onChange',
-    resolver: zodResolver(schema)
-  });
-
-  const chatLength = form.watch('chat')?.length || 0;
-
-  const handleClickItem = (item: string) => {
-    form.setValue('chat', item);
-    form.trigger();
+  const handleSetPrompt = (setter: (prompt: string) => void) => {
+    setSetPrompt(() => setter);
   };
 
-  const handleSend = async (data: ChatData) => {
-    const trimmedQuestion = data.chat.trim();
+  const handleClickItem = (item: string) => {
+    if (setPrompt) {
+      setPrompt(item);
+    }
+  };
+
+  const handleFormSubmit = async (formData: TChatFormData) => {
+    const trimmedQuestion = formData.prompt.trim();
 
     // Show preview before sending
     setPreviewPrompt(trimmedQuestion);
-    setPreviewFiles([...files]);
+    setPreviewFiles(formData.attachments || []);
     setShowPreview(true);
     setLoading(true);
 
@@ -102,12 +93,10 @@ const ChatPage = () => {
         {
           onSuccess: () => {
             queryHistorySideBar.refetch();
-            form.reset();
             setLoading(false);
             setShowPreview(false);
             setPreviewPrompt('');
             setPreviewFiles([]);
-            setFiles([]);
             navigate(`${currentPath}/${sessionId}`);
           },
           onError: (err) => {
@@ -130,10 +119,7 @@ const ChatPage = () => {
 
   return (
     <div className="flex w-full flex-1 flex-col items-center justify-center text-left">
-      <form
-        className="mx-auto w-full md:max-w-4xl"
-        onSubmit={form.handleSubmit(handleSend)}
-      >
+      <div className="mx-auto w-full md:max-w-4xl">
         {!loading && (
           <div className="w-full">
             <h2 className="text-gradient-light text-2xl font-bold md:text-3xl lg:text-4xl">
@@ -185,55 +171,15 @@ const ChatPage = () => {
           </div>
         )}
 
-        <Controller
-          control={form.control}
-          name="chat"
-          render={({ field }) => (
-            <div className="mt-2 w-full rounded-xl border border-gray-300 bg-white p-3 md:mt-4 md:p-4">
-              <textarea
-                className="w-full resize-none border-none text-sm outline-none placeholder:text-gray-400"
-                rows={3}
-                placeholder="Ask CombipharGPT whatever you want....."
-                maxLength={1000}
-                value={field.value}
-                onChange={(e) => field.onChange(e.target.value.trimStart())}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    refButton.current?.click();
-                  }
-                }}
-              />
-
-              <div className="mt-4 flex items-center justify-between text-sm text-gray-800">
-                <div className="flex items-center gap-6">
-                  <button className="flex items-center gap-1 transition hover:text-purple-600">
-                    {/* <PlusCircledIcon /> Add attachment */}
-                  </button>
-                  <button className="flex items-center gap-1 transition hover:text-purple-600">
-                    {/* <ImageIcon /> Use image */}
-                  </button>
-                </div>
-
-                <div className="flex items-center gap-3">
-                  <span className="text-sm text-gray-900">
-                    {chatLength}/1000
-                  </span>
-                  <Button
-                    ref={refButton}
-                    size="icon"
-                    type="submit"
-                    disabled={!form.formState.isValid || loading}
-                    className="flex h-8 w-8 items-center justify-center rounded-md bg-[#7051f8] text-white transition hover:bg-[#5b3de4]"
-                  >
-                    <ArrowRightIcon />
-                  </Button>
-                </div>
-              </div>
-            </div>
-          )}
-        />
-      </form>
+        {/* Input Form */}
+        <div className="mt-4">
+          <InputDataWithForm
+            onSubmit={handleFormSubmit}
+            isLoading={loading}
+            onSetPrompt={handleSetPrompt}
+          />
+        </div>
+      </div>
     </div>
   );
 };

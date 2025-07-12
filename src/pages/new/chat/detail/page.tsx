@@ -1,42 +1,44 @@
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { useGetDetailHistory } from '../_hook/use-get-history-chat';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ChatItem } from '../component/ChatItem';
 import useCreateChat from '../_hook/use-create-chat';
 import { Loader } from '../component/Loader';
-import InputData from '../component/InputData';
-import { FileType, PromptPreview } from '../component/prompt-preview';
+import InputDataWithForm from '../component/InputDataWithForm';
+import { PromptPreview } from '../component/prompt-preview';
 import { ModernLoadingIndicator } from '../component/loading-indicator';
+import { TChatFormData } from './schema';
+import { useChatForm } from './use-chat-form';
 
 const DetailPage = () => {
   const { chatId } = useParams();
   const scrollAreaRef = useRef<HTMLDivElement>(null);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [text, setText] = useState('');
   const navigate = useNavigate();
-  const [isChecked, setIsChecked] = useState(false);
-  const [files, setFiles] = useState<FileType[]>([]);
-
-  const [previewPrompt, setPreviewPrompt] = useState<string>('');
-  const [previewFiles, setPreviewFiles] = useState<FileType[]>([]);
-  const [showPreview, setShowPreview] = useState<boolean>(false);
-
-  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setText(e.target.value);
-  };
 
   const query = useGetDetailHistory({ session_id: chatId || '' });
   const mutation = useCreateChat();
 
+  const {
+    loading,
+    previewPrompt,
+    previewFiles,
+    showPreview,
+    handleSubmit,
+    resetForm
+  } = useChatForm({
+    chatId: chatId || '',
+    onSuccess: () => {
+      query.refetch();
+    },
+    onError: () => {
+      // Handle error if needed
+    }
+  });
+
   if (!query.data?.data.length) {
     navigate('/new/chat');
   }
-
-  const payload = {
-    question: text,
-    session_id: chatId || ''
-  };
 
   useEffect(() => {
     query.refetch();
@@ -50,61 +52,20 @@ const DetailPage = () => {
     }
   }, [query.data?.data.length, loading, showPreview]);
 
-  const handleClick = () => {
-    if (!text.trim()) return;
+  const handleFormSubmit = (formData: TChatFormData) => {
+    const payload = handleSubmit(formData);
 
-    setPreviewPrompt(text);
-    setPreviewFiles([...files]);
-    setShowPreview(true);
-    setLoading(true);
-
-    mutation.mutate(payload, {
-      onSuccess: () => {
-        setLoading(false);
-        setText('');
-        setShowPreview(false);
-        setPreviewPrompt('');
-        setPreviewFiles([]);
-        query.refetch();
-        setFiles([]);
-      },
-      onError: () => {
-        setLoading(false);
-        setShowPreview(false);
-        setPreviewPrompt('');
-        setPreviewFiles([]);
-      }
-    });
-  };
-
-  const handleCheckboxChange = () => {
-    setIsChecked(!isChecked);
-  };
-
-  const handleFileDrop = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    if (e.dataTransfer && e.dataTransfer.files) {
-      const droppedFiles = Array.from(e.dataTransfer.files);
-      setFiles((prevFiles) => [...prevFiles, ...droppedFiles]);
-    } else {
-      console.error('Tidak ada file yang ditemukan pada drag-and-drop.');
+    if (payload) {
+      mutation.mutate(payload, {
+        onSuccess: () => {
+          resetForm();
+          query.refetch();
+        },
+        onError: () => {
+          resetForm();
+        }
+      });
     }
-  };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFiles = e.target.files;
-    if (selectedFiles) {
-      const newFiles = Array.from(selectedFiles);
-      setFiles((prevFiles) => [...prevFiles, ...newFiles]);
-    }
-  };
-
-  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-  };
-
-  const removeFile = (index: number) => {
-    setFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
   };
 
   return (
@@ -137,19 +98,7 @@ const DetailPage = () => {
           )}
         </div>
       </ScrollArea>
-      <InputData
-        handleFileDrop={handleFileDrop}
-        handleDragOver={handleDragOver}
-        files={files}
-        removeFile={removeFile}
-        text={text}
-        handleChange={handleChange}
-        handleFileChange={handleFileChange}
-        isChecked={isChecked}
-        setText={setText}
-        handleCheckboxChange={handleCheckboxChange}
-        handleClick={handleClick}
-      />
+      <InputDataWithForm onSubmit={handleFormSubmit} isLoading={loading} />
     </>
   );
 };
