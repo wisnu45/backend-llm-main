@@ -70,6 +70,7 @@ const ChatPage = () => {
 
   const handleClickItem = (item: string) => {
     form.setValue('chat', item);
+    form.trigger();
   };
 
   const handleSend = async (data: ChatData) => {
