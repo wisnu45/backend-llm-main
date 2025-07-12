@@ -18,7 +18,6 @@ import { Button } from '@/components/ui/button';
 
 import useCreateChat from './_hook/use-create-chat';
 import useCreateNewChat from './_hook/use-create-new-chat';
-import { Loader } from './component/Loader';
 import { PromptPreview, FileType } from './component/prompt-preview';
 import { ModernLoadingIndicator } from './component/loading-indicator';
 
