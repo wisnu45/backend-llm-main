@@ -107,7 +107,10 @@ const Sidebar = ({ setShowModal }) => {
 
         {isSidebarOpen && (
           <div
-            className={`mb-[120px] mt-[${topHeight}px] w-full flex-grow px-4 `}
+            className={`mb-[120px]  w-full flex-grow px-4 `}
+            style={{
+              marginTop: topHeight
+            }}
           >
             <h2 className="mb-2 p-2 text-xs font-semibold uppercase tracking-wider text-gray-500">
               Recent Chat
