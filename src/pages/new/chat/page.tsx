@@ -19,6 +19,8 @@ import { Button } from '@/components/ui/button';
 import useCreateChat from './_hook/use-create-chat';
 import useCreateNewChat from './_hook/use-create-new-chat';
 import { Loader } from './component/Loader';
+import { PromptPreview, FileType } from './component/prompt-preview';
+import { ModernLoadingIndicator } from './component/loading-indicator';
 
 const promptSuggestions = [
   {
@@ -48,6 +50,10 @@ type ChatData = z.infer<typeof schema>;
 const ChatPage = () => {
   const refButton = useRef<HTMLButtonElement | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
+  const [files, setFiles] = useState<FileType[]>([]);
+  const [previewPrompt, setPreviewPrompt] = useState<string>('');
+  const [previewFiles, setPreviewFiles] = useState<FileType[]>([]);
+  const [showPreview, setShowPreview] = useState<boolean>(false);
 
   const mutation = useCreateChat();
   const createNewChat = useCreateNewChat();
@@ -68,17 +74,25 @@ const ChatPage = () => {
   };
 
   const handleSend = async (data: ChatData) => {
+    const trimmedQuestion = data.chat.trim();
+
+    // Show preview before sending
+    setPreviewPrompt(trimmedQuestion);
+    setPreviewFiles([...files]);
+    setShowPreview(true);
     setLoading(true);
+
     try {
       const sessionResponse = await createNewChat.mutateAsync();
 
       const sessionId = sessionResponse?.data?.session_id;
       if (!sessionId) {
         setLoading(false);
+        setShowPreview(false);
+        setPreviewPrompt('');
+        setPreviewFiles([]);
         return;
       }
-
-      const trimmedQuestion = data.chat.trim();
 
       mutation.mutate(
         {
@@ -89,19 +103,28 @@ const ChatPage = () => {
           onSuccess: () => {
             queryHistorySideBar.refetch();
             form.reset();
+            setLoading(false);
+            setShowPreview(false);
+            setPreviewPrompt('');
+            setPreviewFiles([]);
+            setFiles([]);
             navigate(`${currentPath}/${sessionId}`);
           },
           onError: (err) => {
             console.error('Chat mutation failed', err);
-          },
-          onSettled: () => {
             setLoading(false);
+            setShowPreview(false);
+            setPreviewPrompt('');
+            setPreviewFiles([]);
           }
         }
       );
     } catch (error) {
       console.error('Session creation failed', error);
       setLoading(false);
+      setShowPreview(false);
+      setPreviewPrompt('');
+      setPreviewFiles([]);
     }
   };
 
@@ -111,9 +134,7 @@ const ChatPage = () => {
         className="mx-auto w-full md:max-w-4xl"
         onSubmit={form.handleSubmit(handleSend)}
       >
-        {loading ? (
-          <Loader />
-        ) : (
+        {!loading && (
           <div className="w-full">
             <h2 className="text-gradient-light text-2xl font-bold md:text-3xl lg:text-4xl">
               Hi there, Marvin
@@ -147,6 +168,20 @@ const ChatPage = () => {
               <ReloadIcon className="mr-2" />
               Refresh prompts
             </Button>
+          </div>
+        )}
+
+        {/* Prompt Preview */}
+        {showPreview && (
+          <div className="mt-4">
+            <PromptPreview text={previewPrompt} files={previewFiles} />
+          </div>
+        )}
+
+        {/* Loading Indicator */}
+        {loading && (
+          <div className="mt-4">
+            <ModernLoadingIndicator />
           </div>
         )}
 
