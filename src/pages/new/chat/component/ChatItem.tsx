@@ -70,55 +70,48 @@ const IconBar = ({ setIsCopied, isCopied, text }) => {
       }, 2000);
     });
   };
+
   return (
-    <div className="flex space-x-4 p-4">
-      <div className="group relative">
-        <button
-          onClick={handleCopy}
-          className="text-gray-600 hover:text-gray-800 focus:outline-none"
-        >
-          {isCopied ? (
-            <CheckIcon className="h-6 w-6 text-green-500" />
-          ) : (
-            <img src="/icons/copy.png" alt="Copy" />
-          )}
-        </button>
-        <span className="absolute bottom-full left-1/2 mb-2 hidden -translate-x-1/2 transform rounded-md bg-black p-1 text-xs text-white group-hover:block">
-          Salin
-        </span>
-      </div>
-      <div className="group relative">
-        <button className="text-gray-600 hover:text-gray-800 focus:outline-none">
-          <img src="/icons/people.png" alt="People" />
-        </button>
-        <span className="absolute bottom-full left-1/2 mb-2 hidden -translate-x-1/2 transform rounded-md bg-black p-1 text-xs text-white group-hover:block">
-          Respon Bagus
-        </span>
-      </div>
-      <div className="group relative">
-        <button className="text-gray-600 hover:text-gray-800 focus:outline-none">
-          <img src="/icons/like.png" alt="Like" />
-        </button>
-        <span className="absolute bottom-full left-1/2 mb-2 hidden -translate-x-1/2 transform rounded-md bg-black p-1 text-xs text-white group-hover:block">
-          Like
-        </span>
-      </div>
-      <div className="group relative">
-        <button className="text-gray-600 hover:text-gray-800 focus:outline-none">
-          <img src="/icons/dislike.png" alt="Dislike" />
-        </button>
-        <span className="absolute bottom-full left-1/2 mb-2 hidden -translate-x-1/2 transform rounded-md bg-black p-1 text-xs text-white group-hover:block">
-          Dislike
-        </span>
-      </div>
-      <div className="group relative">
-        <button className="text-gray-600 hover:text-gray-800 focus:outline-none">
-          <img src="/icons/ungah.png" alt="Ungah" />
-        </button>
-        <span className="absolute bottom-full left-1/2 mb-2 hidden -translate-x-1/2 transform rounded-md bg-black p-1 text-xs text-white group-hover:block">
-          Unggah
-        </span>
-      </div>
+    <div className="flex items-center gap-2 pt-3">
+      <button
+        onClick={handleCopy}
+        className="flex h-8 w-8 items-center justify-center rounded-md text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700"
+        title="Salin"
+      >
+        {isCopied ? (
+          <CheckIcon className="h-4 w-4 text-green-500" />
+        ) : (
+          <img src="/icons/copy.png" alt="Copy" className="h-4 w-4" />
+        )}
+      </button>
+
+      <button
+        className="flex h-8 w-8 items-center justify-center rounded-md text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700"
+        title="Respon Bagus"
+      >
+        <img src="/icons/people.png" alt="People" className="h-4 w-4" />
+      </button>
+
+      <button
+        className="flex h-8 w-8 items-center justify-center rounded-md text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700"
+        title="Like"
+      >
+        <img src="/icons/like.png" alt="Like" className="h-4 w-4" />
+      </button>
+
+      <button
+        className="flex h-8 w-8 items-center justify-center rounded-md text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700"
+        title="Dislike"
+      >
+        <img src="/icons/dislike.png" alt="Dislike" className="h-4 w-4" />
+      </button>
+
+      <button
+        className="flex h-8 w-8 items-center justify-center rounded-md text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700"
+        title="Unggah"
+      >
+        <img src="/icons/ungah.png" alt="Ungah" className="h-4 w-4" />
+      </button>
     </div>
   );
 };
