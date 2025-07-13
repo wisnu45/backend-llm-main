@@ -193,7 +193,7 @@ const InputDataWithForm = ({
             >
               <PlusCircledIcon />
               <label htmlFor="file-upload" className="cursor-pointer">
-                Add attachment
+                Attach Document
               </label>
               <input
                 id="file-upload"

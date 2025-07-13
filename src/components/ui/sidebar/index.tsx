@@ -2,9 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import {
   FileTextIcon,
   HamburgerMenuIcon,
-  PlusIcon,
-  TimerIcon,
-  ExitIcon
+  PlusIcon
 } from '@radix-ui/react-icons';
 import { Link, useLocation } from 'react-router-dom';
 import { useGetFiles } from './_hook/use-get-history-chat';
@@ -12,6 +10,7 @@ import UserCard from '../user-card';
 import { ScrollArea } from '../scroll-area';
 import Cookies from 'js-cookie';
 import { Skeleton } from '../skeleton';
+import useGetListDocument from '@/pages/new/files/_hooks/get-list-document';
 
 type TRecentChats = {
   session_id: string;
@@ -21,6 +20,7 @@ type TRecentChats = {
 const Sidebar = ({ setShowModal }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const query = useGetFiles();
+  const queryDocument = useGetListDocument('', 1, 10);
   const dataResult = query.data?.data as TRecentChats[] | undefined;
   const [topHeight, setTopHeight] = useState<number>();
   const location = useLocation();
@@ -55,7 +55,9 @@ const Sidebar = ({ setShowModal }) => {
   }, []);
 
   return (
-    <ScrollArea className={` h-screen max-h-screen bg-[#D2D2D2]`}>
+    <ScrollArea
+      className={` h-screen max-h-screen bg-[#D2D2D2] hide-scrollbar`}
+    >
       <aside
         className={`ease-[cubic-bezier(0.25, 0.8, 0.25, 1)] transition-all duration-300 ${isSidebarOpen ? 'w-[272px]' : 'w-[50px]'} `}
       >
@@ -95,9 +97,16 @@ const Sidebar = ({ setShowModal }) => {
               className="flex items-center justify-between rounded-lg p-2 text-sm text-gray-700 hover:bg-gray-400/20"
             >
               {isSidebarOpen ? (
-                <div className="flex gap-2">
-                  <FileTextIcon className="font-bold" />
-                  <span className="truncate font-semibold">Document File</span>
+                <div className="flex w-full items-center justify-between">
+                  <div className="flex gap-2">
+                    <FileTextIcon className="font-bold" />
+                    <span className="truncate font-semibold">
+                      Document File
+                    </span>
+                  </div>
+                  <div className="w-12 rounded-full bg-[#B9B7C5] p-1 text-center text-xs text-[#5C47DB]">
+                    {queryDocument.data?.pagination?.total || 0}
+                  </div>
                 </div>
               ) : (
                 <FileTextIcon className="font-bold" />
@@ -158,26 +167,27 @@ const Sidebar = ({ setShowModal }) => {
         >
           <a
             href="#"
-            className="flex items-center rounded-lg p-2 text-sm text-gray-600 hover:bg-neutral-300/60"
+            className="flex items-center justify-between gap-3 rounded-lg p-2 text-sm text-gray-600 transition-colors duration-200 hover:bg-neutral-300/60"
           >
-            {isSidebarOpen ? (
-              <>
-                <TimerIcon className="mr-3 text-lg" />
-                <span>See Full Chat History</span>
-              </>
-            ) : (
-              <TimerIcon className="h-4 w-4 text-gray-700" />
+            {isSidebarOpen && (
+              <span className="truncate">See Full Chat History</span>
             )}
+            <img
+              src="/icons/see_more_icon.png"
+              alt="See more history"
+              className="h-4 w-4"
+            />
           </a>
           <button
             onClick={() => setShowModal(true)}
-            className="mt-4 flex w-full items-center gap-3 rounded-lg bg-slate-400 p-3 text-sm text-blue-600 hover:bg-[#E0E0E0]"
+            className={`mt-4 flex w-full items-center gap-3 rounded-lg bg-slate-400 p-2 text-sm text-[#5C47DB] transition-colors duration-200 hover:bg-[#E0E0E0]`}
           >
-            {isSidebarOpen ? (
-              <span className="w-full text-center font-semibold">Logout</span>
-            ) : (
-              <ExitIcon className="h-6 w-6 text-gray-700" />
-            )}
+            <img
+              src="/icons/logout_icon.png"
+              alt="Logout icon"
+              className="h-4 w-4"
+            />
+            {isSidebarOpen && <span className="font-semibold">Logout</span>}
           </button>
         </div>
       </aside>
