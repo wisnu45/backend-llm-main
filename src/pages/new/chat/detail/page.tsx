@@ -8,8 +8,8 @@ import { Loader } from '../component/Loader';
 import InputDataWithForm from '../component/InputDataWithForm';
 import { PromptPreview } from '../component/prompt-preview';
 import { ModernLoadingIndicator } from '../component/loading-indicator';
-import { TChatFormData } from './schema';
-import { useChatForm } from './use-chat-form';
+import { TChatFormData } from '../schema';
+import { useChatForm } from '../_hook/use-chat-form';
 
 const DetailPage = () => {
   const { chatId } = useParams();

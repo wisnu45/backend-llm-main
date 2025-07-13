@@ -128,7 +128,7 @@ const getColumns = (
   },
   {
     accessorKey: 'metadata',
-    header: 'Data Update',
+    header: '',
     cell: ({ row }) => {
       const isMetadata = row.original.portal_id;
 
