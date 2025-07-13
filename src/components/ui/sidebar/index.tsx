@@ -114,9 +114,11 @@ const Sidebar = ({ setShowModal }) => {
             </Link>
           )}
 
-          <h2 className="mb-2 p-2 text-xs font-semibold uppercase tracking-wider text-gray-500">
-            Recent Chat
-          </h2>
+          {isSidebarOpen && (
+            <h2 className="mb-2 p-2 text-xs font-semibold uppercase tracking-wider text-gray-500">
+              Recent Chat
+            </h2>
+          )}
         </div>
 
         {isSidebarOpen && (
