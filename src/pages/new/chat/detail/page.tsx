@@ -37,7 +37,7 @@ const DetailPage = () => {
   });
 
   if (!query.data?.data.length) {
-    navigate('/new/chat');
+    navigate('/chat');
   }
 
   useEffect(() => {

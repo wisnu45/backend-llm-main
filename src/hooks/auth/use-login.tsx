@@ -14,7 +14,7 @@ export const useLogin = () => {
         access_token: res.authorization,
         username: res.authorization
       });
-      navigate('/new/chat', { replace: true });
+      navigate('/chat', { replace: true });
     },
     onError: () => {}
   });
