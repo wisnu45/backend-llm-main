@@ -63,7 +63,7 @@ const Sidebar = ({ setShowModal }) => {
       >
         <div
           ref={topRef}
-          className={`absolute left-0 right-0 top-0 w-full ${isSidebarOpen ? 'p-4' : 'p-2'} bg-[#D2D2D2]`}
+          className={`absolute left-0 right-0 top-0 w-full ${isSidebarOpen ? 'p-4' : 'p-2'} bg-[#D2D2D2] pb-0`}
         >
           <button
             className="flex h-8 w-8 items-center justify-center rounded-lg hover:bg-gray-400/20"
@@ -113,6 +113,10 @@ const Sidebar = ({ setShowModal }) => {
               )}
             </Link>
           )}
+
+          <h2 className="mb-2 p-2 text-xs font-semibold uppercase tracking-wider text-gray-500">
+            Recent Chat
+          </h2>
         </div>
 
         {isSidebarOpen && (
@@ -122,9 +126,6 @@ const Sidebar = ({ setShowModal }) => {
               marginTop: topHeight
             }}
           >
-            <h2 className="mb-2 p-2 text-xs font-semibold uppercase tracking-wider text-gray-500">
-              Recent Chat
-            </h2>
             <nav>
               <ul>
                 {query.isLoading && (
