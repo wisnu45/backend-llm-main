@@ -57,7 +57,7 @@ export default function AppRouter() {
       ]
     },
     {
-      path: '/new',
+      path: '/',
       element: (
         <ProtectedRoute>
           <NewMainLayout />
@@ -66,18 +66,18 @@ export default function AppRouter() {
       children: [
         {
           index: true,
-          element: <Navigate to="/new/chat" replace />
+          element: <Navigate to="/chat" replace />
         },
         {
-          path: '/new/chat',
+          path: '/chat',
           element: <ChatPage />
         },
         {
-          path: '/new/chat/:chatId',
+          path: '/chat/:chatId',
           element: <DetailPage />
         },
         {
-          path: '/new/files',
+          path: '/files',
           element: <FilesPage />
         }
       ]

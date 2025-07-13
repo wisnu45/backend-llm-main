@@ -63,7 +63,7 @@ const Sidebar = ({ setShowModal }) => {
       >
         <div
           ref={topRef}
-          className={`absolute left-0 right-0 top-0 w-full ${isSidebarOpen ? 'p-4' : 'p-2'} bg-[#D2D2D2]`}
+          className={`absolute left-0 right-0 top-0 w-full ${isSidebarOpen ? 'p-4' : 'p-2'} bg-[#D2D2D2] pb-0`}
         >
           <button
             className="flex h-8 w-8 items-center justify-center rounded-lg hover:bg-gray-400/20"
@@ -77,7 +77,7 @@ const Sidebar = ({ setShowModal }) => {
             </div>
           )}
           <Link
-            to="/new/chat"
+            to="/chat"
             className="mt-2 flex w-full items-center gap-2 rounded-lg p-2 text-left hover:bg-gray-400/20"
           >
             {isSidebarOpen ? (
@@ -93,7 +93,7 @@ const Sidebar = ({ setShowModal }) => {
           </Link>
           {documentSideBar && (
             <Link
-              to="/new/files"
+              to="/files"
               className="flex items-center justify-between rounded-lg p-2 text-sm text-gray-700 hover:bg-gray-400/20"
             >
               {isSidebarOpen ? (
@@ -113,6 +113,10 @@ const Sidebar = ({ setShowModal }) => {
               )}
             </Link>
           )}
+
+          <h2 className="mb-2 p-2 text-xs font-semibold uppercase tracking-wider text-gray-500">
+            Recent Chat
+          </h2>
         </div>
 
         {isSidebarOpen && (
@@ -122,9 +126,6 @@ const Sidebar = ({ setShowModal }) => {
               marginTop: topHeight
             }}
           >
-            <h2 className="mb-2 p-2 text-xs font-semibold uppercase tracking-wider text-gray-500">
-              Recent Chat
-            </h2>
             <nav>
               <ul>
                 {query.isLoading && (
@@ -136,9 +137,9 @@ const Sidebar = ({ setShowModal }) => {
                   ? dataResult.map((chat: TRecentChats) => (
                       <li key={chat.session_id}>
                         <Link
-                          to={`/new/chat/${chat.session_id}`}
+                          to={`/chat/${chat.session_id}`}
                           className={`flex items-center justify-between rounded-lg p-2 text-sm hover:bg-gray-400/20 ${
-                            location.pathname === `/new/chat/${chat.session_id}`
+                            location.pathname === `/chat/${chat.session_id}`
                               ? 'bg-gray-400/40 text-black'
                               : 'text-gray-700'
                           }`}
