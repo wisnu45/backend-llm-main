@@ -5,7 +5,7 @@ import {
   PersonIcon,
   ReloadIcon
 } from '@radix-ui/react-icons';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import { useGetFiles } from '@/components/ui/sidebar/_hook/use-get-history-chat';
@@ -17,7 +17,7 @@ import useCreateNewChat from './_hook/use-create-new-chat';
 import { PromptPreview, FileType } from './component/prompt-preview';
 import { ModernLoadingIndicator } from './component/loading-indicator';
 import InputDataWithForm from './component/InputDataWithForm';
-import { TChatFormData } from './detail/schema';
+import { TChatFormData } from './schema';
 
 const promptSuggestions = [
   {
@@ -38,14 +38,16 @@ const promptSuggestions = [
   }
 ];
 
+export type TSetPromptType = {
+  onSetPrompt: (prompt: string) => void;
+};
+
 const ChatPage = () => {
+  const setPromptRef = useRef<TSetPromptType | null>();
   const [loading, setLoading] = useState<boolean>(false);
   const [previewPrompt, setPreviewPrompt] = useState<string>('');
   const [previewFiles, setPreviewFiles] = useState<FileType[]>([]);
   const [showPreview, setShowPreview] = useState<boolean>(false);
-  const [setPrompt, setSetPrompt] = useState<((prompt: string) => void) | null>(
-    null
-  );
 
   const mutation = useCreateChat();
   const createNewChat = useCreateNewChat();
@@ -54,14 +56,8 @@ const ChatPage = () => {
   const navigate = useNavigate();
   const currentPath = useLocation().pathname;
 
-  const handleSetPrompt = (setter: (prompt: string) => void) => {
-    setSetPrompt(() => setter);
-  };
-
-  const handleClickItem = (item: string) => {
-    if (setPrompt) {
-      setPrompt(item);
-    }
+  const handleClickItem = (prompt: string) => {
+    setPromptRef.current?.onSetPrompt(prompt);
   };
 
   const handleFormSubmit = async (formData: TChatFormData) => {
@@ -176,7 +172,7 @@ const ChatPage = () => {
           <InputDataWithForm
             onSubmit={handleFormSubmit}
             isLoading={loading}
-            onSetPrompt={handleSetPrompt}
+            setPrompRef={setPromptRef}
           />
         </div>
       </div>

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { TChatFormData } from './schema';
+import { TChatFormData } from '../schema';
 import { FileType } from '../component/prompt-preview';
 
 interface UseChatFormProps {

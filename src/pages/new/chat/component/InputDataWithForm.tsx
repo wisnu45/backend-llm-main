@@ -4,23 +4,24 @@ import {
   ArrowRightIcon,
   Cross2Icon
 } from '@radix-ui/react-icons';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useImperativeHandle } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ChatFormSchema, TChatFormData } from '../detail/schema';
+import { ChatFormSchema, TChatFormData } from '../schema';
+import { TSetPromptType } from '../page';
 
 interface InputDataWithFormProps {
   onSubmit: (data: TChatFormData) => void;
   isLoading?: boolean;
   initialPrompt?: string;
-  onSetPrompt?: (setter: (prompt: string) => void) => void;
+  setPrompRef?: React.MutableRefObject<TSetPromptType | null | undefined>;
 }
 
 const InputDataWithForm = ({
   onSubmit,
   isLoading = false,
   initialPrompt = '',
-  onSetPrompt
+  setPrompRef
 }: InputDataWithFormProps) => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [popupFile, setPopupFile] = useState<File | null>(null);
@@ -30,9 +31,9 @@ const InputDataWithForm = ({
     handleSubmit,
     watch,
     setValue,
-    trigger,
     formState: { isValid },
-    reset
+    reset,
+    trigger
   } = useForm<TChatFormData>({
     resolver: zodResolver(ChatFormSchema),
     defaultValues: {
@@ -42,23 +43,6 @@ const InputDataWithForm = ({
     },
     mode: 'onChange'
   });
-
-  // Expose setPrompt method to parent component
-  const setPromptRef = useRef<((prompt: string) => void) | null>(null);
-
-  useEffect(() => {
-    setPromptRef.current = (prompt: string) => {
-      setValue('prompt', prompt);
-      // Trigger validation after setting the value
-      setTimeout(() => {
-        trigger('prompt');
-      }, 0);
-    };
-
-    if (onSetPrompt) {
-      onSetPrompt(setPromptRef.current);
-    }
-  }, [onSetPrompt, setValue, trigger]);
 
   const watchedAttachments = watch('attachments');
   const watchedPrompt = watch('prompt');
@@ -112,6 +96,17 @@ const InputDataWithForm = ({
       handleSubmit(onFormSubmit)();
     }
   };
+
+  useImperativeHandle(
+    setPrompRef,
+    () => ({
+      onSetPrompt: (prompt: string) => {
+        setValue('prompt', prompt);
+        trigger('prompt');
+      }
+    }),
+    [setValue, trigger]
+  );
 
   return (
     <form onSubmit={handleSubmit(onFormSubmit)}>
