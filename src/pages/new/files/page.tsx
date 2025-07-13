@@ -75,12 +75,13 @@ const useFilesPage = () => {
 
 const getColumns = (
   setModal: (modal: TModal, data: TDocItem) => void,
-  tab: string
+  tab: string,
+  startFrom: number
 ): ColumnDef<TDocItem>[] => [
   {
     accessorKey: 'id',
     header: 'NO',
-    cell: ({ row }) => <div>{row.index + 1}</div>
+    cell: ({ row }) => <div>{row.index + 1 + startFrom}</div>
   },
   {
     accessorKey: 'id',
@@ -196,8 +197,9 @@ const FilesPage = () => {
     updateURLParams
   } = useFilesPage();
 
-  const columns = getColumns(setModal, tab);
-
+  const { page, page_size } = query.data?.pagination || {};
+  const startFrom = (Number(page) - 1) * Number(page_size);
+  const columns = getColumns(setModal, tab, startFrom);
   const setInput = (value: React.ChangeEvent<HTMLInputElement>) => {
     setPageIndex(0);
     setTextSearch(value.target.value);
