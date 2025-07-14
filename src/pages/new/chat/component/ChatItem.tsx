@@ -1,15 +1,61 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { CheckIcon } from '@radix-ui/react-icons';
+
 interface Item {
   content: string;
   filename: string;
   download_url: string;
 }
 
+const TypingEffect = ({
+  text,
+  typingSpeed = 10000
+}: {
+  text: string;
+  typingSpeed?: number;
+}) => {
+  const [displayedText, setDisplayedText] = useState<string>('');
+
+  useEffect(() => {
+    let index = 0;
+    const intervalId = setInterval(() => {
+      setDisplayedText((prevText) => prevText + text[index]);
+      index += 1;
+      if (index === text.length) {
+        clearInterval(intervalId);
+      }
+    }, typingSpeed);
+
+    return () => clearInterval(intervalId);
+  }, [text, typingSpeed]);
+
+  return (
+    <ReactMarkdown
+      remarkPlugins={[remarkGfm]}
+      className="prose prose-sm max-w-full space-y-4 break-words text-justify"
+    >
+      {displayedText}
+    </ReactMarkdown>
+  );
+};
+
 export const ChatItem = ({ data }) => {
   const [isCopied, setIsCopied] = useState(false);
+
+  const isLast = (createdAt) => {
+    const dataDate = new Date(createdAt);
+    const now = new Date();
+
+    return (
+      dataDate.getFullYear() === now.getFullYear() &&
+      dataDate.getMonth() === now.getMonth() &&
+      dataDate.getDate() === now.getDate() &&
+      dataDate.getHours() === now.getHours() &&
+      dataDate.getMinutes() === now.getMinutes()
+    );
+  };
 
   return (
     <div className="mb-10 space-y-4 ">
@@ -20,16 +66,20 @@ export const ChatItem = ({ data }) => {
       </div>
       <div className="col-auto flex flex-col items-start space-y-3 overflow-hidden">
         <div>
-          <ReactMarkdown
-            remarkPlugins={[remarkGfm]}
-            className="prose prose-sm max-w-full space-y-4 break-words text-justify"
-          >
-            {data.answer}
-          </ReactMarkdown>
-          {/* <Markdown >{answer}</Markdown> */}
+          {isLast(data.created_at) ? (
+            <TypingEffect text={data.answer} typingSpeed={10} />
+          ) : (
+            <ReactMarkdown
+              remarkPlugins={[remarkGfm]}
+              className="prose prose-sm max-w-full space-y-4 break-words text-justify"
+            >
+              {data.answer}
+            </ReactMarkdown>
+          )}
         </div>
-        {data?.file_links.length ? (
-          <div className=" w-full">
+
+        {data?.file_links?.length ? (
+          <div className="w-full">
             <hr className="mb-2 w-full border-t-4 border-[#C4C4C480]" />
             <div className="font-bold">Referensi Sumber:</div>
             {data?.file_links?.map((item: Item, index: number) => {
