@@ -11,6 +11,8 @@ import { ScrollArea } from '../scroll-area';
 import Cookies from 'js-cookie';
 import { Skeleton } from '../skeleton';
 import useGetListDocument from '@/pages/new/files/_hooks/get-list-document';
+import { AlertModal } from '../../shared/alert-modal';
+import { MoreVertical } from 'lucide-react';
 
 type TRecentChats = {
   session_id: string;
@@ -26,6 +28,7 @@ const Sidebar = ({ setShowModal }) => {
   const location = useLocation();
   const documentSideBar = Cookies.get('username') === 'admin';
   const topRef = useRef<HTMLDivElement | null>(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   useEffect(() => {
     requestAnimationFrame(() => {
@@ -137,7 +140,7 @@ const Sidebar = ({ setShowModal }) => {
                 )}
                 {Array.isArray(dataResult) && dataResult.length > 0
                   ? dataResult.map((chat: TRecentChats) => (
-                      <li key={chat.session_id}>
+                      <li key={chat.session_id} className="group relative">
                         <Link
                           to={`/chat/${chat.session_id}`}
                           className={`flex items-center justify-between rounded-lg p-2 text-sm hover:bg-gray-400/20 ${
@@ -151,13 +154,18 @@ const Sidebar = ({ setShowModal }) => {
                             }
                           }}
                         >
-                          <span className="truncate">
+                          <span className="w-11/12 truncate">
                             {chat.title || 'Untitled Chat'}
                           </span>
                         </Link>
+
+                        <div className="absolute right-1 top-[50%] hidden translate-y-[-50%] cursor-pointer rounded-full py-1 hover:bg-slate-700/10 group-hover:block">
+                          <MoreVertical className="h-4" />
+                        </div>
                       </li>
                     ))
                   : null}
+
                 {!query.isLoading && !dataResult?.length && (
                   <li className="p-2 text-sm text-gray-500">No recent chats</li>
                 )}
@@ -194,6 +202,17 @@ const Sidebar = ({ setShowModal }) => {
           </button>
         </div>
       </aside>
+
+      <AlertModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={() => {
+          setShowDeleteModal(false);
+        }}
+        loading={false}
+        title="Delete Chat"
+        description="Are you sure you want to delete this chat? This action cannot be undone."
+      />
     </ScrollArea>
   );
 };
