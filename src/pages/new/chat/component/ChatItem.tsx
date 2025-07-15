@@ -21,9 +21,11 @@ const TypingEffect = ({
   useEffect(() => {
     let index = 0;
     const intervalId = setInterval(() => {
-      setDisplayedText((prevText) => prevText + text[index]);
+      setDisplayedText((prevText) => {
+        return prevText + text[index];
+      });
       index += 1;
-      if (index === text.length) {
+      if (index === text.length - 1) {
         clearInterval(intervalId);
       }
     }, typingSpeed);
@@ -89,7 +91,6 @@ export const ChatItem = ({ data }) => {
                   key={item.filename}
                   className="cursor-pointer text-blue-400"
                   onClick={() => {
-                    window.location.href = download_url;
                     window.open(download_url, '_blank');
                   }}
                 >

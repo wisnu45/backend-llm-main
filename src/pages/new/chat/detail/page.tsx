@@ -14,6 +14,7 @@ import { useChatForm } from '../_hook/use-chat-form';
 const DetailPage = () => {
   const { chatId } = useParams();
   const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const chatEndRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
   const query = useGetDetailHistory({ session_id: chatId || '' });
@@ -47,10 +48,17 @@ const DetailPage = () => {
   useEffect(() => {
     if (scrollAreaRef.current) {
       scrollAreaRef.current.scrollIntoView({
-        behavior: 'smooth'
+        behavior: 'smooth',
+        block: 'end'
       });
     }
   }, [query.data?.data.length, loading, showPreview]);
+
+  useEffect(() => {
+    if (chatEndRef.current) {
+      chatEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    }
+  }, [query?.data?.data, loading, showPreview]);
 
   const handleFormSubmit = (formData: TChatFormData) => {
     const payload = handleSubmit(formData);
@@ -77,7 +85,7 @@ const DetailPage = () => {
             const isLast = index === (query?.data?.data?.length ?? 0) - 1;
             return (
               <div
-                ref={isLast && !loading && !showPreview ? scrollAreaRef : null}
+                ref={isLast && !loading && !showPreview ? chatEndRef : null}
                 key={index}
               >
                 <ChatItem key={index} data={message} />
@@ -97,6 +105,7 @@ const DetailPage = () => {
             </div>
           )}
         </div>
+        <div ref={chatEndRef} />
       </ScrollArea>
       <InputDataWithForm onSubmit={handleFormSubmit} isLoading={loading} />
     </>
