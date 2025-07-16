@@ -4,7 +4,7 @@ import {
   HamburgerMenuIcon,
   PlusIcon
 } from '@radix-ui/react-icons';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useGetFiles } from './_hook/use-get-history-chat';
 import UserCard from '../user-card';
 import { ScrollArea } from '../scroll-area';
@@ -20,6 +20,7 @@ import {
   DropdownMenuShortcut
 } from '../dropdown-menu';
 import { DropdownMenuTrigger } from '@radix-ui/react-dropdown-menu';
+import { useDeleteChat } from './_hook/use-delete-chat';
 
 type TRecentChats = {
   session_id: string;
@@ -37,6 +38,11 @@ const Sidebar = ({ setShowModal }) => {
   const topRef = useRef<HTMLDivElement | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [active, setActive] = useState<string | null>(null);
+  const [activeId, setActiveId] = useState<string | null>(null);
+  const navigate = useNavigate();
+  const params = useParams();
+
+  const deleteMutation = useDeleteChat();
 
   useEffect(() => {
     requestAnimationFrame(() => {
@@ -194,7 +200,13 @@ const Sidebar = ({ setShowModal }) => {
                           </DropdownMenuTrigger>
 
                           <DropdownMenuContent side="bottom" align="end">
-                            <DropdownMenuItem className="cursor-pointer">
+                            <DropdownMenuItem
+                              className="cursor-pointer"
+                              onClick={() => {
+                                setActiveId(chat.session_id);
+                                setShowDeleteModal(true);
+                              }}
+                            >
                               Delete
                               <DropdownMenuShortcut>
                                 <TrashIcon className="h-4 text-red-500" />
@@ -247,9 +259,20 @@ const Sidebar = ({ setShowModal }) => {
         isOpen={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}
         onConfirm={() => {
-          setShowDeleteModal(false);
+          deleteMutation.mutate(
+            { session_id: activeId! },
+            {
+              onSuccess: () => {
+                setShowDeleteModal(false);
+                query.refetch();
+                if (activeId === params.chatId) {
+                  navigate('/chat');
+                }
+              }
+            }
+          );
         }}
-        loading={false}
+        loading={deleteMutation.isPending}
         title="Delete Chat"
         description="Are you sure you want to delete this chat? This action cannot be undone."
       />
