@@ -1,47 +1,35 @@
-name: Frontend Notification
+# This is a basic workflow to help you get started with Actions
 
+name: CI
+
+# Controls when the workflow will run
 on:
+  # Triggers the workflow on push or pull request events but only for the "production" branch
   push:
-    branches:
-      - main
+    branches: ["main"]
 
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  notify:
-    runs-on: ubuntu-latest
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: osi-jkt
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      - name: Send Telegram Notification
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+
+      # Runs a single command using the runners shell
+      - name: Run a one-line script test
+        run: echo "start deployment ya mas nya"
+
+      # Runs a set of commands using the runners shell
+      - name: Run a multi-line script
         run: |
-          # Escape special characters for JSON
-          COMMIT_MESSAGE=$(echo '${{ github.event.head_commit.message }}' | sed 's/"/\\"/g' | sed "s/'/\\'/g" | tr -d '\n\r')
-          AUTHOR=$(echo '${{ github.actor }}' | sed 's/"/\\"/g')
-          REPOSITORY=$(echo '${{ github.repository }}' | sed 's/"/\\"/g')
-          BRANCH=$(echo '${{ github.ref_name }}' | sed 's/"/\\"/g')
-
-          # Prepare message thread ID if specified
-          THREAD_ID_PARAM=""
-          if [ -n "${{ secrets.TELEGRAM_THREAD_ID }}" ]; then
-            THREAD_ID_PARAM=", \"message_thread_id\": \"${{ secrets.TELEGRAM_THREAD_ID }}\""
-          fi
-
-          curl -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
-            -H "Content-Type: application/json" \
-            -d "{
-              \"chat_id\": \"${{ secrets.TELEGRAM_CHAT_ID }}\"$THREAD_ID_PARAM,
-              \"text\": \"🚀 *Frontend Push Detected!*\\nRepository: $REPOSITORY\\nBranch: $BRANCH\\nCommit: $COMMIT_MESSAGE\\nAuthor: $AUTHOR\",
-              \"parse_mode\": \"Markdown\",
-              \"disable_web_page_preview\": true,
-              \"reply_markup\": {
-                \"inline_keyboard\": [
-                  [
-                    {
-                      \"text\": \"📋 View Changes\",
-                      \"url\": \"${{ github.event.compare }}\"
-                    },
-                    {
-                      \"text\": \"📂 Repository\",
-                      \"url\": \"${{ github.event.repository.html_url }}\"
-                    }
-                  ]
-                ]
-              }
-            }"
+          cd /home/osi
+          ./deploy_ssh_fe_llm.sh
+          echo "sepertinya deployment berhasil"
