@@ -138,13 +138,6 @@ const IconBar = ({ setIsCopied, isCopied, text }) => {
 
       <button
         className="flex h-8 w-8 items-center justify-center rounded-md text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700"
-        title="Respon Bagus"
-      >
-        <img src="/icons/people.png" alt="People" className="h-4 w-4" />
-      </button>
-
-      <button
-        className="flex h-8 w-8 items-center justify-center rounded-md text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700"
         title="Like"
       >
         <img src="/icons/like.png" alt="Like" className="h-4 w-4" />
@@ -155,13 +148,6 @@ const IconBar = ({ setIsCopied, isCopied, text }) => {
         title="Dislike"
       >
         <img src="/icons/dislike.png" alt="Dislike" className="h-4 w-4" />
-      </button>
-
-      <button
-        className="flex h-8 w-8 items-center justify-center rounded-md text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700"
-        title="Unggah"
-      >
-        <img src="/icons/ungah.png" alt="Ungah" className="h-4 w-4" />
       </button>
     </div>
   );
