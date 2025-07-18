@@ -1,12 +1,9 @@
+import { AlertModal } from '@/components/shared/alert-modal';
+import { useDeleteChat } from '@/components/ui/sidebar/_hook/use-delete-chat';
 import { useGetFiles } from '@/components/ui/sidebar/_hook/use-get-history-chat';
+import { TrashIcon } from 'lucide-react';
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
-
-type Chat = {
-  id: number;
-  title: string;
-  timestamp: string;
-};
+import { Link, useNavigate, useParams } from 'react-router-dom';
 
 type TRecentChats = {
   session_id: string;
@@ -18,11 +15,19 @@ export default function ChatHistory() {
 
   const query = useGetFiles();
   const dataHistory = query.data?.data as TRecentChats[] | undefined;
+  const [activeId, setActiveId] = useState<string | null>(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const params = useParams();
 
   const toggleSelect = (id: string) => {
     setSelected((prev) =>
       prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
     );
+  };
+
+  const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
   };
 
   const handleSelectAll = () => {
@@ -35,6 +40,12 @@ export default function ChatHistory() {
     alert(`Menghapus ${selected.length} obrolan`);
     setSelected([]);
   };
+  const navigate = useNavigate();
+  const deleteMutation = useDeleteChat();
+
+  const filteredChats = dataHistory?.filter((chat) =>
+    chat.title.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <main className="min-h-screen px-6 py-10 text-black">
@@ -52,7 +63,8 @@ export default function ChatHistory() {
           <input
             type="text"
             placeholder="Cari obrolan Anda..."
-            className="w-full rounded bg-[#b4b3b3] px-4 py-2 text-white"
+            onChange={handleInput}
+            className="w-full rounded bg-white px-4 py-2 text-black"
           />
         </div>
         {selected.length > 0 && (
@@ -78,8 +90,8 @@ export default function ChatHistory() {
           </div>
         )}
         <div className="space-y-2">
-          {Array.isArray(dataHistory) && dataHistory.length > 0
-            ? dataHistory.map((chat) => (
+          {Array.isArray(filteredChats) && filteredChats.length > 0
+            ? filteredChats.map((chat) => (
                 <div
                   key={chat.session_id}
                   className={`group relative flex items-start gap-3 rounded-md border p-4 hover:cursor-pointer ${
@@ -103,22 +115,44 @@ export default function ChatHistory() {
                   </Link>
                   {selected.length == 0 && (
                     <button
-                      onClick={() =>
-                        alert(`Hapus obrolan ID ${chat.session_id}`)
-                      }
-                      className="absolute right-2 top-2 rounded bg-red-600 px-2 py-1 text-xs text-white opacity-0 transition-opacity group-hover:opacity-100"
+                      onClick={() => {
+                        setActiveId(chat.session_id);
+                        setShowDeleteModal(true);
+                      }}
+                      className="absolute right-2 top-2  px-2 py-1 text-xs text-white opacity-0 transition-opacity group-hover:opacity-100"
                     >
-                      Hapus
+                      <TrashIcon className="h-4 text-red-500" />
                     </button>
                   )}
                 </div>
               ))
             : null}
-          {!query.isLoading && !dataHistory?.length && (
+          {!query.isLoading && !filteredChats?.length && (
             <li className="p-2 text-sm text-gray-500">No recent chats</li>
           )}
         </div>
       </div>
+      <AlertModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={() => {
+          deleteMutation.mutate(
+            { session_id: activeId! },
+            {
+              onSuccess: () => {
+                setShowDeleteModal(false);
+                query.refetch();
+                if (activeId === params.chatId) {
+                  navigate('/chat');
+                }
+              }
+            }
+          );
+        }}
+        loading={deleteMutation.isPending}
+        title="Delete Chat"
+        description="Are you sure you want to delete this chat? This action cannot be undone."
+      />
     </main>
   );
 }
