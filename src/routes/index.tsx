@@ -9,6 +9,7 @@ import DivisionFile from '@/pages/old/files/division';
 import ChatPage from '@/pages/new/chat/page';
 import FilesPage from '@/pages/new/files/page';
 import DetailPage from '@/pages/new/chat/detail/page';
+import ChatHistory from '@/pages/history/ChatHistory';
 
 const SignInPage = lazy(() => import('@/pages/auth/signin'));
 
@@ -79,6 +80,10 @@ export default function AppRouter() {
         {
           path: '/files',
           element: <FilesPage />
+        },
+        {
+          path: '/history',
+          element: <ChatHistory />
         }
       ]
     }

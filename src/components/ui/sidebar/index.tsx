@@ -228,8 +228,8 @@ const Sidebar = ({ setShowModal }) => {
         <div
           className={`absolute bottom-0 left-0 right-0 mt-auto w-full  ${isSidebarOpen ? 'p-4' : 'p-2'} bg-[#D2D2D2]`}
         >
-          <a
-            href="#"
+          <Link
+            to="/history"
             className="flex items-center justify-between gap-3 rounded-lg p-2 text-sm text-gray-600 transition-colors duration-200 hover:bg-neutral-300/60"
           >
             {isSidebarOpen && (
@@ -240,7 +240,7 @@ const Sidebar = ({ setShowModal }) => {
               alt="See more history"
               className="h-4 w-4"
             />
-          </a>
+          </Link>
           <button
             onClick={() => setShowModal(true)}
             className={`mt-4 flex w-full items-center gap-3 rounded-lg bg-slate-400 p-2 text-sm text-[#5C47DB] transition-colors duration-200 hover:bg-[#E0E0E0]`}
