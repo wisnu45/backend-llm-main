@@ -1,12 +1,13 @@
 import { getDocs } from '@/api/document/api';
+import { TDocParams } from '@/api/document/type';
 import { useQuery } from '@tanstack/react-query';
 
 export const documentListQueryKey = 'get-document-list';
 
-const useGetListDocument = (search: string, page: number, limit: number) => {
+const useGetListDocument = (params?: TDocParams) => {
   return useQuery({
-    queryKey: [documentListQueryKey, search, page, limit],
-    queryFn: () => getDocs(search, page, limit)
+    queryKey: [documentListQueryKey, params],
+    queryFn: () => getDocs(params)
   });
 };
 export default useGetListDocument;

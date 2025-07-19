@@ -4,7 +4,7 @@ import { DataTable } from '@/components/shared/data-table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { LoaderCircle } from '@/components/shared/loader';
-import { TDocItem } from '@/api/document/type';
+import { TDocItem, TDocParams } from '@/api/document/type';
 import useGetListDocument from './_hooks/get-list-document';
 import { formatDate } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -18,7 +18,7 @@ type TModal = 'delete' | 'edit' | 'create' | 'detail' | null;
 const useFilesPage = () => {
   const [modal, setModal] = useState<TModal>(null);
   const [data, setData] = useState<TDocItem | null>(null);
-  const [tab, setTab] = useState('all');
+  const [tab, setTab] = useState<TDocParams['doc_type']>('all');
   const [textSearch, setTextSearch] = useState<string>('');
   const [pageIndex, setPageIndex] = useState(0);
   const [pageSize, setPageSize] = useState(10);
@@ -42,7 +42,12 @@ const useFilesPage = () => {
     setPageSize(limitFromURL);
   }, [searchParams]);
 
-  const query = useGetListDocument(debouncedValue, pageIndex, pageSize);
+  const query = useGetListDocument({
+    search: debouncedValue,
+    page: pageIndex,
+    page_size: pageSize,
+    doc_type: tab
+  });
 
   const updateURLParams = (newPageIndex: number, newPageSize: number) => {
     setSearchParams({
@@ -187,7 +192,6 @@ const FilesPage = () => {
     data,
     tab,
     setTab,
-    textSearch,
     setTextSearch,
     pageIndex,
     setPageIndex,
@@ -197,7 +201,7 @@ const FilesPage = () => {
     updateURLParams
   } = useFilesPage();
 
-  const { page, page_size } = query.data?.pagination || {};
+  const { page, page_size, total_pages, total } = query.data?.pagination || {};
   const startFrom = (Number(page) - 1) * Number(page_size);
   const columns = getColumns(setModal, tab, startFrom);
   const setInput = (value: React.ChangeEvent<HTMLInputElement>) => {
@@ -215,42 +219,6 @@ const FilesPage = () => {
     updateURLParams(pageIndex, newPageSize);
   };
 
-  const [debouncedValue] = useDebounce(textSearch, 1000);
-
-  const filterAndSortData = (
-    data: TDocItem[] | undefined,
-    tab: string,
-    debouncedValue: string
-  ): TDocItem[] => {
-    return (
-      data
-        ?.sort(
-          (a: TDocItem, b: TDocItem) =>
-            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-        )
-        ?.filter((item: TDocItem) => {
-          switch (tab) {
-            case 'all':
-              return true;
-            case 'metadata':
-              return item.portal_id;
-            case 'upload':
-              return !item.portal_id;
-            default:
-              return true;
-          }
-        })
-        ?.filter((item: TDocItem) => {
-          if (debouncedValue) {
-            return item.document_name
-              .toLowerCase()
-              .includes(debouncedValue.toLowerCase());
-          }
-          return true;
-        }) || []
-    );
-  };
-
   return (
     <div>
       <FilesPageHeader
@@ -260,7 +228,7 @@ const FilesPage = () => {
       <Tabs
         defaultValue="all"
         onValueChange={(val) => {
-          setTab(val);
+          setTab(val as TDocParams['doc_type']);
         }}
       >
         <ScrollArea className="w-full">
@@ -280,19 +248,16 @@ const FilesPage = () => {
         <TabsContent value={tab}>
           <Suspense fallback={<LoaderCircle />}>
             <DataTable
-              pageCount={query.data?.pagination?.total_pages || 0}
+              pageCount={total_pages || 0}
               loading={query.isLoading}
-              // data={query.data?.data || []}
-              data={
-                filterAndSortData(query.data?.data, tab, debouncedValue) || []
-              }
+              data={query.data?.data || []}
               columns={columns}
               pageSizeOptions={[10, 20, 30, 40, 50]}
               setPageIndex={handlePageChange}
               pageIndex={pageIndex}
               setPageSize={handlePageSizeChange}
-              total={query.data?.pagination?.total || 0}
-              pageSize={pageSize}
+              total={total || 0}
+              pageSize={page_size || 10}
             />
           </Suspense>
         </TabsContent>

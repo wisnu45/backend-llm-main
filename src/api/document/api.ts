@@ -1,5 +1,6 @@
 import api from '@/lib/api';
 import {
+  TDocParams,
   TRequestCreateDocument,
   TResponseDetailDocument,
   TResponseListDocument
@@ -7,18 +8,10 @@ import {
 import { TDefaultResponse } from '@/commons/types/response';
 
 export const getDocs = async (
-  search: string = '',
-  page: number = 1,
-  page_size: number = 10,
-  tab: string = 'all'
+  params?: TDocParams
 ): Promise<TResponseListDocument> => {
   const res = await api.get<TResponseListDocument>('/documents', {
-    params: {
-      search,
-      page,
-      page_size,
-      tab
-    }
+    params
   });
   return res.data;
 };

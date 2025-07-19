@@ -13,5 +13,12 @@ export type TDocItem = {
   updated_at: string;
 };
 
+export type TDocParams = {
+  search: string;
+  page: number;
+  page_size: number;
+  doc_type: 'all' | 'metadata' | 'upload';
+};
+
 export type TResponseListDocument = TResponse<TDocItem[]>;
 export type TResponseDetailDocument = TResponse<TDocItem>;

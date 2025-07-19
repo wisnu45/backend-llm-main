@@ -30,7 +30,7 @@ type TRecentChats = {
 const Sidebar = ({ setShowModal }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const query = useGetFiles();
-  const queryDocument = useGetListDocument('', 1, 10);
+  const queryDocument = useGetListDocument();
   const dataResult = query.data?.data as TRecentChats[] | undefined;
   const [topHeight, setTopHeight] = useState<number>();
   const location = useLocation();
