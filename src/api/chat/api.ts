@@ -2,7 +2,9 @@ import api from '@/lib/api';
 
 import {
   TChatRequest,
+  TChatResponseRequest,
   TClearChatRequest,
+  TDeleteBulkChatRequest,
   TGetDetailHistoryData,
   TGetHistoryRequest,
   TNewSesionResponse
@@ -10,32 +12,49 @@ import {
 import { TDefaultResponse } from '@/commons/types/response';
 
 export const chat = async (req: TChatRequest): Promise<TDefaultResponse> => {
-  const res = await api.post<TDefaultResponse>('/ask', req);
+  const res = await api.post<TDefaultResponse>('/chats/ask', req);
+  return res.data;
+};
+
+export const chatFeedback = async (
+  req: TChatResponseRequest
+): Promise<TDefaultResponse> => {
+  const res = await api.patch<TDefaultResponse>(
+    `/chats/feedback/${req.chat_id}`,
+    {
+      feedback: req.feedback
+    }
+  );
   return res.data;
 };
 
 export const clearChat = async (
   req: TClearChatRequest
 ): Promise<TDefaultResponse> => {
-  const res = await api.post<TDefaultResponse>('/clear-chat', req);
+  const res = await api.delete<TDefaultResponse>(`/chats/${req.session_id}`);
   return res.data;
 };
 
 export const newChat = async (): Promise<TNewSesionResponse> => {
-  const res = await api.get<TNewSesionResponse>('/generate-session');
+  const res = await api.get<TNewSesionResponse>('/chats/generate-session');
   return res.data;
 };
 
 export const getHistory = async (): Promise<TGetHistoryRequest> => {
-  const res = await api.get<TGetHistoryRequest>('/recent-chat');
+  const res = await api.get<TGetHistoryRequest>('/chats/history');
   return res.data;
 };
 
 export const getDetailHistory = async (
   req: TClearChatRequest
 ): Promise<TGetDetailHistoryData> => {
-  const res = await api.get<TGetDetailHistoryData>(
-    `/get-history?session_id=${req.session_id}`
-  );
+  const res = await api.get<TGetDetailHistoryData>(`/chats/${req.session_id}`);
+  return res.data;
+};
+
+export const bulkDeleteChat = async (
+  req: TDeleteBulkChatRequest
+): Promise<TDefaultResponse> => {
+  const res = await api.post<TDefaultResponse>('/chats/bulk-delete', req);
   return res.data;
 };

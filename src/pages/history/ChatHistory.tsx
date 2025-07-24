@@ -4,6 +4,7 @@ import { useGetFiles } from '@/components/ui/sidebar/_hook/use-get-history-chat'
 import { TrashIcon } from 'lucide-react';
 import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useBulkDeleteChat } from './_hook/use-delete-bulk-chat';
 
 type TRecentChats = {
   session_id: string;
@@ -19,6 +20,7 @@ export default function ChatHistory() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const params = useParams();
+  const deleteBulkChat = useBulkDeleteChat();
 
   const toggleSelect = (id: string) => {
     setSelected((prev) =>
@@ -37,7 +39,19 @@ export default function ChatHistory() {
   };
   const handleClear = () => setSelected([]);
   const handleDelete = () => {
-    alert(`Menghapus ${selected.length} obrolan`);
+    deleteBulkChat.mutate(
+      { session_ids: selected },
+      {
+        onSuccess: () => {
+          setSelected([]);
+          query.refetch();
+          alert(`Berhasil menghapus sejumlah ${selected.length} obrolan`);
+        },
+        onError: (error) => {
+          console.error('Error deleting chats:', error);
+        }
+      }
+    );
     setSelected([]);
   };
   const navigate = useNavigate();
