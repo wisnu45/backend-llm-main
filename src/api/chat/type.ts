@@ -18,8 +18,17 @@ export interface TChatRequest {
   session_id: string;
 }
 
+export interface TChatResponseRequest {
+  feedback: number | string;
+  chat_id: string;
+}
+
 export interface TClearChatRequest {
   session_id: string;
+}
+
+export interface TDeleteBulkChatRequest {
+  session_ids: string[];
 }
 
 export interface TGetHistoryRequest {

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { CheckIcon } from '@radix-ui/react-icons';
+import useCreateFeedbackChat from '../_hook/use-mutate-response';
 
 interface Item {
   content: string;
@@ -80,7 +81,7 @@ export const ChatItem = ({ data }) => {
           )}
         </div>
 
-        {data?.file_links?.length ? (
+        {data?.file_links?.length && (
           <div className="w-full">
             <hr className="mb-2 w-full border-t-4 border-[#C4C4C480]" />
             <div className="font-bold">Referensi Sumber:</div>
@@ -99,19 +100,21 @@ export const ChatItem = ({ data }) => {
               );
             })}
           </div>
-        ) : (
-          <IconBar
-            setIsCopied={setIsCopied}
-            isCopied={isCopied}
-            text={data.answer}
-          />
         )}
+        <IconBar
+          setIsCopied={setIsCopied}
+          isCopied={isCopied}
+          text={data.answer}
+          id={data.id}
+        />
       </div>
     </div>
   );
 };
 
-const IconBar = ({ setIsCopied, isCopied, text }) => {
+const IconBar = ({ setIsCopied, isCopied, text, id }) => {
+  const { mutate } = useCreateFeedbackChat();
+
   const handleCopy = () => {
     const textToCopy = text;
     navigator.clipboard.writeText(textToCopy).then(() => {
@@ -122,33 +125,53 @@ const IconBar = ({ setIsCopied, isCopied, text }) => {
     });
   };
 
+  const handleLike = () => {
+    mutate({ feedback: '1', chat_id: id });
+  };
+  const handledisLike = () => {
+    mutate({ feedback: '-1', chat_id: id });
+  };
+
   return (
     <div className="flex items-center gap-2 pt-3">
-      <button
-        onClick={handleCopy}
-        className="flex h-8 w-8 items-center justify-center rounded-md text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700"
-        title="Salin"
-      >
-        {isCopied ? (
-          <CheckIcon className="h-4 w-4 text-green-500" />
-        ) : (
-          <img src="/icons/copy.png" alt="Copy" className="h-4 w-4" />
-        )}
-      </button>
-
-      <button
-        className="flex h-8 w-8 items-center justify-center rounded-md text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700"
-        title="Like"
-      >
-        <img src="/icons/like.png" alt="Like" className="h-4 w-4" />
-      </button>
-
-      <button
-        className="flex h-8 w-8 items-center justify-center rounded-md text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700"
-        title="Dislike"
-      >
-        <img src="/icons/dislike.png" alt="Dislike" className="h-4 w-4" />
-      </button>
+      {/* Copy Button */}
+      <div className="group relative">
+        <button
+          onClick={handleCopy}
+          className="flex h-8 w-8 items-center justify-center rounded-md text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700"
+        >
+          {isCopied ? (
+            <CheckIcon className="h-4 w-4 text-green-500" />
+          ) : (
+            <img src="/icons/copy.png" alt="Copy" className="h-4 w-4" />
+          )}
+        </button>
+        <span className="absolute -top-7 left-1/2 -translate-x-1/2 scale-90 rounded bg-gray-800 px-2 py-1 text-xs text-white opacity-0 transition-opacity group-hover:opacity-100">
+          Salin
+        </span>
+      </div>
+      <div className="group relative">
+        <button
+          onClick={handleLike}
+          className="flex h-8 w-8 items-center justify-center rounded-md text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700"
+        >
+          <img src="/icons/like.png" alt="Like" className="h-4 w-4" />
+        </button>
+        <span className="absolute -top-7 left-1/2 -translate-x-1/2 scale-90 rounded bg-gray-800 px-2 py-1 text-xs text-white opacity-0 transition-opacity group-hover:opacity-100">
+          Suka
+        </span>
+      </div>
+      <div className="group relative">
+        <button
+          onClick={handledisLike}
+          className="flex h-8 w-8 items-center justify-center rounded-md text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700"
+        >
+          <img src="/icons/dislike.png" alt="Dislike" className="h-4 w-4" />
+        </button>
+        <span className="absolute -top-7 left-1/2 -translate-x-1/2 scale-90 rounded bg-gray-800 px-2 py-1 text-xs text-white opacity-0 transition-opacity group-hover:opacity-100">
+          Tidak Suka
+        </span>
+      </div>
     </div>
   );
 };
