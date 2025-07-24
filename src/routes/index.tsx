@@ -10,6 +10,7 @@ import ChatPage from '@/pages/new/chat/page';
 import FilesPage from '@/pages/new/files/page';
 import DetailPage from '@/pages/new/chat/detail/page';
 import ChatHistory from '@/pages/history/ChatHistory';
+import OAuthCallbackPage from '@/pages/auth/oauth-callback';
 
 const SignInPage = lazy(() => import('@/pages/auth/signin'));
 
@@ -99,10 +100,15 @@ export default function AppRouter() {
       ),
       index: true
     },
+
     {
       path: '/thankyou',
       element: <ThankyouPage />,
       index: true
+    },
+    {
+      path: '/SSO/Validate',
+      element: <OAuthCallbackPage />
     },
     {
       path: '/404',

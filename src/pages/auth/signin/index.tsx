@@ -21,13 +21,15 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useSession } from '@/components/providers/session';
 import { LoginSchema, TLoginFormData } from './components/schema';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const { signin, status } = useSession();
   const [error, setError] = useState('');
   const loading = status === 'authenticating';
+  const [searchParams] = useSearchParams();
 
   const form = useForm<TLoginFormData>({
     mode: 'onChange',
@@ -46,10 +48,19 @@ export default function LoginPage() {
     }
   };
 
+  const redirectUrl = new URL(`${import.meta.env.VITE_BASE_URL}/SSO/Validate`);
+
   const handleSsoLogin = () => {
-    const redirectUrl = encodeURIComponent(window.location.href);
     window.location.href = `https://portal.combiphar.com/Account/Login?ReturnUrl=${redirectUrl}`;
   };
+
+  useEffect(() => {
+    const error = searchParams.get('error');
+    if (error) {
+      setError(error);
+    }
+    return () => setError('');
+  }, [searchParams]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-[#f8f8f9] font-sans">
