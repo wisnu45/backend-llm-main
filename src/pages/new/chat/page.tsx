@@ -18,6 +18,7 @@ import { PromptPreview, FileType } from './component/prompt-preview';
 import { ModernLoadingIndicator } from './component/loading-indicator';
 import InputDataWithForm from './component/InputDataWithForm';
 import { TChatFormData } from './schema';
+import Cookies from 'js-cookie';
 
 const promptSuggestions = [
   {
@@ -119,10 +120,10 @@ const ChatPage = () => {
         {!loading && (
           <div className="w-full">
             <h2 className="text-gradient-light text-2xl font-bold md:text-3xl lg:text-4xl">
-              Hi there, Marvin
+              Hi there, {Cookies.get('username')}
             </h2>
             <h3 className="text-gradient-light mt-1 text-2xl font-bold md:mt-2 md:text-3xl lg:text-4xl">
-              What would you like to know?
+              What can Vita help you with today?
             </h3>
             <p className="mt-2 text-gray-500 md:mt-6">
               Use one of the most common prompts below or use your own to begin
