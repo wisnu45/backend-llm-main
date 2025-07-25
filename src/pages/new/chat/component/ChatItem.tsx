@@ -3,6 +3,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { CheckIcon } from '@radix-ui/react-icons';
 import useCreateFeedbackChat from '../_hook/use-mutate-response';
+import { useGetDetailHistory } from '../_hook/use-get-history-chat';
 
 interface Item {
   content: string;
@@ -45,6 +46,7 @@ const TypingEffect = ({
 };
 
 export const ChatItem = ({ data }) => {
+  console.log('data ITem', data);
   const [isCopied, setIsCopied] = useState(false);
 
   const isLast = (createdAt) => {
@@ -106,14 +108,18 @@ export const ChatItem = ({ data }) => {
           isCopied={isCopied}
           text={data.answer}
           id={data.id}
+          session_id={data.session_id}
+          feedback={data.feedback}
         />
       </div>
     </div>
   );
 };
 
-const IconBar = ({ setIsCopied, isCopied, text, id }) => {
+const IconBar = ({ setIsCopied, isCopied, text, id, session_id, feedback }) => {
+  console.log('feedback', feedback === 1);
   const { mutate } = useCreateFeedbackChat();
+  const query = useGetDetailHistory({ session_id: session_id || '' });
 
   const handleCopy = () => {
     const textToCopy = text;
@@ -126,10 +132,24 @@ const IconBar = ({ setIsCopied, isCopied, text, id }) => {
   };
 
   const handleLike = () => {
-    mutate({ feedback: '1', chat_id: id });
+    mutate(
+      { feedback: '1', chat_id: id },
+      {
+        onSuccess: () => {
+          query.refetch();
+        }
+      }
+    );
   };
   const handledisLike = () => {
-    mutate({ feedback: '-1', chat_id: id });
+    mutate(
+      { feedback: '-1', chat_id: id },
+      {
+        onSuccess: () => {
+          query.refetch();
+        }
+      }
+    );
   };
 
   return (
@@ -150,28 +170,32 @@ const IconBar = ({ setIsCopied, isCopied, text, id }) => {
           Salin
         </span>
       </div>
-      <div className="group relative">
-        <button
-          onClick={handleLike}
-          className="flex h-8 w-8 items-center justify-center rounded-md text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700"
-        >
-          <img src="/icons/like.png" alt="Like" className="h-4 w-4" />
-        </button>
-        <span className="absolute -top-7 left-1/2 -translate-x-1/2 scale-90 rounded bg-gray-800 px-2 py-1 text-xs text-white opacity-0 transition-opacity group-hover:opacity-100">
-          Suka
-        </span>
-      </div>
-      <div className="group relative">
-        <button
-          onClick={handledisLike}
-          className="flex h-8 w-8 items-center justify-center rounded-md text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700"
-        >
-          <img src="/icons/dislike.png" alt="Dislike" className="h-4 w-4" />
-        </button>
-        <span className="absolute -top-7 left-1/2 -translate-x-1/2 scale-90 rounded bg-gray-800 px-2 py-1 text-xs text-white opacity-0 transition-opacity group-hover:opacity-100">
-          Tidak Suka
-        </span>
-      </div>
+      {(feedback == 1 || feedback === null) && (
+        <div className="group relative">
+          <button
+            onClick={handleLike}
+            className="flex h-8 w-8 items-center justify-center rounded-md text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700"
+          >
+            <img src="/icons/like.png" alt="Like" className="h-4 w-4" />
+          </button>
+          <span className="absolute -top-7 left-1/2 -translate-x-1/2 scale-90 rounded bg-gray-800 px-2 py-1 text-xs text-white opacity-0 transition-opacity group-hover:opacity-100">
+            Suka
+          </span>
+        </div>
+      )}
+      {(feedback == -1 || feedback === null) && (
+        <div className="group relative">
+          <button
+            onClick={handledisLike}
+            className="flex h-8 w-8 items-center justify-center rounded-md text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700"
+          >
+            <img src="/icons/dislike.png" alt="Dislike" className="h-4 w-4" />
+          </button>
+          <span className="absolute -top-7 left-1/2 -translate-x-1/2 scale-90 rounded bg-gray-800 px-2 py-1 text-xs text-white opacity-0 transition-opacity group-hover:opacity-100">
+            Tidak Suka
+          </span>
+        </div>
+      )}
     </div>
   );
 };
