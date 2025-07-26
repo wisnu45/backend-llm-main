@@ -109,7 +109,12 @@ const SessionProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
       setSessionData({
         access_token: token
       });
-      SessionToken.set({ access_token: token, username: res.data.username });
+      SessionToken.set({
+        access_token: token,
+        username: res.data.userdata.username,
+        role: res.data.userdata.role,
+        name: res.data.userdata.name
+      });
       setStatus('authenticated');
       setErrorMessage(null);
       navigate('/chat', { replace: true });
@@ -117,8 +122,10 @@ const SessionProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
       return res;
     } catch (error) {
       const err = error as TErrorResponse;
+      const message = err.response?.data.message || error;
+
       setStatus('unauthenticated');
-      navigate(`/auth/signin?error=${err.response?.data.message}`, {
+      navigate(`/auth/signin?error=${message}`, {
         replace: true
       });
     }
