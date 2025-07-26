@@ -118,18 +118,18 @@ const ChatPage = () => {
     <div className="flex w-full flex-1 flex-col items-center justify-center text-left">
       <div className="mx-auto w-full md:max-w-4xl">
         {!loading && (
-          <div className="w-full">
-            <h2 className="text-gradient-light text-2xl font-bold md:text-3xl lg:text-4xl">
+          <div className="mb-4 w-full">
+            <h2 className="text-gradient-light mb-1 text-2xl font-bold md:mb-2 md:text-3xl lg:text-4xl">
               Hi there, {Cookies.get('username')}
             </h2>
-            <h3 className="text-gradient-light mt-1 text-2xl font-bold md:mt-2 md:text-3xl lg:text-4xl">
+            <h3 className="text-gradient-light mb-1 text-2xl font-bold md:mb-8 md:text-3xl lg:text-4xl">
               What can Vita help you with today?
             </h3>
-            <p className="mt-2 text-gray-500 md:mt-8">
+            <p className="mb-4 text-gray-500 md:mb-10">
               Use one of the most common prompts below or use your own to begin
             </p>
 
-            <ScrollArea className="mt-2 w-full overflow-x-auto md:mt-8">
+            <ScrollArea className="mb-2 w-full overflow-x-auto md:mb-8">
               <div className="flex w-max gap-4 py-2">
                 {promptSuggestions.map((prompt, index) => (
                   <div
@@ -147,29 +147,23 @@ const ChatPage = () => {
               <ScrollBar orientation="horizontal" />
             </ScrollArea>
 
-            <Button variant="ghost" className="mt-2 flex text-sm md:mt-3">
+            <Button variant="ghost" className="mb-2 flex text-sm md:mb-3">
               <ReloadIcon className="mr-2" />
               Refresh prompts
             </Button>
           </div>
         )}
-
-        {/* Prompt Preview */}
         {showPreview && (
-          <div className="mt-4">
+          <div className="mb-4">
             <PromptPreview text={previewPrompt} files={previewFiles} />
           </div>
         )}
-
-        {/* Loading Indicator */}
         {loading && (
-          <div className="mt-4">
+          <div className="mb-4">
             <ModernLoadingIndicator />
           </div>
         )}
-
-        {/* Input Form */}
-        <div className="mt-4">
+        <div className="mb-4">
           <InputDataWithForm
             onSubmit={handleFormSubmit}
             isLoading={loading}
