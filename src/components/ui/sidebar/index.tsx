@@ -34,16 +34,8 @@ const Sidebar = ({ setShowModal }) => {
   const [topHeight, setTopHeight] = useState<number>();
   const location = useLocation();
   const documentSideBar = Cookies.get('role') === 'admin';
-  type DocumentListResult = {
-    pagination?: {
-      total?: number;
-    };
-  };
 
-  const queryDocument = useGetListDocument(undefined, {
-    enabled: documentSideBar,
-    queryKey: []
-  }) as { data?: DocumentListResult };
+  const queryDocument = useGetListDocument();
   const topRef = useRef<HTMLDivElement | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [active, setActive] = useState<string | null>(null);
