@@ -18,6 +18,7 @@ export type TDocParams = {
   page: number;
   page_size: number;
   doc_type: 'all' | 'metadata' | 'upload';
+  enabled?: boolean;
 };
 
 export type TResponseListDocument = TResponse<TDocItem[]>;
