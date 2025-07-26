@@ -30,11 +30,20 @@ type TRecentChats = {
 const Sidebar = ({ setShowModal }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const query = useGetFiles();
-  const queryDocument = useGetListDocument();
   const dataResult = query.data?.data as TRecentChats[] | undefined;
   const [topHeight, setTopHeight] = useState<number>();
   const location = useLocation();
   const documentSideBar = Cookies.get('role') === 'admin';
+  type DocumentListResult = {
+    pagination?: {
+      total?: number;
+    };
+  };
+
+  const queryDocument = useGetListDocument(undefined, {
+    enabled: documentSideBar,
+    queryKey: []
+  }) as { data?: DocumentListResult };
   const topRef = useRef<HTMLDivElement | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [active, setActive] = useState<string | null>(null);
