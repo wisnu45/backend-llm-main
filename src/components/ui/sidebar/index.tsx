@@ -34,9 +34,7 @@ const Sidebar = ({ setShowModal }) => {
   const dataResult = query.data?.data as TRecentChats[] | undefined;
   const [topHeight, setTopHeight] = useState<number>();
   const location = useLocation();
-  const documentSideBar = Cookies.get('username')
-    ?.toLocaleLowerCase()
-    ?.includes('admin');
+  const documentSideBar = Cookies.get('role') === 'admin';
   const topRef = useRef<HTMLDivElement | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [active, setActive] = useState<string | null>(null);

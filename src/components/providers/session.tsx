@@ -69,13 +69,16 @@ const SessionProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
 
     try {
       const res = await loginMutation.mutateAsync(payload);
-      // const authHeader = res.authorization;
       const authHeader = res.data.token;
       const token = authHeader.replace('Basic ', '');
       setSessionData({
         access_token: token
       });
-      SessionToken.set({ access_token: token, username: res.data.username });
+      SessionToken.set({
+        access_token: token,
+        username: res.data.userdata.username,
+        role: res.data.userdata.role
+      });
       setStatus('authenticated');
       setErrorMessage(null);
 

@@ -9,6 +9,10 @@ export type TLoginResponse = {
   data: {
     token: string;
     username: string;
+    userdata: {
+      role: string;
+      username: string;
+    };
     user: {
       id: string;
       fullname: string;
