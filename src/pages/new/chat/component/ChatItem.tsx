@@ -57,18 +57,22 @@ const MarkdownRenderer = ({ content }: { content: string }) => (
       ),
       hr: () => <hr className="my-4 border-t border-gray-300" />,
       code: (props) => {
-        const { inline, className, children, ...rest } = props as any;
-        return inline ? (
-          <code className="rounded bg-gray-100 px-1 py-0.5 text-sm" {...rest}>
+        const { children, ...rest } = props as any;
+        return (
+          <code
+            className="rounded bg-gray-200 px-1 py-0.5 text-sm text-black"
+            {...rest}
+          >
             {children}
           </code>
-        ) : (
-          <pre className="overflow-x-auto rounded bg-gray-900 p-4 text-sm text-white">
-            <code className={className} {...rest}>
-              {children}
-            </code>
-          </pre>
         );
+        // ) : (
+        // return <pre className="overflow-x-auto rounded bg-gray-900 p-4 text-sm text-white">
+        //   <code className={className} {...rest}>
+        //     {children}
+        //   </code>
+        // </pre>
+        // );
       },
       table: (props) => (
         <table className="my-4 w-full table-auto border-collapse" {...props} />
