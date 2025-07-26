@@ -135,11 +135,9 @@ const MarkdownRenderer = ({ content }: { content: string }) => (
 // };
 
 export const ChatItem = ({ data }) => {
-  // console.log('data ITem', data);
   const [isCopied, setIsCopied] = useState(false);
 
   const answer = (data.answer ?? '').replace(/\n{2,}/g, '\n');
-  console.log('answare', answer);
 
   // const isLast = (createdAt) => {
   //   const dataDate = new Date(createdAt);
