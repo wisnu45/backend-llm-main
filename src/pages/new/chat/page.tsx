@@ -119,7 +119,7 @@ const ChatPage = () => {
         {!loading && (
           <div className="mb-4 w-full">
             <h2 className="text-gradient-light mb-1 text-2xl font-bold md:mb-2 md:text-3xl lg:text-4xl">
-              Hi there, {Cookies.get('username')}
+              Hi there, {Cookies.get('name')}
             </h2>
             <h3 className="text-gradient-light mb-1 text-2xl font-bold md:mb-8 md:text-3xl lg:text-4xl">
               What can Vita help you with today?

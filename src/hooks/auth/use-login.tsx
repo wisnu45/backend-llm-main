@@ -12,7 +12,8 @@ export const useLogin = () => {
     onSuccess: (res) => {
       SessionToken.set({
         access_token: res.authorization,
-        username: res.authorization,
+        username: res.data.userdata.username,
+        name: res.data.userdata.name,
         role: res.data.userdata.role
       });
       navigate('/chat', { replace: true });

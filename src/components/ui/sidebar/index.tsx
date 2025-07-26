@@ -91,7 +91,10 @@ const Sidebar = ({ setShowModal }) => {
           </button>
           {isSidebarOpen && (
             <div className="mt-2 transition-transform duration-300">
-              <UserCard name="Pengguna" id="#12392832" />
+              <UserCard
+                name={Cookies.get('name') || ''}
+                id={Cookies.get('role') || ''}
+              />
             </div>
           )}
 

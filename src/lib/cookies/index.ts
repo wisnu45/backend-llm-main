@@ -4,12 +4,14 @@ type TCookies = {
   access_token: string;
   username: string;
   role: string;
+  name: string;
 };
 
 export const SessionToken = {
   set: (values: TCookies) => {
     Cookies.set('token', values.access_token);
     Cookies.set('username', values.username);
+    Cookies.set('name', values.name);
     Cookies.set('role', values.role);
   },
   get: (): string | undefined => {

@@ -77,7 +77,8 @@ const SessionProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
       SessionToken.set({
         access_token: token,
         username: res.data.userdata.username,
-        role: res.data.userdata.role
+        role: res.data.userdata.role,
+        name: res.data.userdata.name
       });
       setStatus('authenticated');
       setErrorMessage(null);

@@ -12,6 +12,7 @@ export type TLoginResponse = {
     userdata: {
       role: string;
       username: string;
+      name: string;
     };
     user: {
       id: string;
