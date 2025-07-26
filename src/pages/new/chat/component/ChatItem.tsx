@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { CheckIcon } from '@radix-ui/react-icons';
@@ -11,66 +11,66 @@ interface Item {
   download_url: string;
 }
 
-const TypingEffect = ({
-  text,
-  typingSpeed = 10
-}: {
-  text: string;
-  typingSpeed?: number;
-}) => {
-  const [displayedText, setDisplayedText] = useState<string>('');
+// const TypingEffect = ({
+//   text,
+//   typingSpeed = 10
+// }: {
+//   text: string;
+//   typingSpeed?: number;
+// }) => {
+//   const [displayedText, setDisplayedText] = useState<string>('');
 
-  useEffect(() => {
-    let index = 0;
+//   useEffect(() => {
+//     let index = 0;
 
-    const intervalId = setInterval(() => {
-      setDisplayedText((prevText) => prevText + text.charAt(index));
-      index++;
+//     const intervalId = setInterval(() => {
+//       setDisplayedText((prevText) => prevText + text.charAt(index));
+//       index++;
 
-      if (index >= text.length) {
-        clearInterval(intervalId);
-      }
-    }, typingSpeed);
+//       if (index >= text.length) {
+//         clearInterval(intervalId);
+//       }
+//     }, typingSpeed);
 
-    return () => clearInterval(intervalId);
-  }, [text, typingSpeed]);
+//     return () => clearInterval(intervalId);
+//   }, [text, typingSpeed]);
 
-  return (
-    <ReactMarkdown
-      remarkPlugins={[remarkGfm]}
-      className="prose prose-sm max-w-full space-y-4 break-words text-justify"
-    >
-      {displayedText}
-    </ReactMarkdown>
-  );
+// return (
+//   <ReactMarkdown
+//     remarkPlugins={[remarkGfm]}
+//     className="prose prose-sm max-w-full space-y-4 break-words text-justify"
+//   >
+//     {displayedText}
+//   </ReactMarkdown>
+// );
 
-  // console.log('displayedText', displayedText);
-  // return (
-  //   <ReactMarkdown
-  //     remarkPlugins={[remarkGfm]}
-  //     className="prose prose-sm max-w-full space-y-4 break-words text-justify"
-  //   >
-  //     {displayedText}
-  //   </ReactMarkdown>
-  // );
-};
+// console.log('displayedText', displayedText);
+// return (
+//   <ReactMarkdown
+//     remarkPlugins={[remarkGfm]}
+//     className="prose prose-sm max-w-full space-y-4 break-words text-justify"
+//   >
+//     {displayedText}
+//   </ReactMarkdown>
+// );
+// };
 
 export const ChatItem = ({ data }) => {
   // console.log('data ITem', data);
   const [isCopied, setIsCopied] = useState(false);
 
-  const isLast = (createdAt) => {
-    const dataDate = new Date(createdAt);
-    const now = new Date();
+  // const isLast = (createdAt) => {
+  //   const dataDate = new Date(createdAt);
+  //   const now = new Date();
 
-    return (
-      dataDate.getFullYear() === now.getFullYear() &&
-      dataDate.getMonth() === now.getMonth() &&
-      dataDate.getDate() === now.getDate() &&
-      dataDate.getHours() === now.getHours() &&
-      dataDate.getMinutes() === now.getMinutes()
-    );
-  };
+  //   return (
+  //     dataDate.getFullYear() === now.getFullYear() &&
+  //     dataDate.getMonth() === now.getMonth() &&
+  //     dataDate.getDate() === now.getDate() &&
+  //     dataDate.getHours() === now.getHours() &&
+  //     dataDate.getMinutes() === now.getMinutes()
+  //   );
+  // };
 
   return (
     <div className="mb-10 space-y-4 ">
