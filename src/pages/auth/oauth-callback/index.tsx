@@ -1,10 +1,21 @@
-import { useEffect, useState } from 'react';
+import { useSession } from '@/components/providers/session';
+import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
 const OAuthCallbackPage = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [dots, setDots] = useState('');
+  const { signinSSO } = useSession();
+
+  const handleLoginBySSO = useCallback((id?: string | null) => {
+    if (!id) {
+      navigate('/auth/signin?error=Login failed. Session not found.');
+      return;
+    }
+
+    signinSSO({ token: id });
+  }, []);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -15,17 +26,9 @@ const OAuthCallbackPage = () => {
 
   useEffect(() => {
     const token = searchParams.get('id');
-    if (!token) {
-      navigate('/auth/signin?error=Login Failed');
-    }
 
-    // TODO: validate token
-    const timer = setTimeout(() => {
-      navigate('/');
-    }, 3000);
-
-    return () => clearTimeout(timer);
-  }, [navigate, searchParams]);
+    handleLoginBySSO(token);
+  }, [navigate, searchParams, handleLoginBySSO]);
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-[#f8f8f9] text-center font-sans transition-opacity duration-500">

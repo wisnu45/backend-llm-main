@@ -1,12 +1,19 @@
-import { TLoginRequest, TLoginResponse } from '@/api/auth/type';
+import {
+  TLoginRequest,
+  TLoginResponse,
+  TLoginSSORequest
+} from '@/api/auth/type';
 import { useEffect, useState, createContext, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SessionToken } from '@/lib/cookies';
 import { SessionUser } from '@/lib/local-storage';
 import { useLogin } from '@/hooks/auth/use-login';
+import { useLoginSSO } from '@/hooks/auth/login-sso';
+import { TErrorResponse } from '@/commons/types/response';
 
 type Session = {
   signin: (payload: TLoginRequest) => void;
+  signinSSO: (payload: TLoginSSORequest) => void;
   signout: () => void;
   updateSession: (data: TLoginResponse['data']['user']) => void;
   session?: {
@@ -21,6 +28,7 @@ type Session = {
 
 const SessionContext = createContext<Session>({
   signin: () => {},
+  signinSSO: () => {},
   signout: () => {},
   updateSession: () => {},
   session: undefined,
@@ -35,6 +43,7 @@ const SessionProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const loginMutation = useLogin();
+  const loginSSO = useLoginSSO();
 
   useEffect(() => {
     const session = SessionToken.get();
@@ -90,6 +99,31 @@ const SessionProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     }
   };
 
+  const signinSSO = async (payload: TLoginSSORequest) => {
+    setStatus('authenticating');
+
+    try {
+      const res = await loginSSO.mutateAsync(payload);
+      const authHeader = res.data.token;
+      const token = authHeader.replace('Basic ', '');
+      setSessionData({
+        access_token: token
+      });
+      SessionToken.set({ access_token: token, username: res.data.username });
+      setStatus('authenticated');
+      setErrorMessage(null);
+      navigate('/chat', { replace: true });
+
+      return res;
+    } catch (error) {
+      const err = error as TErrorResponse;
+      setStatus('unauthenticated');
+      navigate(`/auth/signin?error=${err.response?.data.message}`, {
+        replace: true
+      });
+    }
+  };
+
   const signout = () => {
     setStatus('unauthenticated');
     setSessionData(undefined);
@@ -104,6 +138,7 @@ const SessionProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
         session: sessionData,
         status,
         signin,
+        signinSSO,
         signout,
         updateSession,
         errorMessage

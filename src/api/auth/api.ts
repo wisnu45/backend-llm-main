@@ -1,5 +1,10 @@
 import api from '@/lib/api';
-import { TLoginRequest, TLoginResponse, TLogoutRequest } from './type';
+import {
+  TLoginRequest,
+  TLoginResponse,
+  TLoginSSORequest,
+  TLogoutRequest
+} from './type';
 
 export const login = async (req: TLoginRequest): Promise<TLoginResponse> => {
   const res = await api.post<TLoginResponse>('/auth/login', req);
@@ -8,5 +13,12 @@ export const login = async (req: TLoginRequest): Promise<TLoginResponse> => {
 
 export const logout = async (req: TLogoutRequest): Promise<TLoginResponse> => {
   const res = await api.post<TLoginResponse>('/logout', { session_id: req });
+  return res.data;
+};
+
+export const loginBySSO = async (
+  req: TLoginSSORequest
+): Promise<TLoginResponse> => {
+  const res = await api.post<TLoginResponse>('/auth/sso-login', req);
   return res.data;
 };

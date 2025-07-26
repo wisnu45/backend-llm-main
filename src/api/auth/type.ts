@@ -32,3 +32,7 @@ export type TLoginResponse = {
 export type TLogoutRequest = {
   session_id: string;
 };
+
+export type TLoginSSORequest = {
+  token: string;
+};
