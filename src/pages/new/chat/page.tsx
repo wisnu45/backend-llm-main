@@ -125,7 +125,7 @@ const ChatPage = () => {
             <h3 className="text-gradient-light mt-1 text-2xl font-bold md:mt-2 md:text-3xl lg:text-4xl">
               What can Vita help you with today?
             </h3>
-            <p className="mt-2 text-gray-500 md:mt-6">
+            <p className="mt-2 text-gray-500 md:mt-8">
               Use one of the most common prompts below or use your own to begin
             </p>
 
