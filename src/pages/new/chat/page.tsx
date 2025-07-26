@@ -49,7 +49,6 @@ const ChatPage = () => {
   const [previewPrompt, setPreviewPrompt] = useState<string>('');
   const [previewFiles, setPreviewFiles] = useState<FileType[]>([]);
   const [showPreview, setShowPreview] = useState<boolean>(false);
-
   const mutation = useCreateChat();
   const createNewChat = useCreateNewChat();
   const queryHistorySideBar = useGetFiles();
