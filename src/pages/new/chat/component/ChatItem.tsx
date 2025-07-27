@@ -66,13 +66,6 @@ const MarkdownRenderer = ({ content }: { content: string }) => (
             {children}
           </code>
         );
-        // ) : (
-        // return <pre className="overflow-x-auto rounded bg-gray-900 p-4 text-sm text-white">
-        //   <code className={className} {...rest}>
-        //     {children}
-        //   </code>
-        // </pre>
-        // );
       },
       table: (props) => (
         <table className="my-4 w-full table-auto border-collapse" {...props} />
@@ -90,67 +83,11 @@ const MarkdownRenderer = ({ content }: { content: string }) => (
   </ReactMarkdown>
 );
 
-// const TypingEffect = ({
-//   text,
-//   typingSpeed = 10
-// }: {
-//   text: string;
-//   typingSpeed?: number;
-// }) => {
-//   const [displayedText, setDisplayedText] = useState<string>('');
-
-//   useEffect(() => {
-//     let index = 0;
-
-//     const intervalId = setInterval(() => {
-//       setDisplayedText((prevText) => prevText + text.charAt(index));
-//       index++;
-
-//       if (index >= text.length) {
-//         clearInterval(intervalId);
-//       }
-//     }, typingSpeed);
-
-//     return () => clearInterval(intervalId);
-//   }, [text, typingSpeed]);
-
-// return (
-//   <ReactMarkdown
-//     remarkPlugins={[remarkGfm]}
-//     className="prose prose-sm max-w-full space-y-4 break-words text-justify"
-//   >
-//     {displayedText}
-//   </ReactMarkdown>
-// );
-
-// console.log('displayedText', displayedText);
-// return (
-//   <ReactMarkdown
-//     remarkPlugins={[remarkGfm]}
-//     className="prose prose-sm max-w-full space-y-4 break-words text-justify"
-//   >
-//     {displayedText}
-//   </ReactMarkdown>
-// );
-// };
-
 export const ChatItem = ({ data }) => {
   const [isCopied, setIsCopied] = useState(false);
-
-  const answer = (data.answer ?? '').replace(/\n{2,}/g, '\n');
-
-  // const isLast = (createdAt) => {
-  //   const dataDate = new Date(createdAt);
-  //   const now = new Date();
-
-  //   return (
-  //     dataDate.getFullYear() === now.getFullYear() &&
-  //     dataDate.getMonth() === now.getMonth() &&
-  //     dataDate.getDate() === now.getDate() &&
-  //     dataDate.getHours() === now.getHours() &&
-  //     dataDate.getMinutes() === now.getMinutes()
-  //   );
-  // };
+  const answer = (data.answer ?? '')
+    .replace(/\n\s+\n/g, '\n\n')
+    .replace(/\n{2,}/g, '\n');
   return (
     <div className="mb-10 space-y-4 ">
       <div className="flex justify-end">
@@ -160,23 +97,6 @@ export const ChatItem = ({ data }) => {
       </div>
       <div className="col-auto flex flex-col items-start space-y-3 overflow-hidden">
         <div>
-          {/* <TypingEffect text={data.answer} typingSpeed={10} /> */}
-          {/* {isLast(data.created_at) ? (
-            <TypingEffect text={data.answer} typingSpeed={10} />
-          ) : (
-            <ReactMarkdown
-              remarkPlugins={[remarkGfm]}
-              className="prose prose-sm max-w-full space-y-4 break-words text-justify"
-            >
-              {data.answer}
-            </ReactMarkdown>
-          )} */}
-          {/* <ReactMarkdown
-            remarkPlugins={[remarkGfm]}
-            className="prose prose-sm max-w-full space-y-4 break-words text-justify"
-          >
-            {data.answer}
-          </ReactMarkdown> */}
           <MarkdownRenderer content={answer} />
         </div>
         {data?.file_links?.length && data?.file_links?.length > 0 ? (
