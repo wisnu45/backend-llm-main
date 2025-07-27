@@ -22,7 +22,7 @@ import { Button } from '@/components/ui/button';
 import { useSession } from '@/components/providers/session';
 import { LoginSchema, TLoginFormData } from './components/schema';
 import { useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
@@ -157,6 +157,14 @@ export default function LoginPage() {
               >
                 Login with SSO
               </Button>
+              <div className="mt-2 text-center">
+                <Link
+                  className=" text-xs"
+                  to="https://portal.combiphar.com/Apps/open/combiai"
+                >
+                  Direct to SSO (for testing only)
+                </Link>
+              </div>
             </form>
           </Form>
         </CardContent>
