@@ -48,10 +48,8 @@ export default function LoginPage() {
     }
   };
 
-  const redirectUrl = new URL(`${import.meta.env.VITE_BASE_URL}/SSO/Validate`);
-
   const handleSsoLogin = () => {
-    window.location.href = `https://portal.combiphar.com/Account/Login?ReturnUrl=${redirectUrl}`;
+    window.location.href = `https://portal.combiphar.com`;
   };
 
   useEffect(() => {
