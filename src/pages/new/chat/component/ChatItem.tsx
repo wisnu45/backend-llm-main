@@ -43,10 +43,10 @@ const MarkdownRenderer = ({ content }: { content: string }) => (
         />
       ),
       ul: (props) => (
-        <ul className="ml-4 list-inside list-disc space-y-1" {...props} />
+        <ul className="ml-4 list-outside list-disc space-y-1" {...props} />
       ),
       ol: (props) => (
-        <ol className="ml-4 list-inside list-decimal space-y-1" {...props} />
+        <ol className="ml-4 list-outside list-decimal space-y-1" {...props} />
       ),
       li: (props) => (
         <li
@@ -60,7 +60,7 @@ const MarkdownRenderer = ({ content }: { content: string }) => (
         const { children, ...rest } = props as any;
         return (
           <code
-            className="rounded bg-gray-200 px-1 py-0.5 text-sm text-black"
+            className="text-black, rounded bg-gray-200 px-1 py-0.5 text-sm"
             {...rest}
           >
             {children}
@@ -86,8 +86,8 @@ const MarkdownRenderer = ({ content }: { content: string }) => (
 export const ChatItem = ({ data }) => {
   const [isCopied, setIsCopied] = useState(false);
   const answer = (data.answer ?? '')
-    .replace(/\n\s+\n/g, '\n\n')
-    .replace(/\n{2,}/g, '\n');
+    .replace(/\n{2,}(?=\s*-\s)/g, '\n')
+    .replace(/```(?:\s*)(.*?)(?:\s*)```/gs, '```\n$1\n```');
   return (
     <div className="mb-10 space-y-4 ">
       <div className="flex justify-end">
