@@ -86,10 +86,10 @@ export function DataTable<TData, TValue>({
       <ScrollArea className="rounded-md border">
         <Table className="relative">
           <TableHeader className="bg-[#5C47DB]">
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id} className="uppercase text-white">
+            {table.getHeaderGroups().map((headerGroup, index) => (
+              <TableRow key={index}>
+                {headerGroup.headers.map((header, index) => (
+                  <TableHead key={index} className="uppercase text-white">
                     {header.isPlaceholder
                       ? null
                       : flexRender(
@@ -110,10 +110,10 @@ export function DataTable<TData, TValue>({
                 </TableCell>
               </TableRow>
             ) : table.getRowModel().rows.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id}>
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+              table.getRowModel().rows.map((row, index) => (
+                <TableRow key={index}>
+                  {row.getVisibleCells().map((cell, index) => (
+                    <TableCell key={index}>
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext()
@@ -155,8 +155,8 @@ export function DataTable<TData, TValue>({
               />
             </SelectTrigger>
             <SelectContent side="top">
-              {pageSizeOptions.map((pageSize) => (
-                <SelectItem key={pageSize} value={`${pageSize}`}>
+              {pageSizeOptions.map((pageSize, index) => (
+                <SelectItem key={index} value={`${pageSize}`}>
                   {pageSize}
                 </SelectItem>
               ))}
