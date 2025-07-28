@@ -21,6 +21,7 @@ import {
 } from '../dropdown-menu';
 import { DropdownMenuTrigger } from '@radix-ui/react-dropdown-menu';
 import { useDeleteChat } from './_hook/use-delete-chat';
+import DocumentMenu from './document-menu';
 
 type TRecentChats = {
   session_id: string;
@@ -35,7 +36,6 @@ const Sidebar = ({ setShowModal }) => {
   const location = useLocation();
   const documentSideBar = Cookies.get('role') === 'admin';
 
-  const queryDocument = useGetListDocument();
   const topRef = useRef<HTMLDivElement | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [active, setActive] = useState<string | null>(null);
@@ -113,28 +113,7 @@ const Sidebar = ({ setShowModal }) => {
               <PlusIcon className="text-gray-800" />
             )}
           </Link>
-          {documentSideBar && (
-            <Link
-              to="/files"
-              className="flex items-center justify-between rounded-lg p-2 text-sm text-gray-700 hover:bg-gray-400/20"
-            >
-              {isSidebarOpen ? (
-                <div className="flex w-full items-center justify-between">
-                  <div className="flex gap-2">
-                    <FileTextIcon className="font-bold" />
-                    <span className="truncate font-semibold">
-                      Document File
-                    </span>
-                  </div>
-                  <div className="w-12 rounded-full bg-[#B9B7C5] p-1 text-center text-xs text-[#5C47DB]">
-                    {queryDocument.data?.pagination?.total || 0}
-                  </div>
-                </div>
-              ) : (
-                <FileTextIcon className="font-bold" />
-              )}
-            </Link>
-          )}
+          {documentSideBar && <DocumentMenu isSidebarOpen={isSidebarOpen} />}
 
           {isSidebarOpen && (
             <h2 className="mb-2 p-2 text-xs font-semibold uppercase tracking-wider text-gray-500">
