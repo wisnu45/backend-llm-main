@@ -15,12 +15,10 @@ type Session = {
   signin: (payload: TLoginRequest) => void;
   signinSSO: (payload: TLoginSSORequest) => void;
   signout: () => void;
-  updateSession: (data: TLoginResponse['data']['user']) => void;
+  updateSession: (data: TLoginResponse['data']['userdata']) => void;
   session?: {
-    // TODO format response login token
-    // refresh_token: string;
+    refresh_token: string;
     access_token: string;
-    // user?: TLoginResponse['data']['user'];
   };
   status?: 'authenticated' | 'authenticating' | 'unauthenticated';
   errorMessage: string | null;
@@ -56,7 +54,7 @@ const SessionProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     }
   }, []);
 
-  const updateSession = (data: TLoginResponse['data']['user']) => {
+  const updateSession = (data: TLoginResponse['data']['userdata']) => {
     if (!sessionData) return;
 
     const updatedUser = {
@@ -78,13 +76,12 @@ const SessionProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
 
     try {
       const res = await loginMutation.mutateAsync(payload);
-      const authHeader = res.data.token;
-      const token = authHeader.replace('Basic ', '');
       setSessionData({
-        access_token: token
+        access_token: res.data.access_token,
+        refresh_token: res.data.refresh_token
       });
       SessionToken.set({
-        access_token: token,
+        access_token: res.data.access_token,
         username: res.data.userdata.username,
         role: res.data.userdata.role,
         name: res.data.userdata.name
@@ -104,13 +101,12 @@ const SessionProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
 
     try {
       const res = await loginSSO.mutateAsync(payload);
-      const authHeader = res.data.token;
-      const token = authHeader.replace('Basic ', '');
       setSessionData({
-        access_token: token
+        access_token: res.data.access_token,
+        refresh_token: res.data.refresh_token
       });
       SessionToken.set({
-        access_token: token,
+        access_token: res.data.access_token,
         username: res.data.userdata.username,
         role: res.data.userdata.role,
         name: res.data.userdata.name

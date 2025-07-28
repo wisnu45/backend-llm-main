@@ -7,24 +7,15 @@ export type TLoginResponse = {
   authorization: string;
   message: string;
   data: {
-    token: string;
-    username: string;
+    access_token: string;
+    refresh_token: string;
+    token_type: string;
+    expires_in: number;
     userdata: {
       role: string;
       username: string;
       name: string;
-    };
-    user: {
-      id: string;
-      fullname: string;
-      email?: string;
-      username?: string;
-      login_type?: 'username' | 'email';
-      created_at: string;
-      updated_at: string;
-      role: 'admin' | 'marketing';
-      avatar_path: string | null;
-      avatar_url: string | null;
+      is_portal: boolean;
     };
   };
 };
