@@ -108,7 +108,7 @@ export const ChatItem = ({ data }) => {
                 const download_url: string = item.download_url;
                 return (
                   <div
-                    key={item.filename}
+                    key={index}
                     className="inline-block max-w-full  break-words "
                   >
                     <div
