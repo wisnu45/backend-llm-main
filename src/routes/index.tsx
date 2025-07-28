@@ -11,8 +11,7 @@ import FilesPage from '@/pages/new/files/page';
 import DetailPage from '@/pages/new/chat/detail/page';
 import ChatHistory from '@/pages/history/ChatHistory';
 import OAuthCallbackPage from '@/pages/auth/oauth-callback';
-
-const SignInPage = lazy(() => import('@/pages/auth/signin'));
+import LoginPage from '@/pages/auth/signin';
 
 const MainLayout = lazy(() => import('@/components/layout/main-layout'));
 const NewMainLayout = lazy(() => import('@/components/layout/new-main-layout'));
@@ -95,7 +94,7 @@ export default function AppRouter() {
       path: '/auth/signin',
       element: (
         <PublicRoute>
-          <SignInPage />
+          <LoginPage />
         </PublicRoute>
       ),
       index: true

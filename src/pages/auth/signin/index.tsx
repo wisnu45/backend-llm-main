@@ -22,14 +22,17 @@ import { Button } from '@/components/ui/button';
 import { useSession } from '@/components/providers/session';
 import { LoginSchema, TLoginFormData } from './components/schema';
 import { useEffect, useState } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { SessionToken } from '@/lib/cookies';
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const { signin, status } = useSession();
+  const token = SessionToken.get();
   const [error, setError] = useState('');
   const loading = status === 'authenticating';
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
 
   const form = useForm<TLoginFormData>({
     mode: 'onChange',
@@ -59,6 +62,12 @@ export default function LoginPage() {
     }
     return () => setError('');
   }, [searchParams]);
+
+  useEffect(() => {
+    if (token) {
+      navigate('/');
+    }
+  }, [token, navigate]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-[#f8f8f9] font-sans">
