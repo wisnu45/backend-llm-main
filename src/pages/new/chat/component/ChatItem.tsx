@@ -2,6 +2,7 @@ import { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { CheckIcon } from '@radix-ui/react-icons';
+import { formatMarkdownToPlainText } from '@/lib/markdown';
 import useCreateFeedbackChat from '../_hook/use-mutate-response';
 import { useGetDetailHistory } from '../_hook/use-get-history-chat';
 
@@ -43,10 +44,10 @@ const MarkdownRenderer = ({ content }: { content: string }) => (
         />
       ),
       ul: (props) => (
-        <ul className="ml-4 list-outside list-disc space-y-1" {...props} />
+        <ul className="ml-5 list-outside list-disc space-y-1" {...props} />
       ),
       ol: (props) => (
-        <ol className="ml-4 list-outside list-decimal space-y-1" {...props} />
+        <ol className="ml-5 list-outside list-decimal space-y-1" {...props} />
       ),
       li: (props) => (
         <li
@@ -143,7 +144,7 @@ const IconBar = ({ setIsCopied, isCopied, text, id, session_id, feedback }) => {
   const query = useGetDetailHistory({ session_id: session_id || '' });
 
   const handleCopy = () => {
-    const textToCopy = text;
+    const textToCopy = formatMarkdownToPlainText(text);
     navigator.clipboard.writeText(textToCopy).then(() => {
       setIsCopied(true);
       setTimeout(() => {
