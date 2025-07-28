@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import Cookies from 'js-cookie';
 import { SessionToken } from './cookies';
 const api = axios.create({
@@ -16,3 +16,15 @@ api.interceptors.request.use((config) => {
   return config;
 });
 export default api;
+
+api.interceptors.response.use(
+  (response) => response,
+  (error: AxiosError) => {
+    if (error.response?.status === 401) {
+      SessionToken.remove();
+      window.location.href =
+        '/auth/signin?error=Your session has expired. Please sign in again.';
+    }
+    return Promise.reject(error);
+  }
+);
