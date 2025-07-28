@@ -1,16 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
-import {
-  FileTextIcon,
-  HamburgerMenuIcon,
-  PlusIcon
-} from '@radix-ui/react-icons';
+import { HamburgerMenuIcon, PlusIcon } from '@radix-ui/react-icons';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useGetFiles } from './_hook/use-get-history-chat';
 import UserCard from '../user-card';
 import { ScrollArea } from '../scroll-area';
 import Cookies from 'js-cookie';
 import { Skeleton } from '../skeleton';
-import useGetListDocument from '@/pages/new/files/_hooks/get-list-document';
 import { AlertModal } from '../../shared/alert-modal';
 import { MoreVertical, TrashIcon } from 'lucide-react';
 import {
