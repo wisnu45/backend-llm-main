@@ -16,6 +16,7 @@ export interface Metadata {
 export interface TChatRequest {
   question: string;
   session_id: string;
+  is_browse: string;
 }
 
 export interface TChatResponseRequest {

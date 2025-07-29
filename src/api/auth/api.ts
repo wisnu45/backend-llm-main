@@ -12,7 +12,7 @@ export const login = async (req: TLoginRequest): Promise<TLoginResponse> => {
 };
 
 export const logout = async (req: TLogoutRequest): Promise<TLoginResponse> => {
-  const res = await api.post<TLoginResponse>('/logout', { session_id: req });
+  const res = await api.post<TLoginResponse>('/auth/logout', req);
   return res.data;
 };
 

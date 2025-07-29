@@ -155,7 +155,7 @@ const getColumns = (
   {
     header: 'Action',
     cell: ({ row }) => {
-      const isMetadata = Boolean(row.original.portal_id);
+      // const isMetadata = Boolean(row.original.portal_id);
 
       return (
         <div>
@@ -173,7 +173,7 @@ const getColumns = (
           </Button>
 
           <Button
-            className={isMetadata ? 'hidden' : ''}
+            // className={isMetadata ? 'hidden' : ''}
             variant="ghost"
             onClick={() => setModal('delete', row.original)}
           >

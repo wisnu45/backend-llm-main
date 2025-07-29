@@ -1,14 +1,19 @@
-import { SessionToken } from '@/lib/cookies';
+import { useLogout } from '@/hooks/auth/use-logout';
 
 const Logout = ({ showModal, setShowModal }) => {
-  const handleLogout = () => {
-    SessionToken.remove();
-    setShowModal(false);
-    window.location.href = '/auth/signin';
+  const logoutMutation = useLogout();
+  const handleLogout = async () => {
+    try {
+      const res = await logoutMutation.mutateAsync();
+      console.log('CEK CEK', res);
+    } catch (err) {
+      console.log('cek');
+    }
   };
   if (!showModal) {
     return null;
   }
+
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
       <div className="w-96 rounded-lg bg-white p-6">

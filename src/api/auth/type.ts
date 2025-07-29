@@ -21,7 +21,7 @@ export type TLoginResponse = {
 };
 
 export type TLogoutRequest = {
-  session_id: string;
+  refresh_token: string;
 };
 
 export type TLoginSSORequest = {

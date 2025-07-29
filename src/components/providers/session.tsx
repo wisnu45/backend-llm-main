@@ -84,7 +84,8 @@ const SessionProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
         access_token: res.data.access_token,
         username: res.data.userdata.username,
         role: res.data.userdata.role,
-        name: res.data.userdata.name
+        name: res.data.userdata.name,
+        refresh_token: res.data.refresh_token
       });
       setStatus('authenticated');
       setErrorMessage(null);
@@ -109,7 +110,8 @@ const SessionProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
         access_token: res.data.access_token,
         username: res.data.userdata.username,
         role: res.data.userdata.role,
-        name: res.data.userdata.name
+        name: res.data.userdata.name,
+        refresh_token: res.data.refresh_token
       });
       setStatus('authenticated');
       setErrorMessage(null);

@@ -4,7 +4,7 @@ import {
   ArrowRightIcon,
   Cross2Icon
 } from '@radix-ui/react-icons';
-import { useState, useImperativeHandle } from 'react';
+import { useState, useImperativeHandle, useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ChatFormSchema, TChatFormData } from '../schema';
@@ -39,7 +39,7 @@ const InputDataWithForm = ({
     defaultValues: {
       prompt: initialPrompt,
       attachments: [],
-      searchOnInternet: false
+      is_browse: false
     },
     mode: 'onChange'
   });
@@ -107,6 +107,11 @@ const InputDataWithForm = ({
     }),
     [setValue, trigger]
   );
+  const watchedSearch = watch('is_browse');
+
+  useEffect(() => {
+    setValue('is_browse', watchedSearch === true);
+  }, [watchedSearch, setValue]);
 
   return (
     <form onSubmit={handleSubmit(onFormSubmit)}>
@@ -219,7 +224,7 @@ const InputDataWithForm = ({
             </button>
             <div className="flex items-center gap-2">
               <Controller
-                name="searchOnInternet"
+                name="is_browse"
                 control={control}
                 render={({ field }) => (
                   <input

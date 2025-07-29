@@ -14,7 +14,8 @@ export const useLogin = () => {
         access_token: res.authorization,
         username: res.data.userdata.username,
         name: res.data.userdata.name,
-        role: res.data.userdata.role
+        role: res.data.userdata.role,
+        refresh_token: res.data.refresh_token
       });
       navigate('/chat', { replace: true });
     },
