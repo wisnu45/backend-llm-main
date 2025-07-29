@@ -84,7 +84,8 @@ const ChatPage = () => {
       mutation.mutate(
         {
           session_id: sessionId,
-          question: trimmedQuestion
+          question: trimmedQuestion,
+          is_browse: formData.is_browse
         },
         {
           onSuccess: () => {
