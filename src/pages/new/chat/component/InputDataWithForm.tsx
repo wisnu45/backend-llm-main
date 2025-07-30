@@ -86,6 +86,7 @@ const InputDataWithForm = ({
   };
 
   const onFormSubmit = (data: TChatFormData) => {
+    console.log('CEK', data);
     onSubmit(data);
     reset();
   };

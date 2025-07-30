@@ -18,23 +18,28 @@ api.interceptors.request.use((config) => {
 });
 
 async function refreshAccessToken() {
-  const refreshToken = Cookies.get('refresh_token'); // simpan di cookie
-
+  const refreshToken = Cookies.get('refresh_token');
   if (!refreshToken) return null;
 
   try {
+    const { username = '', name = '', role = '' } = Cookies.get();
+
     const response = await axios.post(
       `${import.meta.env.VITE_API_ENDPOINT}auth/refresh`,
       { refresh_token: refreshToken },
-      {
-        headers: { 'Content-Type': 'application/json' }
-      }
+      { headers: { 'Content-Type': 'application/json' } }
     );
 
     const newAccessToken = response.data.data.access_token;
-    const newRefreshToken = response.data.data.refresh_token;
-    SessionToken.set(newAccessToken);
-    Cookies.set('refresh_token', newRefreshToken);
+
+    SessionToken.set({
+      access_token: newAccessToken,
+      refresh_token: refreshToken,
+      username,
+      name,
+      role
+    });
+
     return newAccessToken;
   } catch (err) {
     console.error('Refresh token failed:', err);

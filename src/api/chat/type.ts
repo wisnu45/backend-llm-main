@@ -17,6 +17,7 @@ export interface TChatRequest {
   question: string;
   session_id: string;
   is_browse: boolean;
+  attachments?: File[];
 }
 
 export interface TChatResponseRequest {

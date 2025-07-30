@@ -133,10 +133,7 @@ const Sidebar = ({ setShowModal }) => {
                 )}
                 {Array.isArray(dataResult) && dataResult.length > 0
                   ? dataResult.map((chat: TRecentChats) => (
-                      <li
-                        key={chat.session_id}
-                        className="group/outer relative"
-                      >
+                      <li key={chat.session_id} className="group/outer">
                         <DropdownMenu
                           onOpenChange={(open) => {
                             if (!open) setActive(null);

@@ -86,9 +86,7 @@ const MarkdownRenderer = ({ content }: { content: string }) => (
 
 export const ChatItem = ({ data }) => {
   const [isCopied, setIsCopied] = useState(false);
-  const answer = (data.answer ?? '')
-    .replace(/\n{2,}(?=\s*-\s)/g, '\n')
-    .replace(/```(?:\s*)(.*?)(?:\s*)```/gs, '```\n$1\n```');
+  const answer = (data.answer ?? '').replace(/\n{2,}(?=\s*-\s)/g, '\n');
   return (
     <div className="mb-10 space-y-4 ">
       <div className="flex justify-end">

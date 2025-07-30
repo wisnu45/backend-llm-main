@@ -25,7 +25,8 @@ export const useChatForm = ({ chatId }: UseChatFormProps) => {
     return {
       question: formData.prompt,
       session_id: chatId,
-      is_browse: formData.is_browse
+      is_browse: formData.is_browse,
+      attachments: formData.attachments
     };
   };
 

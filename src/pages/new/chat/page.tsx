@@ -85,7 +85,8 @@ const ChatPage = () => {
         {
           session_id: sessionId,
           question: trimmedQuestion,
-          is_browse: formData.is_browse
+          is_browse: formData.is_browse,
+          attachments: formData.attachments
         },
         {
           onSuccess: () => {
