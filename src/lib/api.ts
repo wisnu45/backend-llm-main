@@ -54,7 +54,7 @@ api.interceptors.response.use(
       _retry?: boolean;
     };
 
-    // Jika token expired
+    console.log('CEK', originalRequest);
     if (error.response?.status === 401 && !originalRequest?._retry) {
       originalRequest._retry = true;
 
@@ -62,7 +62,7 @@ api.interceptors.response.use(
 
       if (newToken) {
         originalRequest.headers.Authorization = `Bearer ${newToken}`;
-        return api(originalRequest); // ulangi request
+        return api(originalRequest);
       } else {
         SessionToken.remove();
         Cookies.remove('refresh_token');

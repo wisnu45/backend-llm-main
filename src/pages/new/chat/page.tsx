@@ -124,7 +124,7 @@ const ChatPage = () => {
               Hi there, {Cookies.get('name')}
             </h2>
             <h3 className="text-gradient-light mb-1 text-2xl font-bold md:mb-8 md:text-3xl lg:text-4xl">
-              What can Vita help you with today?
+              What can Vita help you with today ?
             </h3>
             <p className="mb-4 text-gray-500 md:mb-10">
               Use one of the most common prompts below or use your own to begin

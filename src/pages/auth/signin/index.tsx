@@ -22,7 +22,7 @@ import { Button } from '@/components/ui/button';
 import { useSession } from '@/components/providers/session';
 import { LoginSchema, TLoginFormData } from './components/schema';
 import { useEffect, useState } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { SessionToken } from '@/lib/cookies';
 
 export default function LoginPage() {
@@ -52,7 +52,7 @@ export default function LoginPage() {
   };
 
   const handleSsoLogin = () => {
-    window.location.href = `https://portal.combiphar.com`;
+    window.location.href = `https://portal.combiphar.com/Apps/open/combiai`;
   };
 
   useEffect(() => {
@@ -164,19 +164,19 @@ export default function LoginPage() {
               >
                 Login with SSO
               </Button>
-              <div className="mt-2 text-center">
+              {/* <div className="mt-2 text-center">
                 <Link
                   className=" text-xs"
                   to="https://portal.combiphar.com/Apps/open/combiai"
                 >
                   Direct to SSO (for testing only)
                 </Link>
-              </div>
+              </div> */}
             </form>
           </Form>
         </CardContent>
         <CardFooter>
-          <p className="text-center text-sm text-gray-500">
+          <p className="w-full text-center text-sm text-gray-500">
             © {new Date().getFullYear()} Combiphar. All rights reserved.
           </p>
         </CardFooter>

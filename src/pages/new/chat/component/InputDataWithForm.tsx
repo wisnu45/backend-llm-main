@@ -9,6 +9,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ChatFormSchema, TChatFormData } from '../schema';
 import { TSetPromptType } from '../page';
+import Cookies from 'js-cookie';
 
 interface InputDataWithFormProps {
   onSubmit: (data: TChatFormData) => void;
@@ -25,7 +26,7 @@ const InputDataWithForm = ({
 }: InputDataWithFormProps) => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [popupFile, setPopupFile] = useState<File | null>(null);
-
+  const defaultIsBrowse = Cookies.get('search_internet') === 'true';
   const {
     control,
     handleSubmit,
@@ -36,10 +37,11 @@ const InputDataWithForm = ({
     trigger
   } = useForm<TChatFormData>({
     resolver: zodResolver(ChatFormSchema),
+
     defaultValues: {
       prompt: initialPrompt,
       attachments: [],
-      is_browse: false
+      is_browse: defaultIsBrowse
     },
     mode: 'onChange'
   });
@@ -86,7 +88,6 @@ const InputDataWithForm = ({
   };
 
   const onFormSubmit = (data: TChatFormData) => {
-    console.log('CEK', data);
     onSubmit(data);
     reset();
   };
@@ -112,6 +113,7 @@ const InputDataWithForm = ({
 
   useEffect(() => {
     setValue('is_browse', watchedSearch === true);
+    Cookies.set('search_internet', watchedSearch === true ? 'true' : 'false');
   }, [watchedSearch, setValue]);
 
   return (

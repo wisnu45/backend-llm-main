@@ -30,7 +30,6 @@ const Sidebar = ({ setShowModal }) => {
   const [topHeight, setTopHeight] = useState<number>();
   const location = useLocation();
   const documentSideBar = Cookies.get('role') === 'admin';
-
   const topRef = useRef<HTMLDivElement | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [active, setActive] = useState<string | null>(null);
@@ -116,16 +115,16 @@ const Sidebar = ({ setShowModal }) => {
             </h2>
           )}
         </div>
-
         {isSidebarOpen && (
           <div
-            className={`mb-[120px]  w-full flex-grow px-4 `}
+            className="mb-[120px]  w-full overflow-auto px-4"
             style={{
-              marginTop: topHeight
+              marginTop: topHeight,
+              maxHeight: `calc(100vh - ${topHeight}px - 120px)`
             }}
           >
             <nav>
-              <ul>
+              <ul className="overflow-hidde">
                 {query.isLoading && (
                   <li>
                     <Skeleton className="h-8 w-full" />
@@ -133,63 +132,69 @@ const Sidebar = ({ setShowModal }) => {
                 )}
                 {Array.isArray(dataResult) && dataResult.length > 0
                   ? dataResult.map((chat: TRecentChats) => (
-                      <li key={chat.session_id} className="group/outer">
-                        <DropdownMenu
-                          onOpenChange={(open) => {
-                            if (!open) setActive(null);
-                          }}
+                      <div>
+                        <li
+                          key={chat.session_id}
+                          className="group/outer relative"
                         >
-                          <Link
-                            to={`/chat/${chat.session_id}`}
-                            className={`flex items-center justify-between rounded-lg p-2 text-sm hover:bg-gray-400/20 ${active === chat.session_id ? 'bg-gray-400/30' : ''} ${
-                              location.pathname === `/chat/${chat.session_id}`
-                                ? 'bg-gray-400/40 text-black'
-                                : 'text-gray-700'
-                            }`}
-                            onClick={() => {
-                              if (window.innerWidth < 768) {
-                                setIsSidebarOpen(false);
-                              }
+                          <DropdownMenu
+                            onOpenChange={(open) => {
+                              if (!open) setActive(null);
                             }}
-                            onMouseEnter={() => setActive(chat.session_id)}
-                            onMouseLeave={() => setActive(null)}
                           >
-                            <span className="w-11/12 truncate">
-                              {chat.title || 'Untitled Chat'}
-                            </span>
-                          </Link>
-                          <DropdownMenuTrigger asChild>
-                            <button
-                              className={`group/inner absolute right-1 top-1/2 h-6 w-6 -translate-y-1/2 cursor-pointer rounded-full hover:bg-slate-700/10 ${active === chat.session_id ? 'bg-slate-700/10' : ''}`}
-                              aria-label="More options"
-                              onClick={() => setActive(chat.session_id)}
-                              onMouseEnter={() => setActive(chat.session_id)}
-                            >
-                              <MoreVertical
-                                style={{
-                                  opacity: active === chat.session_id ? 100 : 0
-                                }}
-                                className="h-4  "
-                              />
-                            </button>
-                          </DropdownMenuTrigger>
-
-                          <DropdownMenuContent side="bottom" align="end">
-                            <DropdownMenuItem
-                              className="cursor-pointer"
+                            <Link
+                              to={`/chat/${chat.session_id}`}
+                              className={`flex items-center justify-between rounded-lg p-2 text-sm hover:bg-gray-400/20 ${active === chat.session_id ? 'bg-gray-400/30' : ''} ${
+                                location.pathname === `/chat/${chat.session_id}`
+                                  ? 'bg-gray-400/40 text-black'
+                                  : 'text-gray-700'
+                              }`}
                               onClick={() => {
-                                setActiveId(chat.session_id);
-                                setShowDeleteModal(true);
+                                if (window.innerWidth < 768) {
+                                  setIsSidebarOpen(false);
+                                }
                               }}
+                              onMouseEnter={() => setActive(chat.session_id)}
+                              onMouseLeave={() => setActive(null)}
                             >
-                              Delete
-                              <DropdownMenuShortcut>
-                                <TrashIcon className="h-4 text-red-500" />
-                              </DropdownMenuShortcut>
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </li>
+                              <span className="w-11/12 truncate">
+                                {chat.title || 'Untitled Chat'}
+                              </span>
+                            </Link>
+                            <DropdownMenuTrigger asChild>
+                              <button
+                                className={`group/inner absolute right-1 top-1/2 h-6 w-6 -translate-y-1/2 cursor-pointer rounded-full hover:bg-slate-700/10 ${active === chat.session_id ? 'bg-slate-700/10' : ''}`}
+                                aria-label="More options"
+                                onClick={() => setActive(chat.session_id)}
+                                onMouseEnter={() => setActive(chat.session_id)}
+                              >
+                                <MoreVertical
+                                  style={{
+                                    opacity:
+                                      active === chat.session_id ? 100 : 0
+                                  }}
+                                  className="h-4  "
+                                />
+                              </button>
+                            </DropdownMenuTrigger>
+
+                            <DropdownMenuContent side="bottom" align="end">
+                              <DropdownMenuItem
+                                className="cursor-pointer"
+                                onClick={() => {
+                                  setActiveId(chat.session_id);
+                                  setShowDeleteModal(true);
+                                }}
+                              >
+                                Delete
+                                <DropdownMenuShortcut>
+                                  <TrashIcon className="h-4 text-red-500" />
+                                </DropdownMenuShortcut>
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </li>
+                      </div>
                     ))
                   : null}
 
@@ -225,7 +230,7 @@ const Sidebar = ({ setShowModal }) => {
               alt="Logout icon"
               className="h-4 w-4"
             />
-            {isSidebarOpen && <span className="font-semibold">Logout</span>}
+            {isSidebarOpen && <span className="font-semibold">Log out</span>}
           </button>
         </div>
       </aside>
