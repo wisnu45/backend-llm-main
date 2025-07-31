@@ -37,11 +37,10 @@ const DetailPage = () => {
     }
   });
 
-  if (!query.data?.data.length) {
-    navigate('/chat');
-  }
-
   useEffect(() => {
+    if (!query.data?.data.length) {
+      navigate('/chat');
+    }
     query.refetch();
   }, [chatId]);
 

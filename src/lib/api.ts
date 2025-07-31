@@ -25,7 +25,7 @@ async function refreshAccessToken() {
     const { username = '', name = '', role = '' } = Cookies.get();
 
     const response = await axios.post(
-      `${import.meta.env.VITE_API_ENDPOINT}auth/refresh`,
+      `${import.meta.env.VITE_API_ENDPOINT}/auth/refresh`,
       { refresh_token: refreshToken },
       { headers: { 'Content-Type': 'application/json' } }
     );

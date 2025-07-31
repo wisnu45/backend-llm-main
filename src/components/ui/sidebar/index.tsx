@@ -132,7 +132,7 @@ const Sidebar = ({ setShowModal }) => {
                 )}
                 {Array.isArray(dataResult) && dataResult.length > 0
                   ? dataResult.map((chat: TRecentChats) => (
-                      <div>
+                      <div key={chat.session_id}>
                         <li
                           key={chat.session_id}
                           className="group/outer relative"
