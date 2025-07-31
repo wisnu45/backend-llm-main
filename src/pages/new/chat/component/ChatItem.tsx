@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { CheckIcon } from '@radix-ui/react-icons';
@@ -84,9 +84,43 @@ const MarkdownRenderer = ({ content }: { content: string }) => (
   </ReactMarkdown>
 );
 
+const TypingEffect = ({
+  text,
+  typingSpeed = 10
+}: {
+  text: string;
+  typingSpeed?: number;
+}) => {
+  const [displayedText, setDisplayedText] = useState<string>('');
+  useEffect(() => {
+    let index = 0;
+    const intervalId = setInterval(() => {
+      setDisplayedText((prevText) => prevText + text.charAt(index));
+      index++;
+      if (index >= text.length) {
+        clearInterval(intervalId);
+      }
+    }, typingSpeed);
+    return () => clearInterval(intervalId);
+  }, [text, typingSpeed]);
+  return <MarkdownRenderer content={displayedText} />;
+};
+
 export const ChatItem = ({ data }) => {
   const [isCopied, setIsCopied] = useState(false);
   const answer = (data.answer ?? '').replace(/\n{2,}(?=\s*-\s)/g, '\n');
+
+  const isLast = (createdAt: string | Date) => {
+    const dataDate = new Date(createdAt);
+    const now = new Date();
+    return (
+      dataDate.getFullYear() === now.getFullYear() &&
+      dataDate.getMonth() === now.getMonth() &&
+      dataDate.getDate() === now.getDate() &&
+      dataDate.getHours() === now.getHours() &&
+      dataDate.getMinutes() === now.getMinutes()
+    );
+  };
   return (
     <div className="mb-10 space-y-4 ">
       <div className="flex justify-end">
@@ -95,9 +129,11 @@ export const ChatItem = ({ data }) => {
         </div>
       </div>
       <div className="col-auto flex flex-col items-start space-y-3 overflow-hidden">
-        <div>
+        {isLast(data.created_at) ? (
+          <TypingEffect text={data.answer} typingSpeed={10} />
+        ) : (
           <MarkdownRenderer content={answer} />
-        </div>
+        )}
         {data?.file_links?.length && data?.file_links?.length > 0 ? (
           <div className="w-full">
             <hr className="mb-2 w-full border-t-4 border-[#C4C4C480]" />
@@ -106,19 +142,14 @@ export const ChatItem = ({ data }) => {
               {data?.file_links?.map((item: Item, index: number) => {
                 const download_url: string = item.download_url;
                 return (
-                  <div
-                    key={index}
-                    className="inline-block max-w-full  break-words "
+                  <a
+                    href={download_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-block w-max cursor-pointer rounded-md px-2 py-1 text-blue-400 hover:underline"
                   >
-                    <div
-                      className="w-max cursor-pointer rounded-md px-2 py-1 text-blue-400 hover:underline"
-                      onClick={() => {
-                        window.open(download_url, '_blank');
-                      }}
-                    >
-                      {index + 1}. {item?.filename}
-                    </div>
-                  </div>
+                    {index + 1}. {item?.filename}
+                  </a>
                 );
               })}
             </div>
