@@ -1,4 +1,4 @@
-import api from '@/lib/api';
+import api, { baseAxios } from '@/lib/api';
 import {
   TLoginRequest,
   TLoginResponse,
@@ -7,7 +7,7 @@ import {
 } from './type';
 
 export const login = async (req: TLoginRequest): Promise<TLoginResponse> => {
-  const res = await api.post<TLoginResponse>('/auth/login', req);
+  const res = await baseAxios.post<TLoginResponse>('/auth/login', req);
   return res.data;
 };
 

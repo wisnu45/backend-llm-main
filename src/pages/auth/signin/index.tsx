@@ -31,7 +31,7 @@ export default function LoginPage() {
   const token = SessionToken.get();
   const [error, setError] = useState('');
   const loading = status === 'authenticating';
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
 
   const form = useForm<TLoginFormData>({
@@ -40,14 +40,16 @@ export default function LoginPage() {
   });
 
   const handleSubmit = async (data: TLoginFormData) => {
-    setError('');
+    setSearchParams({ error: '' });
+
     try {
       await signin(data);
     } catch (error) {
       const errMsg =
         (error as any)?.response?.data?.message ||
         (error instanceof Error ? error.message : 'Unknown error');
-      setError(errMsg);
+
+      setSearchParams({ error: errMsg });
     }
   };
 

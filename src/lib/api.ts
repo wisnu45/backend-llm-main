@@ -9,6 +9,13 @@ const api = axios.create({
   }
 });
 
+export const baseAxios = axios.create({
+  baseURL: import.meta.env.VITE_API_ENDPOINT,
+  headers: {
+    'Content-Type': 'application/json'
+  }
+});
+
 api.interceptors.request.use((config) => {
   const accessToken = SessionToken.get();
   if (accessToken) {
