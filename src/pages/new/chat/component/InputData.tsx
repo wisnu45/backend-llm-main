@@ -1,9 +1,5 @@
-import {
-  PlusCircledIcon,
-  ImageIcon,
-  ArrowRightIcon,
-  Cross2Icon
-} from '@radix-ui/react-icons'; // Assuming you have these icons
+import { ArrowRightIcon, Cross2Icon } from '@radix-ui/react-icons';
+import { Paperclip } from 'lucide-react';
 import { useState } from 'react';
 
 const InputData = ({
@@ -85,7 +81,7 @@ const InputData = ({
       <textarea
         className="w-full resize-none border-none text-sm outline-none placeholder:text-gray-400"
         rows={4}
-        placeholder="Ask CombipharGPT whatever you want....."
+        placeholder="Ask Vita"
         maxLength={1000}
         value={text}
         onChange={handleChange}
@@ -101,7 +97,7 @@ const InputData = ({
       <div className="mt-4 flex items-center justify-between text-sm text-gray-800">
         <div className="flex flex-col items-start gap-2 sm:flex-row sm:gap-2">
           <button className="flex items-center gap-1 transition hover:text-purple-600">
-            <PlusCircledIcon />
+            <Paperclip size={18} />
             <label htmlFor="file-upload" className="cursor-pointer">
               Add attachment
             </label>
@@ -113,7 +109,7 @@ const InputData = ({
               onChange={(e) => handleFileChange(e)}
             />
           </button>
-          <button className="flex items-center gap-1 transition hover:text-purple-600">
+          {/* <button className="flex items-center gap-1 transition hover:text-purple-600">
             <ImageIcon />
             <label htmlFor="image-upload" className="cursor-pointer">
               Use image
@@ -126,7 +122,7 @@ const InputData = ({
               className="hidden"
               onChange={(e) => handleFileChange(e)}
             />
-          </button>
+          </button> */}
           <div className="flex items-center gap-2">
             <input
               type="checkbox"

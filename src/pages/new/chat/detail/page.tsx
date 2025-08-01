@@ -79,18 +79,21 @@ const DetailPage = () => {
     <>
       <ScrollArea className="scrollbar-hide flex-1">
         <div className="mx-auto min-h-full w-[95%] ">
-          {query.isLoading && <Loader />}
-          {query?.data?.data?.map((message, index) => {
-            const isLast = index === (query?.data?.data?.length ?? 0) - 1;
-            return (
-              <div
-                ref={isLast && !loading && !showPreview ? chatEndRef : null}
-                key={index}
-              >
-                <ChatItem key={index} data={message} />
-              </div>
-            );
-          })}
+          {query.isLoading ? (
+            <Loader />
+          ) : (
+            query?.data?.data?.map((message, index) => {
+              const isLast = index === (query?.data?.data?.length ?? 0) - 1;
+              return (
+                <div
+                  ref={isLast && !loading && !showPreview ? chatEndRef : null}
+                  key={index}
+                >
+                  <ChatItem key={index} data={message} />
+                </div>
+              );
+            })
+          )}
 
           {showPreview && (
             <div ref={scrollAreaRef}>

@@ -74,7 +74,11 @@ export default function LoginPage() {
       <Card className="mx-auto w-full max-w-md">
         <CardHeader className="space-y-1 text-center">
           <div className="mb-2 flex items-center justify-center">
-            <img src="/icons/logo.png" alt="Combiphar Logo" className="w-52" />
+            <img
+              src="/icons/logo_vita.png"
+              alt="Combiphar Logo"
+              className="w-36"
+            />
           </div>
           <CardTitle className="text-xl">Welcome back</CardTitle>
           <CardDescription>
@@ -162,7 +166,7 @@ export default function LoginPage() {
                 className="w-full"
                 onClick={handleSsoLogin}
               >
-                Login with SSO
+                Login with Portal SSO
               </Button>
               {/* <div className="mt-2 text-center">
                 <Link

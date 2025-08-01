@@ -1,9 +1,7 @@
-import {
-  PlusCircledIcon,
-  ImageIcon,
-  ArrowRightIcon,
-  Cross2Icon
-} from '@radix-ui/react-icons';
+import { ArrowRightIcon, Cross2Icon } from '@radix-ui/react-icons';
+
+import { Paperclip, Globe } from 'lucide-react';
+
 import { useState, useImperativeHandle, useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -179,7 +177,7 @@ const InputDataWithForm = ({
                 {...field}
                 className="w-full resize-none border-none text-sm outline-none placeholder:text-gray-400"
                 rows={4}
-                placeholder="Ask CombipharGPT whatever you want....."
+                placeholder="Ask Vita"
                 maxLength={1000}
                 onKeyDown={handleKeyDown}
                 disabled={isLoading}
@@ -192,9 +190,9 @@ const InputDataWithForm = ({
           <div className="flex flex-col items-start gap-2 sm:flex-row sm:gap-2">
             <button
               type="button"
-              className="flex items-center gap-1 transition hover:text-purple-600"
+              className="flex cursor-pointer items-center gap-1 rounded-xl bg-gradient-to-r px-4 py-2 shadow-md transition duration-300 hover:text-purple-600 hover:shadow-lg"
             >
-              <PlusCircledIcon />
+              <Paperclip size={18} />
               <label htmlFor="file-upload" className="cursor-pointer">
                 Attach Document
               </label>
@@ -207,7 +205,7 @@ const InputDataWithForm = ({
                 disabled={isLoading}
               />
             </button>
-            <button
+            {/* <button
               type="button"
               className="flex items-center gap-1 transition hover:text-purple-600"
             >
@@ -224,9 +222,8 @@ const InputDataWithForm = ({
                 onChange={handleFileChange}
                 disabled={isLoading}
               />
-            </button>
-            <div className="flex items-center gap-2">
-              <Controller
+            </button> */}
+            {/* <Controller
                 name="is_browse"
                 control={control}
                 render={({ field }) => (
@@ -238,9 +235,38 @@ const InputDataWithForm = ({
                     disabled={isLoading}
                   />
                 )}
-              />
-              <span className="text-sm">Cari di internet</span>
-            </div>
+              /> */}
+            <Controller
+              name="is_browse"
+              control={control}
+              render={({ field }) => {
+                const { value, onChange } = field;
+
+                return (
+                  <div
+                    className="group relative w-max cursor-pointer"
+                    onClick={() => !isLoading && onChange(!value)} // toggle state
+                  >
+                    <div
+                      className={`flex items-center gap-2 rounded-xl px-4 py-2 shadow-md transition-all duration-300 ${
+                        value
+                          ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white hover:text-purple-200 hover:shadow-lg'
+                          : ' shadow-lg'
+                      } ${isLoading ? 'cursor-not-allowed opacity-50' : ''}`}
+                    >
+                      <Globe className="h-5 w-5" />
+                      <span className="text-sm font-medium">
+                        Cari di internet
+                      </span>
+                    </div>
+
+                    <div className="pointer-events-none absolute left-full top-1/2 ml-2 w-max -translate-y-1/2 rounded-md bg-gray-800 px-3 py-1 text-xs text-white opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                      search the web when necessary
+                    </div>
+                  </div>
+                );
+              }}
+            />
           </div>
 
           <div className="flex items-center gap-3">
@@ -289,6 +315,9 @@ const InputDataWithForm = ({
             </div>
           </div>
         )}
+      </div>
+      <div className="flex h-32 justify-center pt-4 font-bold">
+        Vita can make mistakes, so double-check it
       </div>
     </form>
   );

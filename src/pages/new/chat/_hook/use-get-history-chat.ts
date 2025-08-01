@@ -9,6 +9,7 @@ interface UseGetDetailHistoryParams {
 interface UseGetDetailHistoryResult {
   data: TGetDetailHistoryData | undefined;
   isLoading: boolean;
+  isFetching: boolean;
   error: unknown;
   refetch: () => void;
 }
@@ -24,6 +25,7 @@ export const useGetDetailHistory = (
     data: query.data,
     isLoading: query.isLoading,
     error: query.error,
+    isFetching: query.isFetching,
     refetch: query.refetch
   };
 };

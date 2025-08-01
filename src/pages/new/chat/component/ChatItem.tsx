@@ -86,7 +86,7 @@ const MarkdownRenderer = ({ content }: { content: string }) => (
 
 const TypingEffect = ({
   text,
-  typingSpeed = 10
+  typingSpeed = 2
 }: {
   text: string;
   typingSpeed?: number;
@@ -130,7 +130,7 @@ export const ChatItem = ({ data }) => {
       </div>
       <div className="col-auto flex flex-col items-start space-y-3 overflow-hidden">
         {isLast(data.created_at) ? (
-          <TypingEffect text={data.answer} typingSpeed={10} />
+          <TypingEffect text={data.answer} typingSpeed={2} />
         ) : (
           <MarkdownRenderer content={answer} />
         )}
@@ -205,7 +205,6 @@ const IconBar = ({ setIsCopied, isCopied, text, id, session_id, feedback }) => {
 
   return (
     <div className="flex items-center gap-2 pt-3">
-      {/* Copy Button */}
       <div className="group relative">
         <button
           onClick={handleCopy}
