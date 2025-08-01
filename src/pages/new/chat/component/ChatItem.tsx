@@ -5,6 +5,7 @@ import { CheckIcon } from '@radix-ui/react-icons';
 import { formatMarkdownToPlainText } from '@/lib/markdown';
 import useCreateFeedbackChat from '../_hook/use-mutate-response';
 import { useGetDetailHistory } from '../_hook/use-get-history-chat';
+import { useOpenPdf } from '@/hooks/use-donwload-file';
 
 interface Item {
   content: string;
@@ -109,6 +110,7 @@ const TypingEffect = ({
 export const ChatItem = ({ data }) => {
   const [isCopied, setIsCopied] = useState(false);
   const answer = (data.answer ?? '').replace(/\n{2,}(?=\s*-\s)/g, '\n');
+  const openPdf = useOpenPdf();
 
   const isLast = (createdAt: string | Date) => {
     const dataDate = new Date(createdAt);
@@ -143,9 +145,11 @@ export const ChatItem = ({ data }) => {
                 const download_url: string = item.download_url;
                 return (
                   <a
-                    href={download_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      openPdf.mutate(download_url);
+                    }}
                     className="inline-block w-max cursor-pointer rounded-md px-2 py-1 text-blue-400 hover:underline"
                   >
                     {index + 1}. {item?.filename}
