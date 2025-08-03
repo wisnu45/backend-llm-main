@@ -4,7 +4,10 @@ export const useOpenPdf = () => {
   return useMutation({
     mutationKey: ['download-file'],
     mutationFn: async (url: string) => {
-      const response = await fetch(url);
+      const secureUrl = url.startsWith('http://')
+        ? url.replace('http://', 'https://')
+        : url;
+      const response = await fetch(secureUrl);
       if (!response.ok) {
         throw new Error('Network response was not ok.');
       }
