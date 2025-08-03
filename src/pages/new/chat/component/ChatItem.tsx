@@ -87,29 +87,55 @@ const MarkdownRenderer = ({ content }: { content: string }) => (
 
 const TypingEffect = ({
   text,
-  typingSpeed = 2
+  typingSpeed = 500
 }: {
   text: string;
   typingSpeed?: number;
 }) => {
-  const [displayedText, setDisplayedText] = useState<string>('');
+  const [lines, setLines] = useState<string[]>([]);
+
   useEffect(() => {
+    const allLines = text.split('\n');
     let index = 0;
-    const intervalId = setInterval(() => {
-      setDisplayedText((prevText) => prevText + text.charAt(index));
+    let timeoutId: NodeJS.Timeout;
+
+    setLines([]);
+
+    const type = () => {
+      setLines((prev) => [...prev, allLines[index]]);
       index++;
-      if (index >= text.length) {
-        clearInterval(intervalId);
+      if (index < allLines.length) {
+        timeoutId = setTimeout(type, typingSpeed);
       }
-    }, typingSpeed);
-    return () => clearInterval(intervalId);
+    };
+
+    timeoutId = setTimeout(type, typingSpeed);
+
+    return () => clearTimeout(timeoutId);
   }, [text, typingSpeed]);
-  return <MarkdownRenderer content={displayedText} />;
+
+  return (
+    <div className="space-y-4">
+      {lines.map((line, idx) => (
+        <p
+          key={idx}
+          className="animate-fade-in-up text-base opacity-0 transition-all duration-700"
+          style={{
+            animationDelay: `${idx * 0.1}s`,
+            animationFillMode: 'forwards'
+          }}
+        >
+          <MarkdownRenderer content={line} />
+        </p>
+      ))}
+    </div>
+  );
 };
 
 export const ChatItem = ({ data }) => {
   const [isCopied, setIsCopied] = useState(false);
   const answer = (data.answer ?? '').replace(/\n{2,}(?=\s*-\s)/g, '\n');
+  // const answer = `Saya adalah asisten virtual AI yang dirancang untuk membantu Anda dengan informasi dan pertanyaan. Saya tidak memiliki nama seperti manusia, tetapi Anda dapat memanggil saya \"Asisten\" atau \"AI\". Ada yang bisa saya bantu?`;
   const openPdf = useOpenPdf();
 
   const isLast = (createdAt: string | Date) => {
@@ -132,7 +158,7 @@ export const ChatItem = ({ data }) => {
       </div>
       <div className="col-auto flex flex-col items-start space-y-3 overflow-hidden">
         {isLast(data.created_at) ? (
-          <TypingEffect text={data.answer} typingSpeed={2} />
+          <TypingEffect text={answer} typingSpeed={500} />
         ) : (
           <MarkdownRenderer content={answer} />
         )}

@@ -37,12 +37,12 @@ const DetailPage = () => {
     }
   });
 
-  useEffect(() => {
-    if (!query.data?.data.length) {
-      navigate('/chat');
-    }
-    query.refetch();
-  }, [chatId]);
+  // useEffect(() => {
+  //   if (!query.data?.data.length) {
+  //     navigate('/chat');
+  //   }
+  //   query.refetch();
+  // }, [chatId]);
 
   useEffect(() => {
     if (scrollAreaRef.current) {

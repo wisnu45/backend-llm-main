@@ -94,6 +94,9 @@ const Sidebar = ({ setShowModal }) => {
 
           <Link
             to="/chat"
+            onClick={() => {
+              Cookies.remove('chat_id');
+            }}
             className="mt-2 flex w-full items-center gap-2 rounded-lg p-2 text-left hover:bg-gray-400/20"
           >
             {isSidebarOpen ? (
@@ -153,6 +156,7 @@ const Sidebar = ({ setShowModal }) => {
                                 if (window.innerWidth < 768) {
                                   setIsSidebarOpen(false);
                                 }
+                                Cookies.set('chat_id', chat.session_id);
                               }}
                               onMouseEnter={() => setActive(chat.session_id)}
                               onMouseLeave={() => setActive(null)}

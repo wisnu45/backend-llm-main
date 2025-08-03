@@ -5,7 +5,7 @@ import {
   PersonIcon,
   ReloadIcon
 } from '@radix-ui/react-icons';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import { useGetFiles } from '@/components/ui/sidebar/_hook/use-get-history-chat';
@@ -59,6 +59,13 @@ const ChatPage = () => {
   const handleClickItem = (prompt: string) => {
     setPromptRef.current?.onSetPrompt(prompt);
   };
+
+  useEffect(() => {
+    const sessionId = Cookies.get('chat_id');
+    if (sessionId) {
+      navigate(`${currentPath}/${sessionId}`);
+    }
+  }, []);
 
   const handleFormSubmit = async (formData: TChatFormData) => {
     const trimmedQuestion = formData.prompt.trim();
