@@ -135,7 +135,6 @@ const TypingEffect = ({
 export const ChatItem = ({ data }) => {
   const [isCopied, setIsCopied] = useState(false);
   const answer = (data.answer ?? '').replace(/\n{2,}(?=\s*-\s)/g, '\n');
-  // const answer = `Saya adalah asisten virtual AI yang dirancang untuk membantu Anda dengan informasi dan pertanyaan. Saya tidak memiliki nama seperti manusia, tetapi Anda dapat memanggil saya \"Asisten\" atau \"AI\". Ada yang bisa saya bantu?`;
   const openPdf = useOpenPdf();
 
   const isLast = (createdAt: string | Date) => {
