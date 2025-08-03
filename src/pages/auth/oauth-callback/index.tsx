@@ -34,7 +34,7 @@ const OAuthCallbackPage = () => {
     <div className="flex min-h-screen flex-col items-center justify-center bg-[#f8f8f9] text-center font-sans transition-opacity duration-500">
       <div className="flex flex-col items-center justify-center">
         <img
-          src="/icons/logo.png"
+          src="/icons/logo_vita.png"
           alt="Combiphar Logo"
           className="h-10 w-auto animate-pulse"
         />
