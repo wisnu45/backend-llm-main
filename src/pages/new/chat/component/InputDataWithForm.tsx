@@ -316,7 +316,7 @@ const InputDataWithForm = ({
           </div>
         )}
       </div>
-      <div className="flex h-10 justify-center bg-red-500 pt-2 text-[10px] font-bold sm:text-sm">
+      <div className="flex h-10 justify-center pt-2 text-[10px] font-bold sm:text-sm">
         Vita can make mistakes, so double-check it
       </div>
     </form>
