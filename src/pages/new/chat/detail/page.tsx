@@ -1,7 +1,7 @@
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useEffect, useRef } from 'react';
 import { useGetDetailHistory } from '../_hook/use-get-history-chat';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { ChatItem } from '../component/ChatItem';
 import useCreateChat from '../_hook/use-create-chat';
 import { Loader } from '../component/Loader';
@@ -15,7 +15,7 @@ const DetailPage = () => {
   const { chatId } = useParams();
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
 
   const query = useGetDetailHistory({ session_id: chatId || '' });
   const mutation = useCreateChat();
@@ -37,12 +37,12 @@ const DetailPage = () => {
     }
   });
 
-  // useEffect(() => {
-  //   if (!query.data?.data.length) {
-  //     navigate('/chat');
-  //   }
-  //   query.refetch();
-  // }, [chatId]);
+  useEffect(() => {
+    if (!query.data?.data.length && !query.isLoading) {
+      navigate('/chat');
+    }
+    query.refetch();
+  }, [chatId]);
 
   useEffect(() => {
     if (scrollAreaRef.current) {
