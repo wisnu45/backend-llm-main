@@ -1,7 +1,7 @@
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useEffect, useRef, useState } from 'react';
 import { useGetDetailHistory } from '../_hook/use-get-history-chat';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { ChatItem } from '../component/ChatItem';
 import useCreateChat from '../_hook/use-create-chat';
 import { Loader } from '../component/Loader';
