@@ -61,7 +61,11 @@ export interface Daum {
   session_id: string;
   user_id: string;
   source_documents: string;
-  file_links: string[];
+  file_links: {
+    filename: string;
+    download_url: string;
+  }[];
+  feedback: '1' | '-1' | null;
   data?: Daum[];
 }
 
