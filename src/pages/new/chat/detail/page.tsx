@@ -1,5 +1,5 @@
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { useGetDetailHistory } from '../_hook/use-get-history-chat';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ChatItem } from '../component/ChatItem';
@@ -10,13 +10,11 @@ import { PromptPreview } from '../component/prompt-preview';
 import { ModernLoadingIndicator } from '../component/loading-indicator';
 import { TChatFormData } from '../schema';
 import { useChatForm } from '../_hook/use-chat-form';
-import Cookies from 'js-cookie';
 
 const DetailPage = () => {
   const { chatId } = useParams();
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
-  const [loader, setLoader] = useState(false);
   const query = useGetDetailHistory({ session_id: chatId || '' });
   const mutation = useCreateChat();
   const navigate = useNavigate();
@@ -38,21 +36,13 @@ const DetailPage = () => {
     }
   });
 
-  const chatIdLoader = Cookies.get('chat_id');
-
   useEffect(() => {
-    if (chatIdLoader) {
-      if (!query.data?.data.length && !query.isLoading) {
-        navigate('/chat');
-      }
-      setLoader(true);
-      query.refetch();
-      const timer = setTimeout(() => {
-        setLoader(false);
-      }, 5000);
-      return () => clearTimeout(timer);
+    if (!query.data?.data.length && !query.isLoading) {
+      navigate('/chat');
+      return;
     }
-  }, [chatIdLoader]);
+    query.refetch();
+  }, [chatId, query.data, query.isLoading]);
 
   useEffect(() => {
     if (scrollAreaRef.current) {
@@ -61,13 +51,13 @@ const DetailPage = () => {
         block: 'end'
       });
     }
-  }, [query.data?.data.length, loading, showPreview, loader]);
+  }, [query.data?.data.length, loading, showPreview, query.isLoading]);
 
   useEffect(() => {
     if (chatEndRef.current) {
       chatEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
     }
-  }, [query?.data?.data, loading, showPreview, loader]);
+  }, [query?.data?.data, loading, showPreview]);
 
   const handleFormSubmit = (formData: TChatFormData) => {
     const payload = handleSubmit(formData);
@@ -89,9 +79,7 @@ const DetailPage = () => {
     <>
       <ScrollArea className="scrollbar-hide flex-1">
         <div className="mx-auto min-h-full w-[95%] ">
-          {loader ? (
-            <Loader />
-          ) : query.isLoading ? (
+          {query.isLoading ? (
             <Loader />
           ) : (
             query?.data?.data?.map((message, index) => {

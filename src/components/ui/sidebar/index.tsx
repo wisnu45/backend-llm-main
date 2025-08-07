@@ -156,7 +156,6 @@ const Sidebar = ({ setShowModal }) => {
                                 if (window.innerWidth < 768) {
                                   setIsSidebarOpen(false);
                                 }
-                                Cookies.set('chat_id', chat.session_id);
                               }}
                               onMouseEnter={() => setActive(chat.session_id)}
                               onMouseLeave={() => setActive(null)}

@@ -18,14 +18,8 @@ export const useGetDetailHistory = (
   request: UseGetDetailHistoryParams['request']
 ): UseGetDetailHistoryResult => {
   const query = useQuery<TGetDetailHistoryData>({
-    queryKey: ['history-detail-chat'],
+    queryKey: ['history-detail-chat', request],
     queryFn: async () => getDetailHistory(request)
   });
-  return {
-    data: query.data,
-    isLoading: query.isLoading,
-    error: query.error,
-    isFetching: query.isFetching,
-    refetch: query.refetch
-  };
+  return query;
 };
