@@ -8,6 +8,8 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { TDocItem } from '@/api/document/type';
+import { Link } from 'react-router-dom';
+import { useOpenPdf } from '@/hooks/use-donwload-file';
 
 interface Props {
   open?: boolean;
@@ -18,6 +20,8 @@ interface Props {
 }
 
 const DetailModal = ({ onEdit, onDelete, data, open, onOpenChange }: Props) => {
+  const downloadFile = useOpenPdf();
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
@@ -50,9 +54,17 @@ const DetailModal = ({ onEdit, onDelete, data, open, onOpenChange }: Props) => {
             <span className="mb-1 block text-sm font-semibold text-gray-500">
               Document Name
             </span>
-            <p className="text-base text-gray-800">
-              {data?.document_name ?? '-'}
-            </p>
+            <Link
+              to="#"
+              onClick={(e) => {
+                e.preventDefault();
+                downloadFile.mutate('#'); // TODO: replace with file link. waiting for api to be updated
+              }}
+            >
+              <p className="text-gray-800 text-primary underline">
+                {data?.document_name ?? '-'}
+              </p>
+            </Link>
           </div>
 
           <div>

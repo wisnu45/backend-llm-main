@@ -11,7 +11,8 @@ import { Button } from '@/components/ui/button';
 import FilesPageHeader from './_components/files-page-header';
 import FilesPageModals from './_components/files-page-modals';
 import { useDebounce } from 'use-debounce';
-import { useSearchParams } from 'react-router-dom'; // Import useSearchParams
+import { Link, useSearchParams } from 'react-router-dom'; // Import useSearchParams
+import { useOpenPdf } from '@/hooks/use-donwload-file';
 
 type TModal = 'delete' | 'edit' | 'create' | 'detail' | null;
 
@@ -78,113 +79,6 @@ const useFilesPage = () => {
   };
 };
 
-const getColumns = (
-  setModal: (modal: TModal, data: TDocItem) => void,
-  tab: string,
-  startFrom: number
-): ColumnDef<TDocItem>[] => [
-  {
-    accessorKey: 'id',
-    header: 'NO',
-    cell: ({ row }) => <div>{row.index + 1 + startFrom}</div>
-  },
-  {
-    accessorKey: 'id',
-    header: 'file id',
-    cell: ({ row }) => <div className="max-w-[150px]">{row.getValue('id')}</div>
-  },
-  ...(tab !== 'upload'
-    ? [
-        {
-          accessorKey: 'portal_id',
-          header: 'PORTAL ID',
-          cell: ({ row }) => (
-            <div className="min-w-28">{row.getValue('portal_id') ?? '-'}</div>
-          )
-        }
-      ]
-    : []),
-  {
-    id: 'document-info',
-    header: 'document name',
-    cell: ({ row }) => (
-      <div className="flex min-w-40 flex-col">
-        <span>{row.original.document_name?.split('.pdf')[0]}</span>
-        <span className="font-semibold text-gray-400">PDF</span>
-      </div>
-    )
-  },
-  {
-    accessorKey: 'dateCreate',
-    header: 'Data Create',
-    cell: ({ row }) => (
-      <div className="min-w-28">{formatDate(row.original.created_at)}</div>
-    )
-  },
-  {
-    accessorKey: 'dateUpdate',
-    header: 'Data Update',
-    cell: ({ row }) => (
-      <div className="min-w-28">
-        {(row.original.updated_at && formatDate(row.original.updated_at)) ||
-          '-'}
-      </div>
-    )
-  },
-  {
-    accessorKey: 'metadata',
-    header: '',
-    cell: ({ row }) => {
-      const isMetadata = row.original.portal_id;
-
-      return (
-        <div className="min-w-40">
-          {isMetadata ? (
-            <span className="inline-block rounded-lg bg-[#5C47DB]/10 px-2 py-1 text-[#5C47DB]">
-              Metadata Document
-            </span>
-          ) : (
-            <span className="inline-block rounded-lg bg-[#20AB4A]/10 px-2 py-1 text-[#20AB4A]">
-              Upload Document
-            </span>
-          )}
-        </div>
-      );
-    }
-  },
-  {
-    header: 'Action',
-    cell: ({ row }) => {
-      // const isMetadata = Boolean(row.original.portal_id);
-
-      return (
-        <div>
-          <Button
-            variant="ghost"
-            onClick={() => setModal('detail', row.original)}
-          >
-            View
-          </Button>
-          <Button
-            variant="ghost"
-            onClick={() => setModal('edit', row.original)}
-          >
-            Edit
-          </Button>
-
-          <Button
-            // className={isMetadata ? 'hidden' : ''}
-            variant="ghost"
-            onClick={() => setModal('delete', row.original)}
-          >
-            Delete
-          </Button>
-        </div>
-      );
-    }
-  }
-];
-
 const FilesPage = () => {
   const {
     modal,
@@ -200,6 +94,124 @@ const FilesPage = () => {
     query,
     updateURLParams
   } = useFilesPage();
+  const downloadFile = useOpenPdf();
+
+  const getColumns = (
+    setModal: (modal: TModal, data: TDocItem) => void,
+    tab: string,
+    startFrom: number
+  ): ColumnDef<TDocItem>[] => [
+    {
+      accessorKey: 'id',
+      header: 'NO',
+      cell: ({ row }) => <div>{row.index + 1 + startFrom}</div>
+    },
+    {
+      accessorKey: 'id',
+      header: 'file id',
+      cell: ({ row }) => (
+        <div className="max-w-[150px]">{row.getValue('id')}</div>
+      )
+    },
+    ...(tab !== 'upload'
+      ? [
+          {
+            accessorKey: 'portal_id',
+            header: 'PORTAL ID',
+            cell: ({ row }) => (
+              <div className="min-w-28">{row.getValue('portal_id') ?? '-'}</div>
+            )
+          }
+        ]
+      : []),
+    {
+      id: 'document-info',
+      header: 'document name',
+      cell: ({ row }) => (
+        <div className="flex min-w-40 flex-col">
+          <span>{row.original.document_name?.split('.pdf')[0]}</span>
+          <Link
+            to="#"
+            onClick={(e) => {
+              e.preventDefault();
+              downloadFile.mutate('#'); // TODO: replace with file link. waiting for api to be updated
+            }}
+          >
+            <span className="font-semibold text-gray-400">PDF</span>
+          </Link>
+        </div>
+      )
+    },
+    {
+      accessorKey: 'dateCreate',
+      header: 'Data Create',
+      cell: ({ row }) => (
+        <div className="min-w-28">{formatDate(row.original.created_at)}</div>
+      )
+    },
+    {
+      accessorKey: 'dateUpdate',
+      header: 'Data Update',
+      cell: ({ row }) => (
+        <div className="min-w-28">
+          {(row.original.updated_at && formatDate(row.original.updated_at)) ||
+            '-'}
+        </div>
+      )
+    },
+    {
+      accessorKey: 'metadata',
+      header: '',
+      cell: ({ row }) => {
+        const isMetadata = row.original.portal_id;
+
+        return (
+          <div className="min-w-40">
+            {isMetadata ? (
+              <span className="inline-block rounded-lg bg-[#5C47DB]/10 px-2 py-1 text-[#5C47DB]">
+                Metadata Document
+              </span>
+            ) : (
+              <span className="inline-block rounded-lg bg-[#20AB4A]/10 px-2 py-1 text-[#20AB4A]">
+                Upload Document
+              </span>
+            )}
+          </div>
+        );
+      }
+    },
+    {
+      header: 'Action',
+      cell: ({ row }) => {
+        // const isMetadata = Boolean(row.original.portal_id);
+
+        return (
+          <div>
+            <Button
+              variant="ghost"
+              onClick={() => setModal('detail', row.original)}
+            >
+              View
+            </Button>
+            <Button
+              variant="ghost"
+              onClick={() => setModal('edit', row.original)}
+            >
+              Edit
+            </Button>
+
+            <Button
+              // className={isMetadata ? 'hidden' : ''}
+              variant="ghost"
+              onClick={() => setModal('delete', row.original)}
+            >
+              Delete
+            </Button>
+          </div>
+        );
+      }
+    }
+  ];
 
   const { page, page_size, total_pages, total } = query.data?.pagination || {};
   const startFrom = (Number(page) - 1) * Number(page_size);
