@@ -1,3 +1,4 @@
+import { SessionToken } from '@/lib/cookies';
 import { useMutation } from '@tanstack/react-query';
 
 export const useOpenPdf = () => {
@@ -7,7 +8,12 @@ export const useOpenPdf = () => {
       const secureUrl = url.startsWith('http://')
         ? url.replace('http://', 'https://')
         : url;
-      const response = await fetch(secureUrl);
+      const response = await fetch(secureUrl, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${SessionToken.get()}`
+        }
+      });
       if (!response.ok) {
         throw new Error('Network response was not ok.');
       }

@@ -134,7 +134,7 @@ const FilesPage = () => {
             to="#"
             onClick={(e) => {
               e.preventDefault();
-              downloadFile.mutate('#'); // TODO: replace with file link. waiting for api to be updated
+              downloadFile.mutate(row.original.document_url || '#');
             }}
           >
             <span className="font-semibold text-gray-400">PDF</span>

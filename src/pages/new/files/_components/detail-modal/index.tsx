@@ -58,7 +58,7 @@ const DetailModal = ({ onEdit, onDelete, data, open, onOpenChange }: Props) => {
               to="#"
               onClick={(e) => {
                 e.preventDefault();
-                downloadFile.mutate('#'); // TODO: replace with file link. waiting for api to be updated
+                downloadFile.mutate(data?.document_url || '#');
               }}
             >
               <p className="text-gray-800 text-primary underline">

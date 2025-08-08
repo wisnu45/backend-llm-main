@@ -6,6 +6,7 @@ export type TDocItem = {
   created_at: string;
   deleted_at: string;
   document_name: string;
+  document_url: string | null;
   id: string;
   metadata: Record<string, string>;
   portal_id: string | null;
