@@ -66,6 +66,12 @@ const Sidebar = ({ setShowModal }) => {
     };
   }, []);
 
+  const [textSearch, setTextSearch] = useState<string>('');
+
+  const filteredData = dataResult?.filter((item) =>
+    item.title.toLowerCase().includes(textSearch.toLowerCase())
+  );
+
   return (
     <ScrollArea
       className={` h-screen max-h-screen bg-[#D2D2D2] hide-scrollbar`}
@@ -77,19 +83,40 @@ const Sidebar = ({ setShowModal }) => {
           ref={topRef}
           className={`absolute left-0 right-0 top-0 w-full ${isSidebarOpen ? 'p-4' : 'p-2'} bg-[#D2D2D2] pb-0`}
         >
-          <button
-            className="flex h-8 w-8 items-center justify-center rounded-lg hover:bg-gray-400/20"
-            onClick={toggleSidebar}
-          >
-            <HamburgerMenuIcon className="h-4 text-gray-800" />
-          </button>
+          <div className="flex items-center justify-between">
+            {isSidebarOpen && (
+              <button
+                onClick={() =>
+                  window.open('https://www.combiphar.com/id', '_blank')
+                }
+              >
+                <img src="/icons/logo.png" className="h-auto max-w-24" />
+              </button>
+            )}
+            <button
+              className="flex h-8 w-8 items-center justify-center rounded-lg hover:bg-gray-400/20"
+              onClick={toggleSidebar}
+            >
+              <HamburgerMenuIcon className="h-4 text-gray-800" />
+            </button>
+          </div>
           {isSidebarOpen && (
-            <div className="mt-2 transition-transform duration-300">
-              <UserCard
-                name={Cookies.get('name') || ''}
-                id={Cookies.get('role') || ''}
-              />
-            </div>
+            <>
+              <div className="mt-2 transition-transform duration-300">
+                <UserCard
+                  name={Cookies.get('name') || ''}
+                  id={Cookies.get('role') || ''}
+                />
+              </div>
+              <div className="mt-3">
+                <input
+                  type="text"
+                  placeholder="Search..."
+                  className="w-full rounded-lg border border-gray-300 p-2 text-sm focus:border-blue-500 focus:outline-none"
+                  onChange={(e) => setTextSearch(e.target.value)}
+                />
+              </div>
+            </>
           )}
 
           <Link
@@ -134,7 +161,7 @@ const Sidebar = ({ setShowModal }) => {
                   </li>
                 )}
                 {Array.isArray(dataResult) && dataResult.length > 0
-                  ? dataResult.map((chat: TRecentChats) => (
+                  ? (filteredData ?? []).map((chat: TRecentChats) => (
                       <div key={chat.session_id}>
                         <li
                           key={chat.session_id}
