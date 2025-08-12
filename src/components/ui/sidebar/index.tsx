@@ -108,14 +108,6 @@ const Sidebar = ({ setShowModal }) => {
                   id={Cookies.get('role') || ''}
                 />
               </div>
-              <div className="mt-3">
-                <input
-                  type="text"
-                  placeholder="Search..."
-                  className="w-full rounded-lg border border-gray-300 p-2 text-sm focus:border-blue-500 focus:outline-none"
-                  onChange={(e) => setTextSearch(e.target.value)}
-                />
-              </div>
             </>
           )}
 
@@ -138,7 +130,16 @@ const Sidebar = ({ setShowModal }) => {
             )}
           </Link>
           {documentSideBar && <DocumentMenu isSidebarOpen={isSidebarOpen} />}
-
+          {isSidebarOpen && (
+            <div className="mb-2 mt-2 pl-2">
+              <input
+                type="text"
+                placeholder="Search Chat"
+                className="w-full rounded-lg border border-gray-300 bg-gray-400/20 p-2 text-sm focus:border-blue-500 focus:outline-none"
+                onChange={(e) => setTextSearch(e.target.value)}
+              />
+            </div>
+          )}
           {isSidebarOpen && (
             <h2 className="mb-2 p-2 text-xs font-semibold uppercase tracking-wider text-gray-500">
               Recent Chat
