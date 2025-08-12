@@ -1,6 +1,6 @@
 import { ArrowRightIcon, Cross2Icon } from '@radix-ui/react-icons';
 
-import { Paperclip, Globe } from 'lucide-react';
+import { Globe } from 'lucide-react';
 
 import { useState, useImperativeHandle, useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
@@ -66,14 +66,14 @@ const InputDataWithForm = ({
     }
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFiles = e.target.files;
-    if (selectedFiles) {
-      const newFiles = Array.from(selectedFiles);
-      const currentAttachments = watchedAttachments || [];
-      setValue('attachments', [...currentAttachments, ...newFiles]);
-    }
-  };
+  // const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const selectedFiles = e.target.files;
+  //   if (selectedFiles) {
+  //     const newFiles = Array.from(selectedFiles);
+  //     const currentAttachments = watchedAttachments || [];
+  //     setValue('attachments', [...currentAttachments, ...newFiles]);
+  //   }
+  // };
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
