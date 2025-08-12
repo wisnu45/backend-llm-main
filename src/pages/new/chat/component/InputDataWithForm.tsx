@@ -188,7 +188,7 @@ const InputDataWithForm = ({
 
         <div className="mt-4 flex items-center justify-between text-sm text-gray-800">
           <div className="flex flex-col items-start gap-2 sm:flex-row sm:gap-2">
-            <button
+            {/* <button
               type="button"
               className="flex cursor-pointer items-center gap-1 rounded-xl bg-gradient-to-r px-4 py-2 shadow-md transition duration-300 hover:text-purple-600 hover:shadow-lg"
             >
@@ -204,7 +204,7 @@ const InputDataWithForm = ({
                 onChange={handleFileChange}
                 disabled={isLoading}
               />
-            </button>
+            </button> */}
             {/* <button
               type="button"
               className="flex items-center gap-1 transition hover:text-purple-600"
