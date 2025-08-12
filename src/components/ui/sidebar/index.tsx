@@ -90,7 +90,7 @@ const Sidebar = ({ setShowModal }) => {
                   window.open('https://www.combiphar.com/id', '_blank')
                 }
               >
-                <img src="/icons/logo.png" className="h-auto max-w-24" />
+                <img src="/combiphar.png" className="h-auto max-w-24" />
               </button>
             )}
             <button
