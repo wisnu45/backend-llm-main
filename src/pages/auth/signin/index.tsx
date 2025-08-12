@@ -84,7 +84,7 @@ export default function LoginPage() {
           </div>
           <CardTitle className="text-xl">Welcome back</CardTitle>
           <CardDescription>
-            Please enter your details to continue.
+            Please enter your credential to continue.
           </CardDescription>
         </CardHeader>
         <CardContent>
