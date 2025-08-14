@@ -19,7 +19,9 @@ const isRecentMessage = (createdAt: string | Date) => {
 export const ChatItem = ({ data }: ChatItemProps) => {
   const { question, answer, created_at, file_links, id, session_id, feedback } =
     data;
-  const cleanedAnswer = (answer ?? '').replace(/\n{2,}(?=\s*-\s)/g, '\n');
+  const cleanedAnswer = (answer ?? '')
+    .replace(/([.])\n(?=•)/g, '$1\n\n')
+    .replace(/\n{1,}(?=\s*-\s)/g, '\n');
   const [isTypingComplete, setIsTypingComplete] = useState(false);
 
   const handleTypingComplete = () => {
