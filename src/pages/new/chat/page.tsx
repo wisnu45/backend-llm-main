@@ -126,15 +126,21 @@ const ChatPage = () => {
     <div className="flex w-full flex-1 flex-col items-center justify-center text-left">
       <div className="mx-auto w-full md:max-w-4xl">
         {!loading && (
-          <div className="mb-4 w-full">
+          <div className="mb-4 mt-4 w-full">
+            <img
+              src="/icons/logo_vita.png"
+              alt="Combiphar Logo"
+              className="w-32"
+            />
             <h2 className="text-gradient-light mb-1 text-2xl font-bold md:mb-2 md:text-3xl lg:text-4xl">
-              Hi there, {Cookies.get('name')}
+              Hai, {Cookies.get('name')}
             </h2>
             <h3 className="text-gradient-light mb-1 text-2xl font-bold md:mb-8 md:text-3xl lg:text-4xl">
-              What can Vita help you with today ?
+              Apa yang bisa Vita bantu hari ini?
             </h3>
             <p className="mb-4 text-gray-500 md:mb-10">
-              Use one of the most common prompts below or use your own to begin
+              Tuliskan pertanyaanmu atau gunakan salah satu dari contoh di bawah
+              ini
             </p>
 
             <ScrollArea className="mb-2 w-full overflow-x-auto md:mb-8">
