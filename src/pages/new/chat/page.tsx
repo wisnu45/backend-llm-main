@@ -23,19 +23,19 @@ import Cookies from 'js-cookie';
 const promptSuggestions = [
   {
     icon: <PersonIcon className=" text-gray-500" />,
-    text: 'Write a to-do list for a personal project or task'
+    text: 'Berikan 10 ide marketing produk obat batuk OBH Combi untuk meningkatkan brand awareness'
   },
   {
     icon: <EnvelopeClosedIcon className=" text-gray-500" />,
-    text: 'Generate an email or reply to a job offer'
+    text: 'Saya karyawan baru PT.Combiphar. Jelaskan kepada saya dengan lengkap tentang peraturan perusahaan, hak, kewajiban dan benefit yang saya dapatkan sebagai karyawan.'
   },
   {
     icon: <ChatBubbleIcon className=" text-gray-500" />,
-    text: 'Summarise this article or text for me in one paragraph'
+    text: 'Buatkan saya kalimat email untuk menawarkan kerjasama dengan apotek baru bernama Apotek Sehat'
   },
   {
     icon: <MixerHorizontalIcon className=" text-gray-500" />,
-    text: 'How does AI work in a technical capacity.'
+    text: 'Bantu saya membuat formula excel'
   }
 ];
 
@@ -143,13 +143,13 @@ const ChatPage = () => {
               ini
             </p>
 
-            <ScrollArea className="mb-2 w-full overflow-x-auto md:mb-8">
-              <div className="flex w-max gap-4 py-2">
+            <ScrollArea className="mb-2 w-full md:mb-8">
+              <div className="flex w-full flex-col gap-4 py-2 md:w-max md:flex-row md:gap-4">
                 {promptSuggestions.map((prompt, index) => (
                   <div
                     key={index}
                     onClick={() => handleClickItem(prompt.text)}
-                    className="flex min-h-20 w-52 shrink-0 cursor-pointer flex-col items-start rounded-md border border-gray-200 p-2 hover:bg-gray-50 md:rounded-lg md:p-4"
+                    className="flex min-h-20 w-full shrink-0 cursor-pointer flex-col items-start rounded-md border border-gray-200 p-2 hover:bg-gray-50 md:w-52 md:rounded-lg md:p-4"
                   >
                     <p className="flex-1 text-xs text-gray-700 md:text-sm">
                       {prompt.text}
@@ -158,7 +158,7 @@ const ChatPage = () => {
                   </div>
                 ))}
               </div>
-              <ScrollBar orientation="horizontal" />
+              <ScrollBar orientation="horizontal" className="hidden md:block" />
             </ScrollArea>
 
             <Button variant="ghost" className="mb-2 flex text-sm md:mb-3">
