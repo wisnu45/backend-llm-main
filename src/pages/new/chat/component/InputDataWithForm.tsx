@@ -8,6 +8,11 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { ChatFormSchema, TChatFormData } from '../schema';
 import { TSetPromptType } from '../page';
 import Cookies from 'js-cookie';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger
+} from '@/components/ui/tooltip';
 
 interface InputDataWithFormProps {
   onSubmit: (data: TChatFormData) => void;
@@ -243,27 +248,30 @@ const InputDataWithForm = ({
                 const { value, onChange } = field;
 
                 return (
-                  <div
-                    className="group relative w-max cursor-pointer"
-                    onClick={() => !isLoading && onChange(!value)} // toggle state
-                  >
-                    <div
-                      className={`flex items-center gap-2 rounded-xl px-4 py-2 shadow-md transition-all duration-300 ${
-                        value
-                          ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white hover:text-purple-200 hover:shadow-lg'
-                          : ' shadow-lg'
-                      } ${isLoading ? 'cursor-not-allowed opacity-50' : ''}`}
-                    >
-                      <Globe className="h-5 w-5" />
-                      <span className="text-sm font-medium">
-                        Cari di internet
-                      </span>
-                    </div>
-
-                    <div className="pointer-events-none absolute left-full top-1/2 ml-2 w-max -translate-y-1/2 rounded-md bg-gray-800 px-3 py-1 text-xs text-white opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-                      search the web when necessary
-                    </div>
-                  </div>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <div
+                        className="group relative w-max cursor-pointer"
+                        onClick={() => !isLoading && onChange(!value)} // toggle state
+                      >
+                        <div
+                          className={`flex items-center gap-2 rounded-xl px-4 py-2 shadow-md transition-all duration-300 ${
+                            value
+                              ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white hover:text-purple-200 hover:shadow-lg'
+                              : ' shadow-lg'
+                          } ${isLoading ? 'cursor-not-allowed opacity-50' : ''}`}
+                        >
+                          <Globe className="h-5 w-5" />
+                          <span className="text-sm font-medium">
+                            Cari di internet
+                          </span>
+                        </div>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent className="hidden sm:block">
+                      Search the web when necessary
+                    </TooltipContent>
+                  </Tooltip>
                 );
               }}
             />
