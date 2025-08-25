@@ -14,6 +14,7 @@ import { useChatForm } from '../_hook/use-chat-form';
 const DetailPage = () => {
   const { chatId } = useParams();
   const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLElement | null>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
   const query = useGetDetailHistory({ session_id: chatId || '' });
   const mutation = useCreateChat();
@@ -35,6 +36,25 @@ const DetailPage = () => {
       // Handle error if needed
     }
   });
+
+  // Get the actual scrollable viewport from the ScrollArea component
+  useEffect(() => {
+    if (scrollAreaRef.current) {
+      // Find the ScrollArea viewport element (Radix UI creates a div with data-radix-scroll-area-viewport)
+      const viewport = scrollAreaRef.current.querySelector(
+        '[data-radix-scroll-area-viewport]'
+      );
+      if (viewport) {
+        scrollContainerRef.current = viewport as HTMLElement;
+      } else {
+        // Fallback: try to find the first scrollable child
+        const firstChild = scrollAreaRef.current.firstElementChild;
+        if (firstChild) {
+          scrollContainerRef.current = firstChild as HTMLElement;
+        }
+      }
+    }
+  }, []);
 
   useEffect(() => {
     if (!query.data?.data.length && !query.isLoading) {
@@ -77,8 +97,8 @@ const DetailPage = () => {
 
   return (
     <>
-      <ScrollArea className="scrollbar-hide flex-1">
-        <div className="mx-auto min-h-full w-[95%] ">
+      <ScrollArea ref={scrollAreaRef} className="scrollbar-hide flex-1">
+        <div className={`mx-auto min-h-full w-[95%] pb-44`}>
           {query.isLoading ? (
             <Loader />
           ) : (
@@ -108,8 +128,14 @@ const DetailPage = () => {
           )}
         </div>
         <div ref={chatEndRef} />
+
+        <InputDataWithForm
+          onSubmit={handleFormSubmit}
+          isLoading={loading}
+          scrollContainerRef={scrollContainerRef}
+          isFloating={true}
+        />
       </ScrollArea>
-      <InputDataWithForm onSubmit={handleFormSubmit} isLoading={loading} />
     </>
   );
 };

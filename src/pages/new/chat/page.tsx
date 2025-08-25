@@ -124,7 +124,7 @@ const ChatPage = () => {
 
   return (
     <div className="flex w-full flex-1 flex-col items-center justify-center text-left">
-      <div className="mx-auto w-full md:max-w-4xl">
+      <div className="relative mx-auto w-full md:max-w-4xl">
         {!loading && (
           <div className="mb-4 mt-4 w-full">
             <img
@@ -177,7 +177,7 @@ const ChatPage = () => {
             <ModernLoadingIndicator />
           </div>
         )}
-        <div className="mb-4">
+        <div className="">
           <InputDataWithForm
             onSubmit={handleFormSubmit}
             isLoading={loading}
