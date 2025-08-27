@@ -1,67 +1,26 @@
-import NotFound from '@/pages/old/not-found';
-import { lazy } from 'react';
 import { Navigate, Outlet, useRoutes } from 'react-router-dom';
-import PublicRoute from './public-route';
-import ProtectedRoute from './protected-route';
 
-import GeneralFile from '@/pages/old/files/general';
-import DivisionFile from '@/pages/old/files/division';
-import ChatPage from '@/pages/new/chat/page';
-import FilesPage from '@/pages/new/files/page';
-import DetailPage from '@/pages/new/chat/detail/page';
-import ChatHistory from '@/pages/history/ChatHistory';
+import ChatPage from '@/pages/(protected)/chat/page';
+import FilesPage from '@/pages/(protected)/files/page';
+import DetailPage from '@/pages/(protected)/chat/detail/page';
+import ChatHistory from '@/pages/(protected)/history/ChatHistory';
 import OAuthCallbackPage from '@/pages/auth/oauth-callback';
 import LoginPage from '@/pages/auth/signin';
-
-const MainLayout = lazy(() => import('@/components/layout/main-layout'));
-const NewMainLayout = lazy(() => import('@/components/layout/new-main-layout'));
-
-const OldChatPage = lazy(() => import('@/pages/old/chat'));
-const EnhancePage = lazy(() => import('@/pages/old/enhance'));
-
-const ThankyouPage = lazy(() => import('@/pages/old/thankyou'));
+import NotFound from '@/pages/not-found';
+import ProtectedRoute from '@/components/providers/protected-route';
+import MainLayout from '@/components/providers/main-layout';
 
 // ----------------------------------------------------------------------
 
 export default function AppRouter() {
-  const dashboardRoutes = [
+  const protectedRoutes = [
     {
-      path: '/old',
+      path: '/',
       element: (
         <ProtectedRoute>
           <MainLayout>
             <Outlet />
           </MainLayout>
-        </ProtectedRoute>
-      ),
-      children: [
-        {
-          index: true,
-          element: <Navigate to="/old/chat" replace />
-        },
-        {
-          path: '/old/chat',
-          element: <OldChatPage />
-        },
-        {
-          path: '/old/files/general',
-          element: <GeneralFile />
-        },
-        {
-          path: '/old/files/division',
-          element: <DivisionFile />
-        },
-        {
-          path: '/old/enhance',
-          element: <EnhancePage />
-        }
-      ]
-    },
-    {
-      path: '/',
-      element: (
-        <ProtectedRoute>
-          <NewMainLayout />
         </ProtectedRoute>
       ),
       children: [
@@ -92,17 +51,7 @@ export default function AppRouter() {
   const publicRoutes = [
     {
       path: '/auth/signin',
-      element: (
-        <PublicRoute>
-          <LoginPage />
-        </PublicRoute>
-      ),
-      index: true
-    },
-
-    {
-      path: '/thankyou',
-      element: <ThankyouPage />,
+      element: <LoginPage />,
       index: true
     },
     {
@@ -123,7 +72,7 @@ export default function AppRouter() {
     }
   ];
 
-  const routes = useRoutes([...dashboardRoutes, ...publicRoutes]);
+  const routes = useRoutes([...protectedRoutes, ...publicRoutes]);
 
   return routes;
 }

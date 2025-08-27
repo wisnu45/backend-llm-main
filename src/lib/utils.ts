@@ -1,8 +1,6 @@
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import dayjs from 'dayjs';
-import { SourceDocument } from '@/types/chat';
-import { FileListResponse } from '@/types/file';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -49,45 +47,4 @@ export const truncateFileName = (fileName: string, maxLength: number) => {
   const backChars = Math.floor(charsToShow / 2);
 
   return `${nameWithoutExtension.slice(0, frontChars)}...${nameWithoutExtension.slice(-backChars)}.${extension}`;
-};
-
-export const getGreeting = (): string => {
-  const currentHour = new Date().getHours();
-
-  if (currentHour >= 5 && currentHour < 12) {
-    return 'Pagi';
-  } else if (currentHour >= 12 && currentHour < 15) {
-    return 'Siang';
-  } else if (currentHour >= 15 && currentHour < 18) {
-    return 'Sore';
-  } else {
-    return 'Malam';
-  }
-};
-
-export const getUniqSourceDocument = (documents: SourceDocument[]) => {
-  const seen = new Set<string>();
-  return documents.filter((doc) => {
-    const key = `${doc.metadata.page}-${doc.metadata.source}`;
-    if (seen.has(key)) {
-      return false;
-    }
-    seen.add(key);
-    return true;
-  });
-};
-
-export const excludeFileByName = (files?: FileListResponse[]) => {
-  const excluded = [
-    'AR-United-Tractors-2023-Final.pdf',
-    'Bung Karno.pdf',
-    'Catatan Hitam Lima Presiden Indonesia.pdf',
-    'Asal Bangsa nusantara.pdf',
-    'konflik_agama.pdf',
-    'Sumbangan Pernikahan-1.PDF',
-    'Diskusi 1 Logika Informatika Eva Vani Elisa.pdf',
-    '053972828_Tugas2_EKMA4158.pdf'
-  ];
-
-  return files?.filter(({ file }) => !excluded.includes(file));
 };
