@@ -17,6 +17,7 @@ import {
 import { DropdownMenuTrigger } from '@radix-ui/react-dropdown-menu';
 import { useDeleteChat } from './_hook/use-delete-chat';
 import DocumentMenu from './document-menu';
+import UserManagementMenu from './user-management-menu';
 
 type TRecentChats = {
   session_id: string;
@@ -130,6 +131,9 @@ const Sidebar = ({ setShowModal }) => {
             )}
           </Link>
           {documentSideBar && <DocumentMenu isSidebarOpen={isSidebarOpen} />}
+          {documentSideBar && (
+            <UserManagementMenu isSidebarOpen={isSidebarOpen} />
+          )}
           {isSidebarOpen && (
             <div className="mb-2 mt-2 pl-2">
               <input

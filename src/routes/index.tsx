@@ -4,6 +4,7 @@ import ChatPage from '@/pages/(protected)/chat/page';
 import FilesPage from '@/pages/(protected)/files/page';
 import DetailPage from '@/pages/(protected)/chat/detail/page';
 import ChatHistory from '@/pages/(protected)/history/ChatHistory';
+import UserManagementPage from '@/pages/(protected)/user-management/page';
 import OAuthCallbackPage from '@/pages/auth/oauth-callback';
 import LoginPage from '@/pages/auth/signin';
 import NotFound from '@/pages/not-found';
@@ -43,6 +44,10 @@ export default function AppRouter() {
         {
           path: '/history',
           element: <ChatHistory />
+        },
+        {
+          path: '/user-management',
+          element: <UserManagementPage />
         }
       ]
     }
