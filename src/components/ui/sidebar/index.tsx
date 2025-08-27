@@ -117,7 +117,11 @@ const Sidebar = ({ setShowModal }) => {
             onClick={() => {
               Cookies.remove('chat_id');
             }}
-            className="mt-2 flex w-full items-center gap-2 rounded-lg p-2 text-left hover:bg-gray-400/20"
+            className={`mt-2 flex w-full items-center gap-2 rounded-lg p-2 text-left hover:bg-gray-400/20 ${
+              location.pathname === '/chat'
+                ? 'bg-gray-400/40 text-black'
+                : 'text-gray-700'
+            }`}
           >
             {isSidebarOpen ? (
               <>

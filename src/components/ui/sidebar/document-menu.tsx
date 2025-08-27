@@ -1,6 +1,6 @@
 import useGetListDocument from '@/pages/(protected)/files/_hooks/get-list-document';
 import { FileTextIcon } from '@radix-ui/react-icons';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 interface Props {
   isSidebarOpen: boolean;
@@ -8,11 +8,15 @@ interface Props {
 
 const DocumentMenu = ({ isSidebarOpen }: Props) => {
   const queryDocument = useGetListDocument();
+  const location = useLocation();
+  const isActive = location.pathname === '/files';
 
   return (
     <Link
       to="/files"
-      className="flex items-center justify-between rounded-lg p-2 text-sm text-gray-700 hover:bg-gray-400/20"
+      className={`flex items-center justify-between rounded-lg p-2 text-sm hover:bg-gray-400/20 ${
+        isActive ? 'bg-gray-400/40 text-black' : 'text-gray-700'
+      }`}
     >
       {isSidebarOpen ? (
         <div className="flex w-full items-center justify-between">
