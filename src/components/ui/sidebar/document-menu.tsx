@@ -1,4 +1,4 @@
-import useGetListDocument from '@/pages/new/files/_hooks/get-list-document';
+import useGetListDocument from '@/pages/(protected)/files/_hooks/get-list-document';
 import { FileTextIcon } from '@radix-ui/react-icons';
 import { Link } from 'react-router-dom';
 
