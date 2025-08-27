@@ -21,94 +21,159 @@ export const useScroll = (
   });
 
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const lastScrollY = useRef(0);
 
-  const handleScroll = useCallback(() => {
-    let currentScrollY: number;
-    let scrollHeight: number;
-    let clientHeight: number;
+  const updateScrollState = useCallback(
+    (currentScrollY: number, scrollHeight: number, clientHeight: number) => {
+      // Clear existing timeout
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
 
+      setScrollState((prev) => {
+        const isScrollingDown =
+          currentScrollY > lastScrollY.current && currentScrollY > threshold;
+        const isAtTop = currentScrollY < threshold;
+        const isAtBottom = currentScrollY + clientHeight >= scrollHeight - 10;
+
+        lastScrollY.current = currentScrollY;
+
+        return {
+          isScrollingDown,
+          scrollY: currentScrollY,
+          isAtTop,
+          isAtBottom,
+          isScrolling: true
+        };
+      });
+
+      // Set timeout to detect when scrolling stops
+      scrollTimeoutRef.current = setTimeout(() => {
+        setScrollState((prev) => ({
+          ...prev,
+          isScrolling: false
+        }));
+      }, 150);
+    },
+    [threshold]
+  );
+
+  const getScrollableElement = useCallback(() => {
     if (containerRef?.current) {
-      // Use container scroll values
+      // Try to find the actual scrollable element within the container
       const container = containerRef.current;
-      currentScrollY = container.scrollTop;
-      scrollHeight = container.scrollHeight;
-      clientHeight = container.clientHeight;
-    } else {
-      // Fall back to window scroll values
-      currentScrollY = window.scrollY;
-      scrollHeight = document.documentElement.scrollHeight;
-      clientHeight = window.innerHeight;
+
+      // Check if the container itself is scrollable
+      if (container.scrollHeight > container.clientHeight) {
+        return container;
+      }
+
+      // Look for a scrollable child (like Radix UI viewport)
+      const viewport = container.querySelector(
+        '[data-radix-scroll-area-viewport]'
+      );
+      if (viewport && viewport.scrollHeight > viewport.clientHeight) {
+        return viewport as HTMLElement;
+      }
+
+      // Look for any scrollable child
+      const children = container.querySelectorAll('*');
+      for (let i = 0; i < children.length; i++) {
+        const child = children[i] as HTMLElement;
+        if (child.scrollHeight > child.clientHeight) {
+          return child;
+        }
+      }
+
+      // Fallback to container
+      return container;
     }
 
-    // Clear existing timeout
-    if (scrollTimeoutRef.current) {
-      clearTimeout(scrollTimeoutRef.current);
-    }
-
-    setScrollState((prev) => {
-      const isScrollingDown =
-        currentScrollY > prev.scrollY && currentScrollY > threshold;
-      const isAtTop = currentScrollY < threshold;
-      const isAtBottom = currentScrollY + clientHeight >= scrollHeight - 10;
-
-      return {
-        isScrollingDown,
-        scrollY: currentScrollY,
-        isAtTop,
-        isAtBottom,
-        isScrolling: true
-      };
-    });
-
-    // Set timeout to detect when scrolling stops
-    scrollTimeoutRef.current = setTimeout(() => {
-      setScrollState((prev) => ({
-        ...prev,
-        isScrolling: false
-      }));
-    }, 150); // 150ms delay after scroll stops
-  }, [threshold, containerRef]);
+    return null;
+  }, [containerRef]);
 
   useEffect(() => {
+    let scrollElement: HTMLElement | null = null;
     let ticking = false;
 
     const debouncedHandleScroll = () => {
       if (!ticking) {
         requestAnimationFrame(() => {
-          handleScroll();
+          if (scrollElement) {
+            updateScrollState(
+              scrollElement.scrollTop,
+              scrollElement.scrollHeight,
+              scrollElement.clientHeight
+            );
+          } else if (typeof window !== 'undefined') {
+            // Fallback to window scroll
+            updateScrollState(
+              window.scrollY,
+              document.documentElement.scrollHeight,
+              window.innerHeight
+            );
+          }
           ticking = false;
         });
         ticking = true;
       }
     };
 
-    if (containerRef?.current) {
-      containerRef.current.addEventListener('scroll', debouncedHandleScroll, {
-        passive: true
+    // Setup scroll listening
+    const setupScrollListener = () => {
+      scrollElement = getScrollableElement();
+
+      if (scrollElement) {
+        scrollElement.addEventListener('scroll', debouncedHandleScroll, {
+          passive: true
+        });
+        // Initialize scroll state
+        debouncedHandleScroll();
+      } else if (typeof window !== 'undefined') {
+        // Fallback to window scroll
+        window.addEventListener('scroll', debouncedHandleScroll, {
+          passive: true
+        });
+        // Initialize scroll state
+        debouncedHandleScroll();
+      }
+    };
+
+    // Setup immediately if possible
+    setupScrollListener();
+
+    // Also observe container changes using ResizeObserver
+    let resizeObserver: ResizeObserver | null = null;
+    if (containerRef?.current && typeof ResizeObserver !== 'undefined') {
+      resizeObserver = new ResizeObserver(() => {
+        // Re-setup when container size changes
+        if (scrollElement) {
+          scrollElement.removeEventListener('scroll', debouncedHandleScroll);
+        }
+        setupScrollListener();
       });
-    } else {
-      window.addEventListener('scroll', debouncedHandleScroll, {
-        passive: true
-      });
+      resizeObserver.observe(containerRef.current);
     }
 
-    handleScroll(); // Initialize state
-
     return () => {
-      if (containerRef?.current) {
-        containerRef.current.removeEventListener(
-          'scroll',
-          debouncedHandleScroll
-        );
-      } else {
+      // Clean up scroll listener
+      if (scrollElement) {
+        scrollElement.removeEventListener('scroll', debouncedHandleScroll);
+      } else if (typeof window !== 'undefined') {
         window.removeEventListener('scroll', debouncedHandleScroll);
       }
+
+      // Clean up observers
+      if (resizeObserver) {
+        resizeObserver.disconnect();
+      }
+
       // Clean up timeout
       if (scrollTimeoutRef.current) {
         clearTimeout(scrollTimeoutRef.current);
       }
     };
-  }, [handleScroll, containerRef]);
+  }, [containerRef, getScrollableElement, updateScrollState]);
 
   return scrollState;
 };

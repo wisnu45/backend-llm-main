@@ -13,8 +13,7 @@ import {
   TooltipContent,
   TooltipTrigger
 } from '@/components/ui/tooltip';
-import { useMobile } from '@/hooks/use-mobile';
-import { useScroll } from '@/hooks/use-scroll';
+import { useMobileScroll } from '@/hooks/use-mobile-scroll';
 import clsx from 'clsx';
 
 interface InputDataWithFormProps {
@@ -38,12 +37,11 @@ const InputDataWithForm = ({
   const [popupFile, setPopupFile] = useState<File | null>(null);
   const defaultIsBrowse = Cookies.get('search_internet') === 'true';
 
-  // Mobile detection and scroll state
-  const isMobile = useMobile();
-  const { isScrolling, isAtTop } = useScroll(50, scrollContainerRef);
+  // Combined mobile detection and scroll state
+  const { shouldHideOnScroll } = useMobileScroll(50, scrollContainerRef);
 
-  // Determine if form should be hidden (only on mobile when scrolling and not at top)
-  const shouldHide = isMobile && isScrolling && !isAtTop;
+  // Determine if form should be hidden
+  const shouldHide = shouldHideOnScroll && isFloating;
 
   const {
     control,
@@ -136,16 +134,20 @@ const InputDataWithForm = ({
 
   return (
     <div
-      className={clsx(
-        ' bottom-0 left-0 right-0 z-40',
-        isFloating ? 'absolute' : ''
-      )}
+      className={clsx(' bottom-0 left-0 right-0', isFloating ? 'absolute' : '')}
     >
       <form
         onSubmit={handleSubmit(onFormSubmit)}
-        className={`relative transition-transform duration-300 ${
-          shouldHide ? 'translate-y-full transform' : 'translate-y-0 transform'
+        className={`relative transition-transform duration-300 ease-in-out ${
+          shouldHide
+            ? 'translate-y-full transform opacity-0'
+            : 'translate-y-0 transform opacity-100'
         }`}
+        style={{
+          transform: shouldHide ? 'translateY(100%)' : 'translateY(0)',
+          opacity: shouldHide ? 0 : 1,
+          visibility: shouldHide ? 'hidden' : 'visible'
+        }}
       >
         <div
           className="mx-auto w-full rounded-xl border border-gray-300 bg-white p-4 shadow-lg"

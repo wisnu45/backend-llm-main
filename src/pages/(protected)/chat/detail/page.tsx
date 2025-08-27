@@ -37,22 +37,10 @@ const DetailPage = () => {
     }
   });
 
-  // Get the actual scrollable viewport from the ScrollArea component
+  // Simplified scroll container setup - use ScrollArea ref directly
   useEffect(() => {
     if (scrollAreaRef.current) {
-      // Find the ScrollArea viewport element (Radix UI creates a div with data-radix-scroll-area-viewport)
-      const viewport = scrollAreaRef.current.querySelector(
-        '[data-radix-scroll-area-viewport]'
-      );
-      if (viewport) {
-        scrollContainerRef.current = viewport as HTMLElement;
-      } else {
-        // Fallback: try to find the first scrollable child
-        const firstChild = scrollAreaRef.current.firstElementChild;
-        if (firstChild) {
-          scrollContainerRef.current = firstChild as HTMLElement;
-        }
-      }
+      scrollContainerRef.current = scrollAreaRef.current;
     }
   }, []);
 
