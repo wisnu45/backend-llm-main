@@ -1,4 +1,4 @@
-import { PencilIcon, TrashIcon } from 'lucide-react';
+import { PencilIcon } from 'lucide-react';
 
 type TSetting = {
   config: string;
