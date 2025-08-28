@@ -10,8 +10,7 @@ import LoginPage from '@/pages/auth/signin';
 import NotFound from '@/pages/not-found';
 import ProtectedRoute from '@/components/providers/protected-route';
 import MainLayout from '@/components/providers/main-layout';
-
-// ----------------------------------------------------------------------
+import SettingTable from '@/pages/(protected)/setting/page';
 
 export default function AppRouter() {
   const protectedRoutes = [
@@ -44,6 +43,10 @@ export default function AppRouter() {
         {
           path: '/history',
           element: <ChatHistory />
+        },
+        {
+          path: '/setting',
+          element: <SettingTable />
         },
         {
           path: '/user-management',

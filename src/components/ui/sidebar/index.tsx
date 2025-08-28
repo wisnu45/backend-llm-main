@@ -260,6 +260,17 @@ const Sidebar = ({ setShowModal }) => {
               className="h-4 w-4"
             />
           </Link>
+          <Link
+            to="/setting"
+            className="flex items-center justify-between gap-3 rounded-lg p-2 text-sm text-gray-600 transition-colors duration-200 hover:bg-neutral-300/60"
+          >
+            {isSidebarOpen && <span className="truncate">Setting</span>}
+            <img
+              src="/icons/setting.png"
+              alt="See more history"
+              className="h-4 w-4"
+            />
+          </Link>
           <button
             onClick={() => setShowModal(true)}
             className={`mt-4 flex w-full items-center gap-3 rounded-lg bg-slate-400 p-2 text-sm text-[#5C47DB] transition-colors duration-200 hover:bg-[#E0E0E0]`}
