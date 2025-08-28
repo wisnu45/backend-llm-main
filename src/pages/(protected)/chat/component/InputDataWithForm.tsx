@@ -1,8 +1,6 @@
 import { ArrowRightIcon, Cross2Icon } from '@radix-ui/react-icons';
-
-import { Globe } from 'lucide-react';
-
-import { useState, useImperativeHandle, useEffect } from 'react';
+import { Globe, Mic } from 'lucide-react';
+import { useState, useImperativeHandle, useEffect, useRef } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ChatFormSchema, TChatFormData } from '../schema';
@@ -131,6 +129,48 @@ const InputDataWithForm = ({
     setValue('is_browse', watchedSearch === true);
     Cookies.set('search_internet', watchedSearch === true ? 'true' : 'false');
   }, [watchedSearch, setValue]);
+
+  const [isRecording, setIsRecording] = useState(false);
+  const recognitionRef = useRef<any>(null);
+  useEffect(() => {
+    if ('webkitSpeechRecognition' in window) {
+      const SpeechRecognition =
+        (window as any).SpeechRecognition ||
+        (window as any).webkitSpeechRecognition;
+      recognitionRef.current = new SpeechRecognition();
+      recognitionRef.current.continuous = false;
+      recognitionRef.current.lang = 'id-ID'; // ✅ set bahasa Indonesia
+      recognitionRef.current.interimResults = true;
+
+      recognitionRef.current.onresult = (event: any) => {
+        const transcript = Array.from(event.results)
+          .map((result: any) => result[0].transcript)
+          .join('');
+
+        setValue('prompt', transcript);
+        trigger('prompt');
+      };
+
+      recognitionRef.current.onend = () => {
+        setIsRecording(false);
+      };
+    }
+  }, [setValue, trigger]);
+
+  const toggleRecording = () => {
+    if (!recognitionRef.current) {
+      alert('Browser tidak mendukung Speech Recognition');
+      return;
+    }
+
+    if (isRecording) {
+      recognitionRef.current.stop();
+      setIsRecording(false);
+    } else {
+      recognitionRef.current.start();
+      setIsRecording(true);
+    }
+  };
 
   return (
     <div
@@ -304,8 +344,27 @@ const InputDataWithForm = ({
                 }}
               />
             </div>
-
             <div className="flex items-center gap-3">
+              <Tooltip>
+                <TooltipTrigger>
+                  <button
+                    type="button"
+                    onClick={toggleRecording}
+                    disabled={isLoading}
+                    className={`flex items-center gap-2 rounded-xl px-4 py-2 shadow-md transition-all duration-300 ${
+                      isRecording
+                        ? 'animate-pulse bg-red-500 text-white'
+                        : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+                    }`}
+                  >
+                    <Mic className="h-5 w-5" />
+                    {isRecording && <span>{'Merekam...'}</span>}
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent className="hidden sm:block">
+                  Ucapkan pertanyaanmu
+                </TooltipContent>
+              </Tooltip>
               <span className="text-sm text-gray-900">
                 {watchedPrompt?.length || 0}/1000
               </span>
