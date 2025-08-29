@@ -39,7 +39,7 @@ export const ChatItem = ({ data }: ChatItemProps) => {
         {isRecentMessage(created_at) ? (
           <TypingEffect
             text={cleanedAnswer}
-            typingSpeed={25}
+            typingSpeed={8}
             onComplete={handleTypingComplete}
           />
         ) : (
