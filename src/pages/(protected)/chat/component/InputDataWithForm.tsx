@@ -325,9 +325,11 @@ const InputDataWithForm = ({
                           <div
                             className={`flex items-center gap-2 rounded-xl px-4 py-2 shadow-md transition-all duration-300 ${
                               value
-                                ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white hover:text-purple-200 hover:shadow-lg'
+                                ? 'bg-[#772f8e] text-white hover:text-purple-200 hover:shadow-lg'
                                 : ' shadow-lg'
-                            } ${isLoading ? 'cursor-not-allowed opacity-50' : ''}`}
+                            } 
+                            // ${isLoading ? 'cursor-not-allowed opacity-50' : ''}
+                            `}
                           >
                             <Globe className="h-5 w-5" />
                             <span className="text-sm font-medium">
@@ -351,7 +353,7 @@ const InputDataWithForm = ({
                     type="button"
                     onClick={toggleRecording}
                     disabled={isLoading}
-                    className={`flex items-center gap-2 rounded-xl px-4 py-2 shadow-md transition-all duration-300 ${
+                    className={`hidden items-center gap-2 rounded-xl px-4 py-2 shadow-md transition-all duration-300 md:flex ${
                       isRecording
                         ? 'animate-pulse bg-red-500 text-white'
                         : 'bg-gray-100 text-gray-800 hover:bg-gray-200'

@@ -7,7 +7,7 @@ import { ScrollArea } from '../scroll-area';
 import Cookies from 'js-cookie';
 import { Skeleton } from '../skeleton';
 import { AlertModal } from '../../shared/alert-modal';
-import { MoreVertical, TrashIcon } from 'lucide-react';
+import { MoreVertical, TrashIcon, Edit, Pin } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,6 +18,7 @@ import { DropdownMenuTrigger } from '@radix-ui/react-dropdown-menu';
 import { useDeleteChat } from './_hook/use-delete-chat';
 import DocumentMenu from './document-menu';
 import UserManagementMenu from './user-management-menu';
+import RenameModal from '../alartEdit';
 
 type TRecentChats = {
   session_id: string;
@@ -33,8 +34,10 @@ const Sidebar = ({ setShowModal }) => {
   const documentSideBar = Cookies.get('role') === 'admin';
   const topRef = useRef<HTMLDivElement | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showEditName, setShowEditName] = useState(false);
   const [active, setActive] = useState<string | null>(null);
   const [activeId, setActiveId] = useState<string | null>(null);
+  const [activeChat, setActiveChat] = useState<string | null>(null);
   const navigate = useNavigate();
   const params = useParams();
 
@@ -230,6 +233,27 @@ const Sidebar = ({ setShowModal }) => {
                                   <TrashIcon className="h-4 text-red-500" />
                                 </DropdownMenuShortcut>
                               </DropdownMenuItem>
+                              <DropdownMenuItem
+                                className="cursor-pointer"
+                                onClick={() => {
+                                  setActiveChat(chat.title);
+                                  setShowEditName(true);
+                                }}
+                              >
+                                Edit
+                                <DropdownMenuShortcut>
+                                  <Edit className="h-4 text-blue-600" />
+                                </DropdownMenuShortcut>
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                className="cursor-pointer"
+                                onClick={() => {}}
+                              >
+                                Pin
+                                <DropdownMenuShortcut>
+                                  <Pin className="h-4 text-blue-600" />
+                                </DropdownMenuShortcut>
+                              </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
                         </li>
@@ -305,6 +329,25 @@ const Sidebar = ({ setShowModal }) => {
         loading={deleteMutation.isPending}
         title="Delete Chat"
         description="Are you sure you want to delete this chat? This action cannot be undone."
+      />
+      <RenameModal
+        isOpen={showEditName}
+        onClose={() => setShowEditName(false)}
+        initialValue={activeChat || ''} // optional, isi nama lama
+        onConfirm={(newName) => {
+          // renameMutation.mutate(
+          //   { session_id: activeId!, name: newName },
+          //   {
+          //     onSuccess: () => {
+          //       setShowRenameModal(false);
+          //       query.refetch();
+          //     }
+          //   }
+          // );
+        }}
+        // loading={renameMutation.isPending}
+        title="Rename Chat"
+        description="Enter a new name for this chat."
       />
     </ScrollArea>
   );
