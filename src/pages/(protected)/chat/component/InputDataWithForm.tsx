@@ -1,5 +1,5 @@
 import { ArrowRightIcon, Cross2Icon } from '@radix-ui/react-icons';
-import { Globe, Mic } from 'lucide-react';
+import { Globe, Mic, Paperclip } from 'lucide-react';
 import { useState, useImperativeHandle, useEffect, useRef } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -82,14 +82,14 @@ const InputDataWithForm = ({
     }
   };
 
-  // const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   const selectedFiles = e.target.files;
-  //   if (selectedFiles) {
-  //     const newFiles = Array.from(selectedFiles);
-  //     const currentAttachments = watchedAttachments || [];
-  //     setValue('attachments', [...currentAttachments, ...newFiles]);
-  //   }
-  // };
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFiles = e.target.files;
+    if (selectedFiles) {
+      const newFiles = Array.from(selectedFiles);
+      const currentAttachments = watchedAttachments || [];
+      setValue('attachments', [...currentAttachments, ...newFiles]);
+    }
+  };
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -261,23 +261,23 @@ const InputDataWithForm = ({
 
           <div className="mt-4 flex items-center justify-between text-sm text-gray-800">
             <div className="flex flex-col items-start gap-2 sm:flex-row sm:gap-2">
-              {/* <button
-              type="button"
-              className="flex cursor-pointer items-center gap-1 rounded-xl bg-gradient-to-r px-4 py-2 shadow-md transition duration-300 hover:text-purple-600 hover:shadow-lg"
-            >
-              <Paperclip size={18} />
-              <label htmlFor="file-upload" className="cursor-pointer">
-                Attach Document
-              </label>
-              <input
-                id="file-upload"
-                type="file"
-                multiple
-                className="hidden"
-                onChange={handleFileChange}
-                disabled={isLoading}
-              />
-            </button> */}
+              <button
+                type="button"
+                className="flex cursor-pointer items-center gap-1 rounded-xl bg-gradient-to-r px-4 py-2 shadow-md transition duration-300 hover:text-purple-600 hover:shadow-lg"
+              >
+                <Paperclip size={18} />
+                <label htmlFor="file-upload" className="cursor-pointer">
+                  Add photos & files
+                </label>
+                <input
+                  id="file-upload"
+                  type="file"
+                  multiple
+                  className="hidden"
+                  onChange={handleFileChange}
+                  disabled={isLoading}
+                />
+              </button>
               {/* <button
               type="button"
               className="flex items-center gap-1 transition hover:text-purple-600"
