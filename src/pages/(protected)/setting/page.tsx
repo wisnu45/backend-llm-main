@@ -1,5 +1,5 @@
 import { PencilIcon } from 'lucide-react';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 
 type TSetting = {
   config: string;
