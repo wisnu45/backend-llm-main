@@ -266,7 +266,10 @@ const InputDataWithForm = ({
                 className="flex cursor-pointer items-center gap-1 rounded-xl bg-gradient-to-r px-4 py-2 shadow-md transition duration-300 hover:text-purple-600 hover:shadow-lg"
               >
                 <Paperclip size={18} />
-                <label htmlFor="file-upload" className="cursor-pointer">
+                <label
+                  htmlFor="file-upload"
+                  className="hidden cursor-pointer md:inline"
+                >
                   Add photos & files
                 </label>
                 <input
