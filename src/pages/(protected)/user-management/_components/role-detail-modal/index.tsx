@@ -35,7 +35,7 @@ const RoleDetailModal = ({
         <DialogHeader>
           <DialogTitle>Role Details</DialogTitle>
           <DialogDescription>
-            View role information and assigned permissions.
+            View role information and capabilities.
           </DialogDescription>
         </DialogHeader>
 
@@ -56,21 +56,67 @@ const RoleDetailModal = ({
 
           <div>
             <span className="mb-1 block text-sm font-semibold text-gray-500">
-              Permissions ({data?.permissions?.length || 0})
+              Capabilities
             </span>
-            <div className="flex flex-wrap gap-1">
-              {data?.permissions?.map((permission) => (
+            <div className="space-y-2">
+              <div className="flex justify-between">
+                <span>Chat:</span>
                 <span
-                  key={permission.id}
-                  className="inline-block rounded-lg bg-green-50 px-2 py-1 text-xs text-green-600"
+                  className={data?.chat ? 'text-green-600' : 'text-red-600'}
                 >
-                  {permission.name}
+                  {data?.chat ? 'Enabled' : 'Disabled'}
                 </span>
-              )) || (
-                <span className="text-sm text-gray-500">
-                  No permissions assigned
+              </div>
+              <div className="flex justify-between">
+                <span>File Management:</span>
+                <span
+                  className={
+                    data?.file_management ? 'text-green-600' : 'text-red-600'
+                  }
+                >
+                  {data?.file_management ? 'Enabled' : 'Disabled'}
                 </span>
-              )}
+              </div>
+              <div className="flex justify-between">
+                <span>History:</span>
+                <span
+                  className={data?.history ? 'text-green-600' : 'text-red-600'}
+                >
+                  {data?.history ? 'Enabled' : 'Disabled'}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span>Chat Attachment:</span>
+                <span
+                  className={
+                    data?.chat_attachment ? 'text-green-600' : 'text-red-600'
+                  }
+                >
+                  {data?.chat_attachment ? 'Enabled' : 'Disabled'}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span>User Management:</span>
+                <span
+                  className={
+                    data?.user_management ? 'text-green-600' : 'text-red-600'
+                  }
+                >
+                  {data?.user_management ? 'Enabled' : 'Disabled'}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span>Max Chat Topics:</span>
+                <span>{data?.max_chat_topic || 0}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Chat Topic Expired Days:</span>
+                <span>{data?.chat_topic_expired_days || 0}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Max Chats:</span>
+                <span>{data?.max_chat || 0}</span>
+              </div>
             </div>
           </div>
 

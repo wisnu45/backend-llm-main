@@ -1,15 +1,16 @@
 import { TResponse } from '@/commons/types/response';
 
-export type TPermission = {
-  id: string;
-  name: string;
-  key: string;
-};
-
 export type TRole = {
   id: string;
   name: string;
-  permissions: TPermission[];
+  chat: boolean;
+  file_management: boolean;
+  history: boolean;
+  chat_attachment: boolean;
+  max_chat_topic: number;
+  chat_topic_expired_days: number;
+  max_chat: number;
+  user_management: boolean;
   created_at: string;
   updated_at: string;
 };
@@ -17,7 +18,8 @@ export type TRole = {
 export type TUser = {
   id: string;
   name: string;
-  email: string;
+  username: string;
+  isPortalUser: boolean;
   role_id: string;
   role?: TRole;
   created_at: string;
@@ -39,28 +41,44 @@ export type TRoleParams = {
 
 export type TRequestCreateUser = {
   name: string;
-  email: string;
+  username: string;
+  password: string;
+  isPortalUser: boolean;
   role_id: string;
 };
 
 export type TRequestUpdateUser = {
   name: string;
-  email: string;
+  username: string;
+  isPortalUser: boolean;
   role_id: string;
 };
 
 export type TRequestCreateRole = {
   name: string;
-  permission_ids: string[];
+  chat: boolean;
+  file_management: boolean;
+  history: boolean;
+  chat_attachment: boolean;
+  max_chat_topic: number;
+  chat_topic_expired_days: number;
+  max_chat: number;
+  user_management: boolean;
 };
 
 export type TRequestUpdateRole = {
   name: string;
-  permission_ids: string[];
+  chat: boolean;
+  file_management: boolean;
+  history: boolean;
+  chat_attachment: boolean;
+  max_chat_topic: number;
+  chat_topic_expired_days: number;
+  max_chat: number;
+  user_management: boolean;
 };
 
 export type TResponseListUsers = TResponse<TUser[]>;
 export type TResponseDetailUser = TResponse<TUser>;
 export type TResponseListRoles = TResponse<TRole[]>;
 export type TResponseDetailRole = TResponse<TRole>;
-export type TResponseListPermissions = TResponse<TPermission[]>;

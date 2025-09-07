@@ -56,9 +56,18 @@ const UserDetailModal = ({
 
           <div>
             <span className="mb-1 block text-sm font-semibold text-gray-500">
-              Email Address
+              Username
             </span>
-            <p className="text-base text-gray-800">{data?.email ?? '-'}</p>
+            <p className="text-base text-gray-800">{data?.username ?? '-'}</p>
+          </div>
+
+          <div>
+            <span className="mb-1 block text-sm font-semibold text-gray-500">
+              Portal Access
+            </span>
+            <p className="text-base text-gray-800">
+              {data?.isPortalUser ? 'Yes' : 'No'}
+            </p>
           </div>
 
           <div>

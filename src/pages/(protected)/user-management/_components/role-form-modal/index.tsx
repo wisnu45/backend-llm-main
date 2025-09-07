@@ -19,14 +19,13 @@ import {
   FormMessage
 } from '@/components/ui/form';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
+import { Switch } from '@/components/ui/switch';
 import { useEffect } from 'react';
 import {
   TRequestCreateRole,
   TRequestUpdateRole
 } from '@/api/user-management/type';
 import { Loader2 } from 'lucide-react';
-import useGetPermissions from '../../_hooks/get-permissions';
 
 interface Props {
   loading?: boolean;
@@ -61,9 +60,6 @@ const RoleFormModal = ({
     resolver: zodResolver(RoleFormSchema)
   });
 
-  const permissionsQuery = useGetPermissions();
-  const permissions = permissionsQuery.data?.data || [];
-
   const handleSubmit = (data: TRoleFormData) => {
     onSubmit(data);
   };
@@ -74,7 +70,14 @@ const RoleFormModal = ({
     } else {
       form.reset({
         name: '',
-        permission_ids: []
+        chat: false,
+        file_management: false,
+        history: false,
+        chat_attachment: false,
+        user_management: false,
+        max_chat_topic: 10,
+        chat_topic_expired_days: 30,
+        max_chat: 100
       });
     }
   }, [defaultValues, form, open]);
@@ -109,61 +112,181 @@ const RoleFormModal = ({
               )}
             />
 
-            <FormField
-              control={form.control}
-              name="permission_ids"
-              render={() => (
-                <FormItem>
-                  <div className="mb-4">
-                    <FormLabel className="text-base">Permissions *</FormLabel>
-                    <p className="text-sm text-muted-foreground">
-                      Select the permissions this role should have
-                    </p>
-                  </div>
-                  <div className="space-y-3">
-                    {permissions.map((permission) => (
-                      <FormField
-                        key={permission.id}
-                        control={form.control}
-                        name="permission_ids"
-                        render={({ field }) => {
-                          return (
-                            <FormItem
-                              key={permission.id}
-                              className="flex flex-row items-start space-x-3 space-y-0"
-                            >
-                              <FormControl>
-                                <Checkbox
-                                  checked={field.value?.includes(permission.id)}
-                                  onCheckedChange={(checked) => {
-                                    return checked
-                                      ? field.onChange([
-                                          ...field.value,
-                                          permission.id
-                                        ])
-                                      : field.onChange(
-                                          field.value?.filter(
-                                            (value) => value !== permission.id
-                                          )
-                                        );
-                                  }}
-                                />
-                              </FormControl>
-                              <div className="space-y-1 leading-none">
-                                <FormLabel className="font-normal">
-                                  {permission.name}
-                                </FormLabel>
-                              </div>
-                            </FormItem>
-                          );
-                        }}
+            <div className="space-y-4">
+              <div className="mb-4">
+                <FormLabel className="text-base">Role Permissions</FormLabel>
+                <p className="text-sm text-muted-foreground">
+                  Configure the capabilities this role should have
+                </p>
+              </div>
+
+              {/* Boolean permissions using Switch */}
+              <FormField
+                control={form.control}
+                name="chat"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center justify-between">
+                    <div className="space-y-0.5">
+                      <FormLabel className="text-base">Chat</FormLabel>
+                    </div>
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
                       />
-                    ))}
-                  </div>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="file_management"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center justify-between">
+                    <div className="space-y-0.5">
+                      <FormLabel className="text-base">
+                        File Management
+                      </FormLabel>
+                    </div>
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="history"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center justify-between">
+                    <div className="space-y-0.5">
+                      <FormLabel className="text-base">History</FormLabel>
+                    </div>
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="chat_attachment"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center justify-between">
+                    <div className="space-y-0.5">
+                      <FormLabel className="text-base">
+                        Chat Attachment
+                      </FormLabel>
+                    </div>
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="user_management"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center justify-between">
+                    <div className="space-y-0.5">
+                      <FormLabel className="text-base">
+                        User Management
+                      </FormLabel>
+                    </div>
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+
+              {/* Numeric permissions using Input */}
+              <FormField
+                control={form.control}
+                name="max_chat_topic"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Max Chat Topics</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        min={1}
+                        max={100}
+                        placeholder="Enter max chat topics"
+                        value={field.value || ''}
+                        onChange={(e) =>
+                          field.onChange(parseInt(e.target.value) || 0)
+                        }
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="chat_topic_expired_days"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Chat Topic Expired Days</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        min={1}
+                        max={365}
+                        placeholder="Enter expired days"
+                        value={field.value || ''}
+                        onChange={(e) =>
+                          field.onChange(parseInt(e.target.value) || 0)
+                        }
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="max_chat"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Max Chats</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        min={1}
+                        max={1000}
+                        placeholder="Enter max chats"
+                        value={field.value || ''}
+                        onChange={(e) =>
+                          field.onChange(parseInt(e.target.value) || 0)
+                        }
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
             <DialogFooter className="mt-2 sm:justify-start">
               <Button type="submit" className="w-full" disabled={loading}>

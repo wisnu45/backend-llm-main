@@ -86,7 +86,8 @@ const UserManagementModals = ({
         }}
         defaultValues={{
           name: userDetailQuery.data?.data.name,
-          email: userDetailQuery.data?.data.email,
+          username: userDetailQuery.data?.data.username,
+          isPortalUser: userDetailQuery.data?.data.isPortalUser,
           role_id: userDetailQuery.data?.data.role_id
         }}
       />
@@ -125,8 +126,15 @@ const UserManagementModals = ({
         }}
         defaultValues={{
           name: roleDetailQuery.data?.data.name,
-          permission_ids:
-            roleDetailQuery.data?.data.permissions?.map((p) => p.id) || []
+          chat: roleDetailQuery.data?.data.chat,
+          file_management: roleDetailQuery.data?.data.file_management,
+          history: roleDetailQuery.data?.data.history,
+          chat_attachment: roleDetailQuery.data?.data.chat_attachment,
+          user_management: roleDetailQuery.data?.data.user_management,
+          max_chat_topic: roleDetailQuery.data?.data.max_chat_topic,
+          chat_topic_expired_days:
+            roleDetailQuery.data?.data.chat_topic_expired_days,
+          max_chat: roleDetailQuery.data?.data.max_chat
         }}
       />
 

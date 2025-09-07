@@ -143,9 +143,11 @@ const UserManagementPage = () => {
       cell: ({ row }) => <div className="min-w-40">{row.getValue('name')}</div>
     },
     {
-      accessorKey: 'email',
-      header: 'Email Address',
-      cell: ({ row }) => <div className="min-w-48">{row.getValue('email')}</div>
+      accessorKey: 'username',
+      header: 'Username',
+      cell: ({ row }) => (
+        <div className="min-w-48">{row.getValue('username')}</div>
+      )
     },
     {
       accessorKey: 'role',
@@ -211,28 +213,39 @@ const UserManagementPage = () => {
       cell: ({ row }) => <div className="min-w-32">{row.getValue('name')}</div>
     },
     {
-      accessorKey: 'permissions',
-      header: 'Permissions',
-      cell: ({ row }) => (
-        <div className="min-w-48">
-          <div className="flex flex-wrap gap-1">
-            {row.original.permissions?.slice(0, 2).map((permission) => (
-              <span
-                key={permission.id}
-                className="inline-block rounded-lg bg-green-50 px-2 py-1 text-xs text-green-600"
-              >
-                {permission.name}
-              </span>
-            ))}
-            {row.original.permissions &&
-              row.original.permissions.length > 2 && (
+      accessorKey: 'capabilities',
+      header: 'Capabilities',
+      cell: ({ row }) => {
+        const capabilities = [];
+        if (row.original.chat) capabilities.push('Chat');
+        if (row.original.file_management) capabilities.push('Files');
+        if (row.original.history) capabilities.push('History');
+        if (row.original.chat_attachment) capabilities.push('Attachments');
+        if (row.original.user_management) capabilities.push('Users');
+
+        return (
+          <div className="min-w-48">
+            <div className="flex flex-wrap gap-1">
+              {capabilities.slice(0, 2).map((capability) => (
+                <span
+                  key={capability}
+                  className="inline-block rounded-lg bg-green-50 px-2 py-1 text-xs text-green-600"
+                >
+                  {capability}
+                </span>
+              ))}
+              {capabilities.length > 2 && (
                 <span className="inline-block rounded-lg bg-gray-50 px-2 py-1 text-xs text-gray-600">
-                  +{row.original.permissions.length - 2} more
+                  +{capabilities.length - 2} more
                 </span>
               )}
+              {capabilities.length === 0 && (
+                <span className="text-xs text-gray-500">No capabilities</span>
+              )}
+            </div>
           </div>
-        </div>
-      )
+        );
+      }
     },
     {
       accessorKey: 'created_at',

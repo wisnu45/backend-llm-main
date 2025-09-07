@@ -7,7 +7,7 @@ import {
   DialogTitle
 } from '@/components/ui/dialog';
 import { useForm } from 'react-hook-form';
-import { UserFormSchema, TUserFormData } from './schema';
+import { CreateUserSchema, EditUserSchema, TUserFormData } from './schema';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Input } from '@/components/ui/input';
 import {
@@ -26,6 +26,7 @@ import {
   SelectValue
 } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { useEffect } from 'react';
 import {
   TRequestCreateUser,
@@ -64,7 +65,7 @@ const UserFormModal = ({
 
   const form = useForm<TUserFormData>({
     mode: 'onChange',
-    resolver: zodResolver(UserFormSchema)
+    resolver: zodResolver(mode === 'create' ? CreateUserSchema : EditUserSchema)
   });
 
   const rolesQuery = useGetRoles();
@@ -80,7 +81,9 @@ const UserFormModal = ({
     } else {
       form.reset({
         name: '',
-        email: '',
+        username: '',
+        password: '',
+        isPortalUser: false,
         role_id: ''
       });
     }
@@ -118,18 +121,56 @@ const UserFormModal = ({
 
             <FormField
               control={form.control}
-              name="email"
+              name="username"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email Address *</FormLabel>
+                  <FormLabel>Username *</FormLabel>
                   <FormControl>
                     <Input
-                      type="email"
-                      placeholder="Enter email address"
+                      type="text"
+                      placeholder="Enter username"
                       {...field}
                     />
                   </FormControl>
                   <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {mode === 'create' && (
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Password *</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="password"
+                        placeholder="Enter password"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+
+            <FormField
+              control={form.control}
+              name="isPortalUser"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                  <FormControl>
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                  <div className="space-y-1 leading-none">
+                    <FormLabel>Portal User</FormLabel>
+                  </div>
                 </FormItem>
               )}
             />
