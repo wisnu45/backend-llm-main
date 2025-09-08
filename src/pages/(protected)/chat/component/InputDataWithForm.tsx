@@ -1,18 +1,18 @@
-import { ArrowRightIcon, Cross2Icon } from '@radix-ui/react-icons';
-import { Globe, Mic, Paperclip } from 'lucide-react';
-import { useState, useImperativeHandle, useEffect, useRef } from 'react';
-import { useForm, Controller } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { ChatFormSchema, TChatFormData } from '../schema';
-import { TSetPromptType } from '../page';
-import Cookies from 'js-cookie';
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger
 } from '@/components/ui/tooltip';
 import { useMobileScroll } from '@/hooks/use-mobile-scroll';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { ArrowRightIcon, Cross2Icon } from '@radix-ui/react-icons';
 import clsx from 'clsx';
+import Cookies from 'js-cookie';
+import { Globe, Mic, Paperclip } from 'lucide-react';
+import { useEffect, useImperativeHandle, useRef, useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
+import { TSetPromptType } from '../page';
+import { ChatFormSchema, TChatFormData } from '../schema';
 
 interface InputDataWithFormProps {
   onSubmit: (data: TChatFormData) => void;
@@ -123,12 +123,6 @@ const InputDataWithForm = ({
     }),
     [setValue, trigger]
   );
-  const watchedSearch = watch('is_browse');
-
-  useEffect(() => {
-    setValue('is_browse', watchedSearch === true);
-    Cookies.set('search_internet', watchedSearch === true ? 'true' : 'false');
-  }, [watchedSearch, setValue]);
 
   const [isRecording, setIsRecording] = useState(false);
   const recognitionRef = useRef<any>(null);
@@ -323,14 +317,26 @@ const InputDataWithForm = ({
                       <TooltipTrigger>
                         <div
                           className="group relative w-max cursor-pointer"
-                          onClick={() => !isLoading && onChange(!value)} // toggle state
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            if (!isLoading) {
+                              const newValue = !value;
+                              onChange(newValue);
+                              // Set cookie immediately for real-time update
+                              Cookies.set(
+                                'search_internet',
+                                newValue ? 'true' : 'false'
+                              );
+                            }
+                          }}
                         >
                           <div
                             className={`flex items-center gap-2 rounded-xl px-4 py-2 shadow-md transition-all duration-300 ${
                               value
                                 ? 'bg-[#772f8e] text-white hover:text-purple-200 hover:shadow-lg'
                                 : ' shadow-lg'
-                            } 
+                            }
                             // ${isLoading ? 'cursor-not-allowed opacity-50' : ''}
                             `}
                           >
@@ -354,7 +360,11 @@ const InputDataWithForm = ({
                 <TooltipTrigger>
                   <button
                     type="button"
-                    onClick={toggleRecording}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      toggleRecording();
+                    }}
                     disabled={isLoading}
                     className={`hidden items-center gap-2 rounded-xl px-4 py-2 shadow-md transition-all duration-300 md:flex ${
                       isRecording
