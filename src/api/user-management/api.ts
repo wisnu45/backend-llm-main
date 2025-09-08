@@ -163,7 +163,8 @@ const MOCK_USERS: TUser[] = [
   {
     id: '11',
     name: 'Ivy Martinez',
-    email: 'ivy.martinez@combiphar.com',
+    username: 'ivy.martinez',
+    isPortalUser: false,
     role_id: '3',
     role: MOCK_ROLES[2],
     created_at: '2024-01-11T10:00:00Z',
@@ -172,7 +173,8 @@ const MOCK_USERS: TUser[] = [
   {
     id: '12',
     name: 'Jack Thompson',
-    email: 'jack.thompson@combiphar.com',
+    username: 'jack.thompson',
+    isPortalUser: false,
     role_id: '2',
     role: MOCK_ROLES[1],
     created_at: '2024-01-12T10:00:00Z',
@@ -193,7 +195,7 @@ export const getUsers = async (
     filteredUsers = filteredUsers.filter(
       (user) =>
         user.name.toLowerCase().includes(params.search!.toLowerCase()) ||
-        user.email.toLowerCase().includes(params.search!.toLowerCase())
+        user.username.toLowerCase().includes(params.search!.toLowerCase())
     );
   }
 

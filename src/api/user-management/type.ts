@@ -11,6 +11,7 @@ export type TRole = {
   chat_topic_expired_days: number;
   max_chat: number;
   user_management: boolean;
+  permissions?: Array<{ id: string; name: string }>;
   created_at: string;
   updated_at: string;
 };

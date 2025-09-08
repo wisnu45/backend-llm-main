@@ -216,7 +216,7 @@ const UserManagementPage = () => {
       accessorKey: 'capabilities',
       header: 'Capabilities',
       cell: ({ row }) => {
-        const capabilities = [];
+        const capabilities: string[] = [];
         if (row.original.chat) capabilities.push('Chat');
         if (row.original.file_management) capabilities.push('Files');
         if (row.original.history) capabilities.push('History');

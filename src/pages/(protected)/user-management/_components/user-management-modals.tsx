@@ -12,7 +12,7 @@ import useUpdateRole from '../_hooks/update-role';
 import useDeleteRole from '../_hooks/delete-role';
 import useGetUserDetail from '../_hooks/get-user-detail';
 import useGetRoleDetail from '../_hooks/get-role-detail';
-import { TUser, TRole } from '@/api/user-management/type';
+import { TUser, TRole, TRequestCreateUser } from '@/api/user-management/type';
 
 type TModal =
   | 'delete-user'
@@ -67,7 +67,7 @@ const UserManagementModals = ({
         loading={createUserMutation.isPending}
         onOpenChange={() => setModal(null)}
         onSubmit={(data) => {
-          createUserMutation.mutate(data, {
+          createUserMutation.mutate(data as TRequestCreateUser, {
             onSuccess: () => setModal(null)
           });
         }}
