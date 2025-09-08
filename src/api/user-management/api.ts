@@ -10,49 +10,52 @@ import {
   TResponseDetailUser,
   TResponseListRoles,
   TResponseDetailRole,
-  TResponseListPermissions,
   TUser,
-  TRole,
-  TPermission
+  TRole
 } from './type';
-
-const MOCK_PERMISSIONS: TPermission[] = [
-  { id: '1', name: 'Chat', key: 'chat' },
-  { id: '2', name: 'Management Files', key: 'management_files' },
-  { id: '3', name: 'History Chat', key: 'history_chat' },
-  { id: '4', name: 'User Management', key: 'user_management' }
-];
 
 const MOCK_ROLES: TRole[] = [
   {
     id: '1',
     name: 'Admin',
-    permissions: MOCK_PERMISSIONS,
+    chat: true,
+    file_management: true,
+    history: true,
+    chat_attachment: true,
+    user_management: true,
+    max_chat_topic: 100,
+    chat_topic_expired_days: 365,
+    max_chat: 1000,
     created_at: '2024-01-01T00:00:00Z',
     updated_at: '2024-01-01T00:00:00Z'
   },
   {
     id: '2',
-    name: 'Manager',
-    permissions: MOCK_PERMISSIONS.filter((p) => p.key !== 'user_management'),
+    name: 'User',
+    chat: true,
+    file_management: false,
+    history: true,
+    chat_attachment: true,
+    user_management: false,
+    max_chat_topic: 10,
+    chat_topic_expired_days: 30,
+    max_chat: 100,
     created_at: '2024-01-02T00:00:00Z',
     updated_at: '2024-01-02T00:00:00Z'
   },
   {
     id: '3',
-    name: 'Editor',
-    permissions: MOCK_PERMISSIONS.filter((p) =>
-      ['chat', 'management_files'].includes(p.key)
-    ),
+    name: 'BOD',
+    chat: true,
+    file_management: true,
+    history: true,
+    chat_attachment: true,
+    user_management: false,
+    max_chat_topic: 50,
+    chat_topic_expired_days: 90,
+    max_chat: 500,
     created_at: '2024-01-03T00:00:00Z',
     updated_at: '2024-01-03T00:00:00Z'
-  },
-  {
-    id: '4',
-    name: 'Viewer',
-    permissions: [MOCK_PERMISSIONS.find((p) => p.key === 'chat')!],
-    created_at: '2024-01-04T00:00:00Z',
-    updated_at: '2024-01-04T00:00:00Z'
   }
 ];
 
@@ -60,7 +63,8 @@ const MOCK_USERS: TUser[] = [
   {
     id: '1',
     name: 'John Doe',
-    email: 'john.doe@combiphar.com',
+    username: 'john.doe',
+    isPortalUser: true,
     role_id: '1',
     role: MOCK_ROLES[0],
     created_at: '2024-01-01T10:00:00Z',
@@ -69,7 +73,8 @@ const MOCK_USERS: TUser[] = [
   {
     id: '2',
     name: 'Jane Smith',
-    email: 'jane.smith@combiphar.com',
+    username: 'jane.smith',
+    isPortalUser: false,
     role_id: '2',
     role: MOCK_ROLES[1],
     created_at: '2024-01-02T10:00:00Z',
@@ -78,7 +83,8 @@ const MOCK_USERS: TUser[] = [
   {
     id: '3',
     name: 'Alice Johnson',
-    email: 'alice.johnson@combiphar.com',
+    username: 'alice.johnson',
+    isPortalUser: true,
     role_id: '2',
     role: MOCK_ROLES[1],
     created_at: '2024-01-03T10:00:00Z',
@@ -87,7 +93,8 @@ const MOCK_USERS: TUser[] = [
   {
     id: '4',
     name: 'Bob Wilson',
-    email: 'bob.wilson@combiphar.com',
+    username: 'bob.wilson',
+    isPortalUser: false,
     role_id: '3',
     role: MOCK_ROLES[2],
     created_at: '2024-01-04T10:00:00Z',
@@ -96,7 +103,8 @@ const MOCK_USERS: TUser[] = [
   {
     id: '5',
     name: 'Carol Brown',
-    email: 'carol.brown@combiphar.com',
+    username: 'carol.brown',
+    isPortalUser: true,
     role_id: '3',
     role: MOCK_ROLES[2],
     created_at: '2024-01-05T10:00:00Z',
@@ -105,25 +113,28 @@ const MOCK_USERS: TUser[] = [
   {
     id: '6',
     name: 'David Lee',
-    email: 'david.lee@combiphar.com',
-    role_id: '4',
-    role: MOCK_ROLES[3],
+    username: 'david.lee',
+    isPortalUser: false,
+    role_id: '2',
+    role: MOCK_ROLES[1],
     created_at: '2024-01-06T10:00:00Z',
     updated_at: '2024-01-06T10:00:00Z'
   },
   {
     id: '7',
     name: 'Emma Davis',
-    email: 'emma.davis@combiphar.com',
-    role_id: '4',
-    role: MOCK_ROLES[3],
+    username: 'emma.davis',
+    isPortalUser: true,
+    role_id: '2',
+    role: MOCK_ROLES[1],
     created_at: '2024-01-07T10:00:00Z',
     updated_at: '2024-01-07T10:00:00Z'
   },
   {
     id: '8',
     name: 'Frank Miller',
-    email: 'frank.miller@combiphar.com',
+    username: 'frank.miller',
+    isPortalUser: false,
     role_id: '3',
     role: MOCK_ROLES[2],
     created_at: '2024-01-08T10:00:00Z',
@@ -132,7 +143,8 @@ const MOCK_USERS: TUser[] = [
   {
     id: '9',
     name: 'Grace Taylor',
-    email: 'grace.taylor@combiphar.com',
+    username: 'grace.taylor',
+    isPortalUser: true,
     role_id: '2',
     role: MOCK_ROLES[1],
     created_at: '2024-01-09T10:00:00Z',
@@ -141,9 +153,10 @@ const MOCK_USERS: TUser[] = [
   {
     id: '10',
     name: 'Henry Anderson',
-    email: 'henry.anderson@combiphar.com',
-    role_id: '4',
-    role: MOCK_ROLES[3],
+    username: 'henry.anderson',
+    isPortalUser: false,
+    role_id: '2',
+    role: MOCK_ROLES[1],
     created_at: '2024-01-10T10:00:00Z',
     updated_at: '2024-01-10T10:00:00Z'
   },
@@ -160,8 +173,8 @@ const MOCK_USERS: TUser[] = [
     id: '12',
     name: 'Jack Thompson',
     email: 'jack.thompson@combiphar.com',
-    role_id: '4',
-    role: MOCK_ROLES[3],
+    role_id: '2',
+    role: MOCK_ROLES[1],
     created_at: '2024-01-12T10:00:00Z',
     updated_at: '2024-01-12T10:00:00Z'
   }
@@ -241,7 +254,8 @@ export const createUser = async (
   const newUser: TUser = {
     id: (MOCK_USERS.length + 1).toString(),
     name: req.name,
-    email: req.email,
+    username: req.username,
+    isPortalUser: req.isPortalUser,
     role_id: req.role_id,
     role: MOCK_ROLES.find((r) => r.id === req.role_id),
     created_at: new Date().toISOString(),
@@ -273,7 +287,8 @@ export const updateUser = async (
   MOCK_USERS[userIndex] = {
     ...MOCK_USERS[userIndex],
     name: req.name,
-    email: req.email,
+    username: req.username,
+    isPortalUser: req.isPortalUser,
     role_id: req.role_id,
     role: MOCK_ROLES.find((r) => r.id === req.role_id),
     updated_at: new Date().toISOString()
@@ -369,14 +384,17 @@ export const createRole = async (
 ): Promise<TDefaultResponse> => {
   await delay(800);
 
-  const selectedPermissions = MOCK_PERMISSIONS.filter((p) =>
-    req.permission_ids.includes(p.id)
-  );
-
   const newRole: TRole = {
     id: (MOCK_ROLES.length + 1).toString(),
     name: req.name,
-    permissions: selectedPermissions,
+    chat: req.chat,
+    file_management: req.file_management,
+    history: req.history,
+    chat_attachment: req.chat_attachment,
+    user_management: req.user_management,
+    max_chat_topic: req.max_chat_topic,
+    chat_topic_expired_days: req.chat_topic_expired_days,
+    max_chat: req.max_chat,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString()
   };
@@ -403,14 +421,17 @@ export const updateRole = async (
     throw new Error('Role not found');
   }
 
-  const selectedPermissions = MOCK_PERMISSIONS.filter((p) =>
-    req.permission_ids.includes(p.id)
-  );
-
   MOCK_ROLES[roleIndex] = {
     ...MOCK_ROLES[roleIndex],
     name: req.name,
-    permissions: selectedPermissions,
+    chat: req.chat,
+    file_management: req.file_management,
+    history: req.history,
+    chat_attachment: req.chat_attachment,
+    user_management: req.user_management,
+    max_chat_topic: req.max_chat_topic,
+    chat_topic_expired_days: req.chat_topic_expired_days,
+    max_chat: req.max_chat,
     updated_at: new Date().toISOString()
   };
 
@@ -443,17 +464,6 @@ export const deleteRole = async (params: {
   return {
     message: 'Role deleted successfully',
     data: null,
-    pageCount: 1,
-    page: 1
-  };
-};
-
-export const getPermissions = async (): Promise<TResponseListPermissions> => {
-  await delay(200);
-
-  return {
-    message: 'Permissions retrieved successfully',
-    data: MOCK_PERMISSIONS,
     pageCount: 1,
     page: 1
   };
