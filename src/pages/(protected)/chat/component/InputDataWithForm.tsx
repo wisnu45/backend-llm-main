@@ -268,7 +268,7 @@ const InputDataWithForm = ({
                 <Paperclip size={18} />
                 <label
                   htmlFor="file-upload"
-                  className="hidden cursor-pointer md:inline"
+                  className="cursor-pointer md:inline"
                 >
                   Add photos & files
                 </label>
