@@ -62,7 +62,7 @@ const MOCK_ROLES: TRole[] = [
 const MOCK_USERS: TUser[] = [
   {
     id: '1',
-    name: 'John Doe',
+    originalName: 'John Doe',
     username: 'john.doe',
     isPortalUser: true,
     role_id: '1',
@@ -72,7 +72,7 @@ const MOCK_USERS: TUser[] = [
   },
   {
     id: '2',
-    name: 'Jane Smith',
+    originalName: 'Jane Smith',
     username: 'jane.smith',
     isPortalUser: false,
     role_id: '2',
@@ -82,7 +82,7 @@ const MOCK_USERS: TUser[] = [
   },
   {
     id: '3',
-    name: 'Alice Johnson',
+    originalName: 'Alice Johnson',
     username: 'alice.johnson',
     isPortalUser: true,
     role_id: '2',
@@ -92,7 +92,7 @@ const MOCK_USERS: TUser[] = [
   },
   {
     id: '4',
-    name: 'Bob Wilson',
+    originalName: 'Bob Wilson',
     username: 'bob.wilson',
     isPortalUser: false,
     role_id: '3',
@@ -102,7 +102,7 @@ const MOCK_USERS: TUser[] = [
   },
   {
     id: '5',
-    name: 'Carol Brown',
+    originalName: 'Carol Brown',
     username: 'carol.brown',
     isPortalUser: true,
     role_id: '3',
@@ -112,7 +112,7 @@ const MOCK_USERS: TUser[] = [
   },
   {
     id: '6',
-    name: 'David Lee',
+    originalName: 'David Lee',
     username: 'david.lee',
     isPortalUser: false,
     role_id: '2',
@@ -122,7 +122,7 @@ const MOCK_USERS: TUser[] = [
   },
   {
     id: '7',
-    name: 'Emma Davis',
+    originalName: 'Emma Davis',
     username: 'emma.davis',
     isPortalUser: true,
     role_id: '2',
@@ -132,7 +132,7 @@ const MOCK_USERS: TUser[] = [
   },
   {
     id: '8',
-    name: 'Frank Miller',
+    originalName: 'Frank Miller',
     username: 'frank.miller',
     isPortalUser: false,
     role_id: '3',
@@ -142,7 +142,7 @@ const MOCK_USERS: TUser[] = [
   },
   {
     id: '9',
-    name: 'Grace Taylor',
+    originalName: 'Grace Taylor',
     username: 'grace.taylor',
     isPortalUser: true,
     role_id: '2',
@@ -152,7 +152,7 @@ const MOCK_USERS: TUser[] = [
   },
   {
     id: '10',
-    name: 'Henry Anderson',
+    originalName: 'Henry Anderson',
     username: 'henry.anderson',
     isPortalUser: false,
     role_id: '2',
@@ -162,7 +162,7 @@ const MOCK_USERS: TUser[] = [
   },
   {
     id: '11',
-    name: 'Ivy Martinez',
+    originalName: 'Ivy Martinez',
     username: 'ivy.martinez',
     isPortalUser: false,
     role_id: '3',
@@ -172,7 +172,7 @@ const MOCK_USERS: TUser[] = [
   },
   {
     id: '12',
-    name: 'Jack Thompson',
+    originalName: 'Jack Thompson',
     username: 'jack.thompson',
     isPortalUser: false,
     role_id: '2',
@@ -192,10 +192,8 @@ export const getUsers = async (
   let filteredUsers = [...MOCK_USERS];
 
   if (params?.search) {
-    filteredUsers = filteredUsers.filter(
-      (user) =>
-        user.name.toLowerCase().includes(params.search!.toLowerCase()) ||
-        user.username.toLowerCase().includes(params.search!.toLowerCase())
+    filteredUsers = filteredUsers.filter((user) =>
+      user.username.toLowerCase().includes(params.search!.toLowerCase())
     );
   }
 
@@ -255,7 +253,7 @@ export const createUser = async (
 
   const newUser: TUser = {
     id: (MOCK_USERS.length + 1).toString(),
-    name: req.name,
+    originalName: req.originalName,
     username: req.username,
     isPortalUser: req.isPortalUser,
     role_id: req.role_id,
@@ -288,7 +286,7 @@ export const updateUser = async (
 
   MOCK_USERS[userIndex] = {
     ...MOCK_USERS[userIndex],
-    name: req.name,
+    originalName: req.originalName,
     username: req.username,
     isPortalUser: req.isPortalUser,
     role_id: req.role_id,

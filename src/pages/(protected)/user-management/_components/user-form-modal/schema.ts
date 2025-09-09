@@ -1,10 +1,7 @@
 import * as z from 'zod';
 
-const BaseUserSchema = z.object({
-  name: z
-    .string({ message: 'Name is required' })
-    .min(1, { message: 'Name is required' })
-    .min(2, { message: 'Name must be at least 2 characters' }),
+const BaseUserSchemaObject = z.object({
+  originalName: z.string().optional(),
   username: z
     .string({ message: 'Username is required' })
     .min(1, { message: 'Username is required' })
@@ -19,15 +16,54 @@ const BaseUserSchema = z.object({
     .min(1, { message: 'Please select a role' })
 });
 
-export const CreateUserSchema = BaseUserSchema.extend({
-  password: z
-    .string({ message: 'Password is required' })
-    .min(6, { message: 'Password must be at least 6 characters' })
+export const CreateUserSchema = BaseUserSchemaObject.extend({
+  password: z.string().optional()
+}).superRefine((data, ctx) => {
+  // Check originalName requirement
+  if (
+    !data.isPortalUser &&
+    (!data.originalName || data.originalName.trim() === '')
+  ) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'Original Name is required when Portal User is disabled',
+      path: ['originalName']
+    });
+  }
+
+  // Check password requirement
+  if (!data.isPortalUser && (!data.password || data.password.trim() === '')) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'Password is required when Portal User is disabled',
+      path: ['password']
+    });
+  }
+
+  if (data.password && data.password.length < 6) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'Password must be at least 6 characters',
+      path: ['password']
+    });
+  }
 });
 
-export const EditUserSchema = BaseUserSchema;
+export const EditUserSchema = BaseUserSchemaObject.superRefine((data, ctx) => {
+  if (
+    !data.isPortalUser &&
+    (!data.originalName || data.originalName.trim() === '')
+  ) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'Original Name is required when Portal User is disabled',
+      path: ['originalName']
+    });
+  }
+});
 
-export const UserFormSchema = BaseUserSchema.extend({
+export const UserFormSchema = BaseUserSchemaObject.extend({
   password: z.string().optional()
 });
+
 export type TUserFormData = z.infer<typeof UserFormSchema>;

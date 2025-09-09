@@ -138,9 +138,11 @@ const UserManagementPage = () => {
       cell: ({ row }) => <div>{row.index + 1 + startFrom}</div>
     },
     {
-      accessorKey: 'name',
-      header: 'Full Name',
-      cell: ({ row }) => <div className="min-w-40">{row.getValue('name')}</div>
+      accessorKey: 'originalName',
+      header: 'Original Name',
+      cell: ({ row }) => (
+        <div className="min-w-40">{row.getValue('originalName')}</div>
+      )
     },
     {
       accessorKey: 'username',

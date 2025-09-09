@@ -75,12 +75,14 @@ const UserFormModal = ({
     onSubmit(data);
   };
 
+  const watchPortalUser = form.watch('isPortalUser');
+
   useEffect(() => {
     if (defaultValues) {
       form.reset(defaultValues);
     } else {
       form.reset({
-        name: '',
+        originalName: '',
         username: '',
         password: '',
         isPortalUser: false,
@@ -107,12 +109,34 @@ const UserFormModal = ({
           >
             <FormField
               control={form.control}
-              name="name"
+              name="isPortalUser"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                  <FormControl>
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                  <div className="space-y-1 leading-none">
+                    <FormLabel>Portal User</FormLabel>
+                  </div>
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="originalName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Full Name *</FormLabel>
+                  <FormLabel>Original Name {!watchPortalUser && '*'}</FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter full name" {...field} />
+                    <Input
+                      placeholder="Enter original name"
+                      disabled={watchPortalUser}
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -143,11 +167,12 @@ const UserFormModal = ({
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Password *</FormLabel>
+                    <FormLabel>Password {!watchPortalUser && '*'}</FormLabel>
                     <FormControl>
                       <Input
                         type="password"
                         placeholder="Enter password"
+                        disabled={watchPortalUser}
                         {...field}
                       />
                     </FormControl>
@@ -156,24 +181,6 @@ const UserFormModal = ({
                 )}
               />
             )}
-
-            <FormField
-              control={form.control}
-              name="isPortalUser"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                  <FormControl>
-                    <Checkbox
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                  <div className="space-y-1 leading-none">
-                    <FormLabel>Portal User</FormLabel>
-                  </div>
-                </FormItem>
-              )}
-            />
 
             <FormField
               control={form.control}

@@ -18,7 +18,7 @@ export type TRole = {
 
 export type TUser = {
   id: string;
-  name: string;
+  originalName: string;
   username: string;
   isPortalUser: boolean;
   role_id: string;
@@ -41,7 +41,7 @@ export type TRoleParams = {
 };
 
 export type TRequestCreateUser = {
-  name: string;
+  originalName: string;
   username: string;
   password: string;
   isPortalUser: boolean;
@@ -49,7 +49,7 @@ export type TRequestCreateUser = {
 };
 
 export type TRequestUpdateUser = {
-  name: string;
+  originalName: string;
   username: string;
   isPortalUser: boolean;
   role_id: string;

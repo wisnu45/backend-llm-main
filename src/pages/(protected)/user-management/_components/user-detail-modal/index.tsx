@@ -49,9 +49,11 @@ const UserDetailModal = ({
 
           <div>
             <span className="mb-1 block text-sm font-semibold text-gray-500">
-              Full Name
+              Original Name
             </span>
-            <p className="text-base text-gray-800">{data?.name ?? '-'}</p>
+            <p className="text-base text-gray-800">
+              {data?.originalName ?? '-'}
+            </p>
           </div>
 
           <div>

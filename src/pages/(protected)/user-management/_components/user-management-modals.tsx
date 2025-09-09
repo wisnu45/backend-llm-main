@@ -85,7 +85,7 @@ const UserManagementModals = ({
           });
         }}
         defaultValues={{
-          name: userDetailQuery.data?.data.name,
+          originalName: userDetailQuery.data?.data.originalName,
           username: userDetailQuery.data?.data.username,
           isPortalUser: userDetailQuery.data?.data.isPortalUser,
           role_id: userDetailQuery.data?.data.role_id
@@ -150,7 +150,9 @@ const UserManagementModals = ({
       <DeleteModal
         open={modal === 'delete-user'}
         title="Delete User"
-        itemName={userDetailQuery.data?.data.name || userData?.name}
+        itemName={
+          userDetailQuery.data?.data.originalName || userData?.originalName
+        }
         loading={deleteUserMutation.isPending}
         onDelete={() => {
           const id = userDetailQuery.data?.data.id || userData?.id;
