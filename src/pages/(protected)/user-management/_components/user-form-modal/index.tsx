@@ -72,7 +72,7 @@ const UserFormModal = ({
   const roles = rolesQuery.data?.data || [];
 
   const handleSubmit = (data: TUserFormData) => {
-    onSubmit(data);
+    // onSubmit(data);
   };
 
   const watchPortalUser = form.watch('isPortalUser');
