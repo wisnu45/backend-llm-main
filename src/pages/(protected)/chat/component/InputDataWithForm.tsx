@@ -103,7 +103,12 @@ const InputDataWithForm = ({
 
   const onFormSubmit = (data: TChatFormData) => {
     onSubmit(data);
-    reset();
+    // reset();
+    reset({
+      prompt: '',
+      attachments: [],
+      is_browse: Cookies.get('search_internet') === 'true'
+    });
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -150,6 +155,11 @@ const InputDataWithForm = ({
       };
     }
   }, [setValue, trigger]);
+
+  useEffect(() => {
+    const cookieValue = Cookies.get('search_internet') === 'true';
+    setValue('is_browse', cookieValue); // update nilai form
+  }, []);
 
   const toggleRecording = () => {
     if (!recognitionRef.current) {
@@ -275,43 +285,11 @@ const InputDataWithForm = ({
                   disabled={isLoading}
                 />
               </button>
-              {/* <button
-              type="button"
-              className="flex items-center gap-1 transition hover:text-purple-600"
-            >
-              <ImageIcon />
-              <label htmlFor="image-upload" className="cursor-pointer">
-                Use image
-              </label>
-              <input
-                id="image-upload"
-                type="file"
-                accept="image/*"
-                multiple
-                className="hidden"
-                onChange={handleFileChange}
-                disabled={isLoading}
-              />
-            </button> */}
-              {/* <Controller
-                name="is_browse"
-                control={control}
-                render={({ field }) => (
-                  <input
-                    type="checkbox"
-                    className="h-4 w-4"
-                    checked={field.value}
-                    onChange={field.onChange}
-                    disabled={isLoading}
-                  />
-                )}
-              /> */}
               <Controller
                 name="is_browse"
                 control={control}
                 render={({ field }) => {
                   const { value, onChange } = field;
-
                   return (
                     <Tooltip>
                       <TooltipTrigger>
@@ -323,7 +301,6 @@ const InputDataWithForm = ({
                             if (!isLoading) {
                               const newValue = !value;
                               onChange(newValue);
-                              // Set cookie immediately for real-time update
                               Cookies.set(
                                 'search_internet',
                                 newValue ? 'true' : 'false'
