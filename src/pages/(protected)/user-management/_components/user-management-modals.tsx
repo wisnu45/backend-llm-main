@@ -1,17 +1,19 @@
+import { TRequestCreateUser, TRole, TUser } from '@/api/user-management/type';
 import { useEffect } from 'react';
-import UserFormModal from './user-form-modal';
-import RoleFormModal from './role-form-modal';
-import UserDetailModal from './user-detail-modal';
-import RoleDetailModal from './role-detail-modal';
-import DeleteModal from './delete-modal';
-import useCreateUser from '../_hooks/create-user';
-import useUpdateUser from '../_hooks/update-user';
-import useDeleteUser from '../_hooks/delete-user';
 import useCreateRole from '../_hooks/create-role';
-import useUpdateRole from '../_hooks/update-role';
+import useCreateUser from '../_hooks/create-user';
 import useDeleteRole from '../_hooks/delete-role';
+import useDeleteUser from '../_hooks/delete-user';
 import useGetUserDetail from '../_hooks/get-user-detail';
-import { TUser, TRole, TRequestCreateUser } from '@/api/user-management/type';
+import useSaveRoleSettings from '../_hooks/save-role-settings';
+import useUpdateRole from '../_hooks/update-role';
+import useUpdateUser from '../_hooks/update-user';
+import DeleteModal from './delete-modal';
+import RoleDetailModal from './role-detail-modal';
+import RoleFormModal from './role-form-modal';
+import RoleSettingsModal from './role-settings-modal';
+import UserDetailModal from './user-detail-modal';
+import UserFormModal from './user-form-modal';
 
 type TModal =
   | 'delete-user'
@@ -22,6 +24,7 @@ type TModal =
   | 'create-role'
   | 'detail-user'
   | 'detail-role'
+  | 'setting-role'
   | null;
 
 interface IUserManagementModals {
@@ -42,8 +45,9 @@ const UserManagementModals = ({
   const deleteUserMutation = useDeleteUser();
 
   const createRoleMutation = useCreateRole();
-  const updateRoleMutation = useUpdateRole(roleData?.id);
+  const updateRoleMutation = useUpdateRole(roleData?.id?.toString());
   const deleteRoleMutation = useDeleteRole();
+  const saveRoleSettingsMutation = useSaveRoleSettings();
 
   const userDetailQuery = useGetUserDetail(userData?.id);
 
@@ -129,9 +133,21 @@ const UserManagementModals = ({
       <RoleDetailModal
         open={modal === 'detail-role'}
         onOpenChange={() => setModal(null)}
-        data={roleData}
+        data={roleData || null}
         onDelete={() => setModal('delete-role')}
         onEdit={() => setModal('edit-role')}
+      />
+
+      <RoleSettingsModal
+        open={modal === 'setting-role'}
+        onOpenChange={() => setModal(null)}
+        roleData={roleData}
+        loading={saveRoleSettingsMutation.isPending}
+        onSave={(settings) => {
+          saveRoleSettingsMutation.mutate(settings, {
+            onSuccess: () => setModal(null)
+          });
+        }}
       />
 
       {/* Delete Modals */}
@@ -160,7 +176,7 @@ const UserManagementModals = ({
         onDelete={() => {
           const id = roleData?.id;
           deleteRoleMutation.mutate(
-            { id: id! },
+            { id: id?.toString()! },
             {
               onSuccess: () => setModal(null)
             }

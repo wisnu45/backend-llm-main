@@ -1,4 +1,9 @@
 import {
+  TRequestCreateRole,
+  TRequestUpdateRole
+} from '@/api/user-management/type';
+import { Button } from '@/components/ui/button';
+import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -6,10 +11,6 @@ import {
   DialogHeader,
   DialogTitle
 } from '@/components/ui/dialog';
-import { useForm } from 'react-hook-form';
-import { RoleFormSchema, TRoleFormData } from './schema';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Input } from '@/components/ui/input';
 import {
   Form,
   FormControl,
@@ -18,14 +19,13 @@ import {
   FormLabel,
   FormMessage
 } from '@/components/ui/form';
-import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
-import { useEffect } from 'react';
-import {
-  TRequestCreateRole,
-  TRequestUpdateRole
-} from '@/api/user-management/type';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2 } from 'lucide-react';
+import { useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { RoleFormSchema, TRoleFormData } from './schema';
 
 interface Props {
   loading?: boolean;
@@ -121,56 +121,47 @@ const RoleFormModal = ({
               )}
             />
 
-            <div className="space-y-4">
-              <div className="mb-4">
-                <FormLabel className="text-base">Role Settings</FormLabel>
-                <p className="text-sm text-muted-foreground">
-                  Configure the role access settings
-                </p>
-              </div>
+            <FormField
+              control={form.control}
+              name="is_local"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-center justify-between">
+                  <div className="space-y-0.5">
+                    <FormLabel className="text-base">Is Local</FormLabel>
+                    <p className="text-sm text-muted-foreground">
+                      Enable if this is a local role
+                    </p>
+                  </div>
+                  <FormControl>
+                    <Switch
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
 
-              <FormField
-                control={form.control}
-                name="is_local"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between">
-                    <div className="space-y-0.5">
-                      <FormLabel className="text-base">Is Local</FormLabel>
-                      <p className="text-sm text-muted-foreground">
-                        Enable if this is a local role
-                      </p>
-                    </div>
-                    <FormControl>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="is_portal"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between">
-                    <div className="space-y-0.5">
-                      <FormLabel className="text-base">Is Portal</FormLabel>
-                      <p className="text-sm text-muted-foreground">
-                        Enable if this is a portal role
-                      </p>
-                    </div>
-                    <FormControl>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-            </div>
+            <FormField
+              control={form.control}
+              name="is_portal"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-center justify-between">
+                  <div className="space-y-0.5">
+                    <FormLabel className="text-base">Is Portal</FormLabel>
+                    <p className="text-sm text-muted-foreground">
+                      Enable if this is a portal role
+                    </p>
+                  </div>
+                  <FormControl>
+                    <Switch
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
 
             <DialogFooter className="mt-2 sm:justify-start">
               <Button type="submit" className="w-full" disabled={loading}>

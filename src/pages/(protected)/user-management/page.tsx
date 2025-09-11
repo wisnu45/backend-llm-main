@@ -1,22 +1,21 @@
-import { Suspense, useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
 import { ColumnDef } from '@tanstack/react-table';
+import { Suspense, useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useDebounce } from 'use-debounce';
 
 import { DataTable } from '@/components/shared/data-table';
 import { LoaderCircle } from '@/components/shared/loader';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 import UserManagementHeader from './_components/user-management-header';
 import UserManagementModals from './_components/user-management-modals';
 
-import useGetUsers from './_hooks/get-users';
 import useGetRoles from './_hooks/get-roles';
+import useGetUsers from './_hooks/get-users';
 
-import { TUser, TRole } from '@/api/user-management/type';
-import { formatDate } from '@/lib/date';
+import { TRole, TUser } from '@/api/user-management/type';
 
 type TModal =
   | 'delete-user'
@@ -27,6 +26,7 @@ type TModal =
   | 'create-role'
   | 'detail-user'
   | 'detail-role'
+  | 'setting-role'
   | null;
 
 const useUserManagementPage = () => {
@@ -281,6 +281,12 @@ const UserManagementPage = () => {
           </Button>
           <Button
             variant="ghost"
+            onClick={() => setModal('setting-role', null, row.original)}
+          >
+            Setting
+          </Button>
+          <Button
+            variant="ghost"
             onClick={() => setModal('delete-role', null, row.original)}
           >
             Delete
@@ -335,7 +341,7 @@ const UserManagementPage = () => {
               Users
             </TabsTrigger>
             <TabsTrigger value="roles" className="w-full sm:w-auto">
-              Role
+              Role Setting
             </TabsTrigger>
           </TabsList>
           <ScrollBar orientation="horizontal" />

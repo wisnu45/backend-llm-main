@@ -1,3 +1,5 @@
+import { TRole } from '@/api/user-management/type';
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -6,14 +8,11 @@ import {
   DialogHeader,
   DialogTitle
 } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { TRole } from '@/api/user-management/type';
-import { formatDate } from '@/lib/date';
 
 interface Props {
   open?: boolean;
   onOpenChange: () => void;
-  data?: TRole;
+  data: TRole | null;
   onEdit: (data?: TRole) => void;
   onDelete: (data?: TRole) => void;
 }
@@ -86,29 +85,19 @@ const RoleDetailModal = ({
               <div className="flex justify-between">
                 <span>Is Local:</span>
                 <span
-                  className={
-                    data?.is_local === true || data?.is_local === 'true'
-                      ? 'text-green-600'
-                      : 'text-red-600'
-                  }
+                  className={data?.is_local ? 'text-green-600' : 'text-red-600'}
                 >
-                  {data?.is_local === true || data?.is_local === 'true'
-                    ? 'Yes'
-                    : 'No'}
+                  {data?.is_local ? 'Yes' : 'No'}
                 </span>
               </div>
               <div className="flex justify-between">
                 <span>Is Portal:</span>
                 <span
                   className={
-                    data?.is_portal === true || data?.is_portal === 'true'
-                      ? 'text-blue-600'
-                      : 'text-red-600'
+                    data?.is_portal === true ? 'text-blue-600' : 'text-red-600'
                   }
                 >
-                  {data?.is_portal === true || data?.is_portal === 'true'
-                    ? 'Yes'
-                    : 'No'}
+                  {data?.is_portal === true ? 'Yes' : 'No'}
                 </span>
               </div>
             </div>
