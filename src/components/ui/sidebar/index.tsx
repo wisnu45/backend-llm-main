@@ -207,12 +207,12 @@ const Sidebar = ({ setShowModal }) => {
                               onMouseLeave={() => setActive(null)}
                             >
                               <span className="flex w-11/12 items-center gap-1">
-                                <span className="truncate">
-                                  {chat.title || 'Untitled Chat'}
-                                </span>
                                 {chat.pinned && (
                                   <Pin className="h-3 w-3 flex-shrink-0 text-blue-500" />
                                 )}
+                                <span className="truncate">
+                                  {chat.title || 'Untitled Chat'}
+                                </span>
                               </span>
                             </Link>
                             <DropdownMenuTrigger asChild>
