@@ -1,28 +1,30 @@
-import { useEffect, useRef, useState } from 'react';
+import { DropdownMenuTrigger } from '@radix-ui/react-dropdown-menu';
 import { HamburgerMenuIcon, PlusIcon } from '@radix-ui/react-icons';
-import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
-import { useGetFiles } from './_hook/use-get-history-chat';
-import UserCard from '../user-card';
-import { ScrollArea } from '../scroll-area';
 import Cookies from 'js-cookie';
-import { Skeleton } from '../skeleton';
+import { Edit, MoreVertical, Pin, TrashIcon } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { AlertModal } from '../../shared/alert-modal';
-import { MoreVertical, TrashIcon, Edit, Pin } from 'lucide-react';
+import RenameModal from '../alert-edit';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuShortcut
 } from '../dropdown-menu';
-import { DropdownMenuTrigger } from '@radix-ui/react-dropdown-menu';
+import { ScrollArea } from '../scroll-area';
+import { Skeleton } from '../skeleton';
+import UserCard from '../user-card';
 import { useDeleteChat } from './_hook/use-delete-chat';
+import { useRenameChat } from './_hook/use-rename-chat';
+import { useGetFiles } from './_hook/use-get-history-chat';
 import DocumentMenu from './document-menu';
 import UserManagementMenu from './user-management-menu';
-import RenameModal from '../alartEdit';
 
 type TRecentChats = {
   session_id: string;
   title: string;
+  id: string;
 };
 
 const Sidebar = ({ setShowModal }) => {
@@ -37,11 +39,13 @@ const Sidebar = ({ setShowModal }) => {
   const [showEditName, setShowEditName] = useState(false);
   const [active, setActive] = useState<string | null>(null);
   const [activeId, setActiveId] = useState<string | null>(null);
+  const [chatId, setChatId] = useState<string | null>(null);
   const [activeChat, setActiveChat] = useState<string | null>(null);
   const navigate = useNavigate();
   const params = useParams();
 
   const deleteMutation = useDeleteChat();
+  const renameMutation = useRenameChat();
 
   useEffect(() => {
     requestAnimationFrame(() => {
@@ -236,13 +240,15 @@ const Sidebar = ({ setShowModal }) => {
                               <DropdownMenuItem
                                 className="cursor-pointer"
                                 onClick={() => {
+                                  setActiveId(chat.session_id);
+                                  setChatId(chat.id);
                                   setActiveChat(chat.title);
                                   setShowEditName(true);
                                 }}
                               >
-                                Edit
+                                Rename{' '}
                                 <DropdownMenuShortcut>
-                                  <Edit className="h-4 text-blue-600" />
+                                  <Edit className="h-4 text-blue-500" />
                                 </DropdownMenuShortcut>
                               </DropdownMenuItem>
                               <DropdownMenuItem
@@ -251,7 +257,7 @@ const Sidebar = ({ setShowModal }) => {
                               >
                                 Pin
                                 <DropdownMenuShortcut>
-                                  <Pin className="h-4 text-blue-600" />
+                                  <Pin className="h-4 text-blue-500" />
                                 </DropdownMenuShortcut>
                               </DropdownMenuItem>
                             </DropdownMenuContent>
@@ -335,19 +341,19 @@ const Sidebar = ({ setShowModal }) => {
       <RenameModal
         isOpen={showEditName}
         onClose={() => setShowEditName(false)}
-        initialValue={activeChat || ''} // optional, isi nama lama
+        initialValue={activeChat || ''}
         onConfirm={(newName) => {
-          // renameMutation.mutate(
-          //   { session_id: activeId!, name: newName },
-          //   {
-          //     onSuccess: () => {
-          //       setShowRenameModal(false);
-          //       query.refetch();
-          //     }
-          //   }
-          // );
+          renameMutation.mutate(
+            { chat_id: chatId!, title: newName },
+            {
+              onSuccess: () => {
+                setShowEditName(false);
+                query.refetch();
+              }
+            }
+          );
         }}
-        // loading={renameMutation.isPending}
+        loading={renameMutation.isPending}
         title="Rename Chat"
         description="Enter a new name for this chat."
       />

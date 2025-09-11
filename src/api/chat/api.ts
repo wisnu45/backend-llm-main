@@ -7,7 +7,8 @@ import {
   TDeleteBulkChatRequest,
   TGetDetailHistoryData,
   TGetHistoryRequest,
-  TNewSesionResponse
+  TNewSesionResponse,
+  TRenameChatRequest
 } from './type';
 import { TDefaultResponse } from '@/commons/types/response';
 
@@ -56,5 +57,17 @@ export const bulkDeleteChat = async (
   req: TDeleteBulkChatRequest
 ): Promise<TDefaultResponse> => {
   const res = await api.post<TDefaultResponse>('/chats/bulk-delete', req);
+  return res.data;
+};
+
+export const renameChat = async (
+  req: TRenameChatRequest
+): Promise<TDefaultResponse> => {
+  const res = await api.patch<TDefaultResponse>(
+    `/chats/rename/${req.chat_id}`,
+    {
+      title: req.title
+    }
+  );
   return res.data;
 };

@@ -33,6 +33,11 @@ export interface TDeleteBulkChatRequest {
   session_ids: string[];
 }
 
+export interface TRenameChatRequest {
+  chat_id: string;
+  title: string;
+}
+
 export interface TGetHistoryRequest {
   result: string[];
   message: string;
