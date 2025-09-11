@@ -1,7 +1,7 @@
 import { DropdownMenuTrigger } from '@radix-ui/react-dropdown-menu';
 import { HamburgerMenuIcon, PlusIcon } from '@radix-ui/react-icons';
 import Cookies from 'js-cookie';
-import { Edit, MoreVertical, Pin, TrashIcon } from 'lucide-react';
+import { Edit, MoreVertical, Pin, PinOff, TrashIcon } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { AlertModal } from '../../shared/alert-modal';
@@ -17,6 +17,7 @@ import { Skeleton } from '../skeleton';
 import UserCard from '../user-card';
 import { useDeleteChat } from './_hook/use-delete-chat';
 import { useRenameChat } from './_hook/use-rename-chat';
+import { usePinChat } from './_hook/use-pin-chat';
 import { useGetFiles } from './_hook/use-get-history-chat';
 import DocumentMenu from './document-menu';
 import UserManagementMenu from './user-management-menu';
@@ -25,6 +26,7 @@ type TRecentChats = {
   session_id: string;
   title: string;
   id: string;
+  pinned: boolean;
 };
 
 const Sidebar = ({ setShowModal }) => {
@@ -46,6 +48,7 @@ const Sidebar = ({ setShowModal }) => {
 
   const deleteMutation = useDeleteChat();
   const renameMutation = useRenameChat();
+  const pinMutation = usePinChat();
 
   useEffect(() => {
     requestAnimationFrame(() => {
@@ -203,8 +206,13 @@ const Sidebar = ({ setShowModal }) => {
                               onMouseEnter={() => setActive(chat.session_id)}
                               onMouseLeave={() => setActive(null)}
                             >
-                              <span className="w-11/12 truncate">
-                                {chat.title || 'Untitled Chat'}
+                              <span className="flex w-11/12 items-center gap-1">
+                                <span className="truncate">
+                                  {chat.title || 'Untitled Chat'}
+                                </span>
+                                {chat.pinned && (
+                                  <Pin className="h-3 w-3 flex-shrink-0 text-blue-500" />
+                                )}
                               </span>
                             </Link>
                             <DropdownMenuTrigger asChild>
@@ -253,11 +261,27 @@ const Sidebar = ({ setShowModal }) => {
                               </DropdownMenuItem>
                               <DropdownMenuItem
                                 className="cursor-pointer"
-                                onClick={() => {}}
+                                onClick={() => {
+                                  pinMutation.mutate(
+                                    {
+                                      chat_id: chat.id,
+                                      pinned: !chat.pinned
+                                    },
+                                    {
+                                      onSuccess: () => {
+                                        query.refetch();
+                                      }
+                                    }
+                                  );
+                                }}
                               >
-                                Pin
+                                {chat.pinned ? 'Unpin' : 'Pin'}
                                 <DropdownMenuShortcut>
-                                  <Pin className="h-4 text-blue-500" />
+                                  {chat.pinned ? (
+                                    <PinOff className="h-4 text-blue-500" />
+                                  ) : (
+                                    <Pin className="h-4 text-blue-500" />
+                                  )}
                                 </DropdownMenuShortcut>
                               </DropdownMenuItem>
                             </DropdownMenuContent>

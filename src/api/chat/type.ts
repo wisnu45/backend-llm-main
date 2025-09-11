@@ -38,6 +38,11 @@ export interface TRenameChatRequest {
   title: string;
 }
 
+export interface TPinChatRequest {
+  chat_id: string;
+  pinned: boolean;
+}
+
 export interface TGetHistoryRequest {
   result: string[];
   message: string;
