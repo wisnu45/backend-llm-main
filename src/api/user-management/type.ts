@@ -1,28 +1,19 @@
 import { TResponse } from '@/commons/types/response';
 
 export type TRole = {
-  id: string;
+  id?: number;
   name: string;
-  chat: boolean;
-  file_management: boolean;
-  history: boolean;
-  chat_attachment: boolean;
-  max_chat_topic: number;
-  chat_topic_expired_days: number;
-  max_chat: number;
-  user_management: boolean;
-  permissions?: Array<{ id: string; name: string }>;
-  created_at: string;
-  updated_at: string;
+  description: string;
+  is_local: boolean;
+  is_portal: boolean;
 };
 
 export type TUser = {
   id: string;
-  originalName: string;
+  is_portal: boolean;
+  name: string;
   username: string;
-  isPortalUser: boolean;
-  role_id: string;
-  role?: TRole;
+  role: string;
   created_at: string;
   updated_at: string;
 };
@@ -31,7 +22,6 @@ export type TUserParams = {
   search?: string;
   page?: number;
   page_size?: number;
-  role_id?: string;
 };
 
 export type TRoleParams = {
@@ -41,42 +31,30 @@ export type TRoleParams = {
 };
 
 export type TRequestCreateUser = {
-  originalName: string;
-  username: string;
+  is_portal: boolean;
+  name: string;
   password: string;
-  isPortalUser: boolean;
-  role_id: string;
+  username: string;
 };
 
 export type TRequestUpdateUser = {
-  originalName: string;
+  is_portal: boolean;
+  name: string;
   username: string;
-  isPortalUser: boolean;
-  role_id: string;
 };
 
 export type TRequestCreateRole = {
   name: string;
-  chat: boolean;
-  file_management: boolean;
-  history: boolean;
-  chat_attachment: boolean;
-  max_chat_topic: number;
-  chat_topic_expired_days: number;
-  max_chat: number;
-  user_management: boolean;
+  description: string;
+  is_local: boolean;
+  is_portal: boolean;
 };
 
 export type TRequestUpdateRole = {
   name: string;
-  chat: boolean;
-  file_management: boolean;
-  history: boolean;
-  chat_attachment: boolean;
-  max_chat_topic: number;
-  chat_topic_expired_days: number;
-  max_chat: number;
-  user_management: boolean;
+  description: string;
+  is_local: boolean;
+  is_portal: boolean;
 };
 
 export type TResponseListUsers = TResponse<TUser[]>;

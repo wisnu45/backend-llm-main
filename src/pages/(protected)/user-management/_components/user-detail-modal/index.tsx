@@ -49,11 +49,9 @@ const UserDetailModal = ({
 
           <div>
             <span className="mb-1 block text-sm font-semibold text-gray-500">
-              Original Name
+              Name
             </span>
-            <p className="text-base text-gray-800">
-              {data?.originalName ?? '-'}
-            </p>
+            <p className="text-base text-gray-800">{data?.name ?? '-'}</p>
           </div>
 
           <div>
@@ -65,38 +63,18 @@ const UserDetailModal = ({
 
           <div>
             <span className="mb-1 block text-sm font-semibold text-gray-500">
-              Portal Access
+              Portal User
             </span>
             <p className="text-base text-gray-800">
-              {data?.isPortalUser ? 'Yes' : 'No'}
+              {data?.is_portal ? 'Yes' : 'No'}
             </p>
           </div>
 
           <div>
             <span className="mb-1 block text-sm font-semibold text-gray-500">
-              Assigned Role
+              Role
             </span>
-            <p className="text-base text-gray-800">{data?.role?.name ?? '-'}</p>
-          </div>
-
-          <div>
-            <span className="mb-1 block text-sm font-semibold text-gray-500">
-              Role Permissions
-            </span>
-            <div className="flex flex-wrap gap-1">
-              {data?.role?.permissions?.map((permission) => (
-                <span
-                  key={permission.id}
-                  className="inline-block rounded-lg bg-blue-50 px-2 py-1 text-xs text-blue-600"
-                >
-                  {permission.name}
-                </span>
-              )) || (
-                <span className="text-sm text-gray-500">
-                  No permissions assigned
-                </span>
-              )}
-            </div>
+            <p className="text-base text-gray-800">{data?.role ?? '-'}</p>
           </div>
 
           <div>

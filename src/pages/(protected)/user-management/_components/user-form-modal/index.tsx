@@ -18,13 +18,6 @@ import {
   FormLabel,
   FormMessage
 } from '@/components/ui/form';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useEffect } from 'react';
@@ -33,7 +26,6 @@ import {
   TRequestUpdateUser
 } from '@/api/user-management/type';
 import { Loader2 } from 'lucide-react';
-import useGetRoles from '../../_hooks/get-roles';
 
 interface Props {
   loading?: boolean;
@@ -68,25 +60,21 @@ const UserFormModal = ({
     resolver: zodResolver(mode === 'create' ? CreateUserSchema : EditUserSchema)
   });
 
-  const rolesQuery = useGetRoles();
-  const roles = rolesQuery.data?.data || [];
-
   const handleSubmit = (data: TUserFormData) => {
     // onSubmit(data);
   };
 
-  const watchPortalUser = form.watch('isPortalUser');
+  const watchPortalUser = form.watch('is_portal');
 
   useEffect(() => {
     if (defaultValues) {
       form.reset(defaultValues);
     } else {
       form.reset({
-        originalName: '',
+        name: '',
         username: '',
         password: '',
-        isPortalUser: false,
-        role_id: ''
+        is_portal: false
       });
     }
   }, [defaultValues, form, open]);
@@ -109,7 +97,7 @@ const UserFormModal = ({
           >
             <FormField
               control={form.control}
-              name="isPortalUser"
+              name="is_portal"
               render={({ field }) => (
                 <FormItem className="flex flex-row items-start space-x-3 space-y-0">
                   <FormControl>
@@ -127,10 +115,10 @@ const UserFormModal = ({
 
             <FormField
               control={form.control}
-              name="originalName"
+              name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Original Name {!watchPortalUser && '*'}</FormLabel>
+                  <FormLabel>Name {!watchPortalUser && '*'}</FormLabel>
                   <FormControl>
                     <Input
                       placeholder="Enter original name"
@@ -181,31 +169,6 @@ const UserFormModal = ({
                 )}
               />
             )}
-
-            <FormField
-              control={form.control}
-              name="role_id"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Role *</FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a role" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {roles.map((role) => (
-                        <SelectItem key={role.id} value={role.id}>
-                          {role.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
 
             <DialogFooter className="mt-2 sm:justify-start">
               <Button type="submit" className="w-full" disabled={loading}>

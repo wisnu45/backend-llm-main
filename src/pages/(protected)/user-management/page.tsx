@@ -135,14 +135,12 @@ const UserManagementPage = () => {
     {
       accessorKey: 'id',
       header: 'NO',
-      cell: ({ row }) => <div>{row.index + 1 + startFrom}</div>
+      cell: ({ row }) => <div>{row.index + 1}</div>
     },
     {
-      accessorKey: 'originalName',
-      header: 'Original Name',
-      cell: ({ row }) => (
-        <div className="min-w-40">{row.getValue('originalName')}</div>
-      )
+      accessorKey: 'name',
+      header: 'Name',
+      cell: ({ row }) => <div className="min-w-40">{row.getValue('name')}</div>
     },
     {
       accessorKey: 'username',
@@ -152,21 +150,31 @@ const UserManagementPage = () => {
       )
     },
     {
-      accessorKey: 'role',
-      header: 'Role',
+      accessorKey: 'is_portal',
+      header: 'Portal User',
       cell: ({ row }) => (
-        <div className="min-w-32">
-          <span className="inline-block rounded-lg bg-blue-50 px-2 py-1 text-sm text-blue-600">
-            {row.original.role?.name || '-'}
+        <div className="min-w-24">
+          <span
+            className={`inline-block rounded-lg px-2 py-1 text-xs ${
+              row.original.is_portal
+                ? 'bg-green-50 text-green-600'
+                : 'bg-gray-50 text-gray-600'
+            }`}
+          >
+            {row.original.is_portal ? 'Yes' : 'No'}
           </span>
         </div>
       )
     },
     {
-      accessorKey: 'created_at',
-      header: 'Created Date',
+      accessorKey: 'role',
+      header: 'Role',
       cell: ({ row }) => (
-        <div className="min-w-28">{formatDate(row.original.created_at)}</div>
+        <div className="min-w-32">
+          <span className="inline-block rounded-lg bg-blue-50 px-2 py-1 text-sm text-blue-600">
+            {row.getValue('role') || '-'}
+          </span>
+        </div>
       )
     },
     {
@@ -207,7 +215,7 @@ const UserManagementPage = () => {
     {
       accessorKey: 'id',
       header: 'NO',
-      cell: ({ row }) => <div>{row.index + 1 + startFrom}</div>
+      cell: ({ row }) => <div>{row.index + 1}</div>
     },
     {
       accessorKey: 'name',
@@ -215,45 +223,44 @@ const UserManagementPage = () => {
       cell: ({ row }) => <div className="min-w-32">{row.getValue('name')}</div>
     },
     {
-      accessorKey: 'capabilities',
-      header: 'Capabilities',
-      cell: ({ row }) => {
-        const capabilities: string[] = [];
-        if (row.original.chat) capabilities.push('Chat');
-        if (row.original.file_management) capabilities.push('Files');
-        if (row.original.history) capabilities.push('History');
-        if (row.original.chat_attachment) capabilities.push('Attachments');
-        if (row.original.user_management) capabilities.push('Users');
-
-        return (
-          <div className="min-w-48">
-            <div className="flex flex-wrap gap-1">
-              {capabilities.slice(0, 2).map((capability) => (
-                <span
-                  key={capability}
-                  className="inline-block rounded-lg bg-green-50 px-2 py-1 text-xs text-green-600"
-                >
-                  {capability}
-                </span>
-              ))}
-              {capabilities.length > 2 && (
-                <span className="inline-block rounded-lg bg-gray-50 px-2 py-1 text-xs text-gray-600">
-                  +{capabilities.length - 2} more
-                </span>
-              )}
-              {capabilities.length === 0 && (
-                <span className="text-xs text-gray-500">No capabilities</span>
-              )}
-            </div>
-          </div>
-        );
-      }
+      accessorKey: 'description',
+      header: 'Description',
+      cell: ({ row }) => (
+        <div className="min-w-48">{row.getValue('description')}</div>
+      )
     },
     {
-      accessorKey: 'created_at',
-      header: 'Created Date',
+      accessorKey: 'is_local',
+      header: 'Local',
       cell: ({ row }) => (
-        <div className="min-w-28">{formatDate(row.original.created_at)}</div>
+        <div className="min-w-20">
+          <span
+            className={`inline-block rounded-lg px-2 py-1 text-xs ${
+              row.original.is_local
+                ? 'bg-green-50 text-green-600'
+                : 'bg-gray-50 text-gray-600'
+            }`}
+          >
+            {row.original.is_local ? 'Yes' : 'No'}
+          </span>
+        </div>
+      )
+    },
+    {
+      accessorKey: 'is_portal',
+      header: 'Portal',
+      cell: ({ row }) => (
+        <div className="min-w-20">
+          <span
+            className={`inline-block rounded-lg px-2 py-1 text-xs ${
+              row.original.is_portal
+                ? 'bg-blue-50 text-blue-600'
+                : 'bg-gray-50 text-gray-600'
+            }`}
+          >
+            {row.original.is_portal ? 'Yes' : 'No'}
+          </span>
+        </div>
       )
     },
     {
@@ -328,7 +335,7 @@ const UserManagementPage = () => {
               Users
             </TabsTrigger>
             <TabsTrigger value="roles" className="w-full sm:w-auto">
-              Role Permission
+              Role
             </TabsTrigger>
           </TabsList>
           <ScrollBar orientation="horizontal" />

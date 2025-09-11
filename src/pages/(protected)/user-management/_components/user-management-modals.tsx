@@ -11,7 +11,6 @@ import useCreateRole from '../_hooks/create-role';
 import useUpdateRole from '../_hooks/update-role';
 import useDeleteRole from '../_hooks/delete-role';
 import useGetUserDetail from '../_hooks/get-user-detail';
-import useGetRoleDetail from '../_hooks/get-role-detail';
 import { TUser, TRole, TRequestCreateUser } from '@/api/user-management/type';
 
 type TModal =
@@ -47,16 +46,12 @@ const UserManagementModals = ({
   const deleteRoleMutation = useDeleteRole();
 
   const userDetailQuery = useGetUserDetail(userData?.id);
-  const roleDetailQuery = useGetRoleDetail(roleData?.id);
 
   useEffect(() => {
     if (modal && modal.includes('user') && modal !== 'create-user') {
       userDetailQuery.refetch();
     }
-    if (modal && modal.includes('role') && modal !== 'create-role') {
-      roleDetailQuery.refetch();
-    }
-  }, [modal, userDetailQuery, roleDetailQuery]);
+  }, [modal, userDetailQuery]);
 
   return (
     <>
@@ -85,10 +80,9 @@ const UserManagementModals = ({
           });
         }}
         defaultValues={{
-          originalName: userDetailQuery.data?.data.originalName,
+          name: userDetailQuery.data?.data.name,
           username: userDetailQuery.data?.data.username,
-          isPortalUser: userDetailQuery.data?.data.isPortalUser,
-          role_id: userDetailQuery.data?.data.role_id
+          is_portal: userDetailQuery.data?.data.is_portal
         }}
       />
 
@@ -114,7 +108,7 @@ const UserManagementModals = ({
       />
 
       <RoleFormModal
-        key={roleDetailQuery.data?.data.id}
+        key={roleData?.id}
         open={modal === 'edit-role'}
         mode="edit"
         loading={updateRoleMutation.isPending}
@@ -125,23 +119,17 @@ const UserManagementModals = ({
           });
         }}
         defaultValues={{
-          name: roleDetailQuery.data?.data.name,
-          chat: roleDetailQuery.data?.data.chat,
-          file_management: roleDetailQuery.data?.data.file_management,
-          history: roleDetailQuery.data?.data.history,
-          chat_attachment: roleDetailQuery.data?.data.chat_attachment,
-          user_management: roleDetailQuery.data?.data.user_management,
-          max_chat_topic: roleDetailQuery.data?.data.max_chat_topic,
-          chat_topic_expired_days:
-            roleDetailQuery.data?.data.chat_topic_expired_days,
-          max_chat: roleDetailQuery.data?.data.max_chat
+          name: roleData?.name,
+          description: roleData?.description,
+          is_local: roleData?.is_local,
+          is_portal: roleData?.is_portal
         }}
       />
 
       <RoleDetailModal
         open={modal === 'detail-role'}
         onOpenChange={() => setModal(null)}
-        data={roleDetailQuery.data?.data}
+        data={roleData}
         onDelete={() => setModal('delete-role')}
         onEdit={() => setModal('edit-role')}
       />
@@ -150,9 +138,7 @@ const UserManagementModals = ({
       <DeleteModal
         open={modal === 'delete-user'}
         title="Delete User"
-        itemName={
-          userDetailQuery.data?.data.originalName || userData?.originalName
-        }
+        itemName={userDetailQuery.data?.data.name || userData?.name}
         loading={deleteUserMutation.isPending}
         onDelete={() => {
           const id = userDetailQuery.data?.data.id || userData?.id;
@@ -169,10 +155,10 @@ const UserManagementModals = ({
       <DeleteModal
         open={modal === 'delete-role'}
         title="Delete Role"
-        itemName={roleDetailQuery.data?.data.name || roleData?.name}
+        itemName={roleData?.name}
         loading={deleteRoleMutation.isPending}
         onDelete={() => {
-          const id = roleDetailQuery.data?.data.id || roleData?.id;
+          const id = roleData?.id;
           deleteRoleMutation.mutate(
             { id: id! },
             {

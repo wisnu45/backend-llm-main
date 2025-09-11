@@ -25,6 +25,21 @@ const RoleDetailModal = ({
   open,
   onOpenChange
 }: Props) => {
+  if (!data) {
+    return (
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="no-scrollbar sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Role Details</DialogTitle>
+          </DialogHeader>
+          <div className="p-4">
+            <p>No role data available.</p>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
@@ -56,86 +71,47 @@ const RoleDetailModal = ({
 
           <div>
             <span className="mb-1 block text-sm font-semibold text-gray-500">
-              Capabilities
+              Description
+            </span>
+            <p className="text-base text-gray-800">
+              {data?.description ?? '-'}
+            </p>
+          </div>
+
+          <div>
+            <span className="mb-1 block text-sm font-semibold text-gray-500">
+              Role Settings
             </span>
             <div className="space-y-2">
               <div className="flex justify-between">
-                <span>Chat:</span>
-                <span
-                  className={data?.chat ? 'text-green-600' : 'text-red-600'}
-                >
-                  {data?.chat ? 'Enabled' : 'Disabled'}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span>File Management:</span>
+                <span>Is Local:</span>
                 <span
                   className={
-                    data?.file_management ? 'text-green-600' : 'text-red-600'
+                    data?.is_local === true || data?.is_local === 'true'
+                      ? 'text-green-600'
+                      : 'text-red-600'
                   }
                 >
-                  {data?.file_management ? 'Enabled' : 'Disabled'}
+                  {data?.is_local === true || data?.is_local === 'true'
+                    ? 'Yes'
+                    : 'No'}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span>History:</span>
-                <span
-                  className={data?.history ? 'text-green-600' : 'text-red-600'}
-                >
-                  {data?.history ? 'Enabled' : 'Disabled'}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span>Chat Attachment:</span>
+                <span>Is Portal:</span>
                 <span
                   className={
-                    data?.chat_attachment ? 'text-green-600' : 'text-red-600'
+                    data?.is_portal === true || data?.is_portal === 'true'
+                      ? 'text-blue-600'
+                      : 'text-red-600'
                   }
                 >
-                  {data?.chat_attachment ? 'Enabled' : 'Disabled'}
+                  {data?.is_portal === true || data?.is_portal === 'true'
+                    ? 'Yes'
+                    : 'No'}
                 </span>
-              </div>
-              <div className="flex justify-between">
-                <span>User Management:</span>
-                <span
-                  className={
-                    data?.user_management ? 'text-green-600' : 'text-red-600'
-                  }
-                >
-                  {data?.user_management ? 'Enabled' : 'Disabled'}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span>Max Chat Topics:</span>
-                <span>{data?.max_chat_topic || 0}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Chat Topic Expired Days:</span>
-                <span>{data?.chat_topic_expired_days || 0}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Max Chats:</span>
-                <span>{data?.max_chat || 0}</span>
               </div>
             </div>
-          </div>
-
-          <div>
-            <span className="mb-1 block text-sm font-semibold text-gray-500">
-              Created Date
-            </span>
-            <p className="text-base text-gray-800">
-              {data?.created_at ? formatDate(data.created_at) : '-'}
-            </p>
-          </div>
-
-          <div>
-            <span className="mb-1 block text-sm font-semibold text-gray-500">
-              Last Updated
-            </span>
-            <p className="text-base text-gray-800">
-              {data?.updated_at ? formatDate(data.updated_at) : '-'}
-            </p>
           </div>
 
           <DialogFooter className="mt-2 sm:justify-start">

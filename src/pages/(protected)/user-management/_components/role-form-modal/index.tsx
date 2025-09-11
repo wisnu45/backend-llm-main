@@ -70,14 +70,9 @@ const RoleFormModal = ({
     } else {
       form.reset({
         name: '',
-        chat: false,
-        file_management: false,
-        history: false,
-        chat_attachment: false,
-        user_management: false,
-        max_chat_topic: 10,
-        chat_topic_expired_days: 30,
-        max_chat: 100
+        description: '',
+        is_local: true,
+        is_portal: false
       });
     }
   }, [defaultValues, form, open]);
@@ -112,22 +107,38 @@ const RoleFormModal = ({
               )}
             />
 
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Description *</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Enter role description" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
             <div className="space-y-4">
               <div className="mb-4">
-                <FormLabel className="text-base">Role Permissions</FormLabel>
+                <FormLabel className="text-base">Role Settings</FormLabel>
                 <p className="text-sm text-muted-foreground">
-                  Configure the capabilities this role should have
+                  Configure the role access settings
                 </p>
               </div>
 
-              {/* Boolean permissions using Switch */}
               <FormField
                 control={form.control}
-                name="chat"
+                name="is_local"
                 render={({ field }) => (
                   <FormItem className="flex flex-row items-center justify-between">
                     <div className="space-y-0.5">
-                      <FormLabel className="text-base">Chat</FormLabel>
+                      <FormLabel className="text-base">Is Local</FormLabel>
+                      <p className="text-sm text-muted-foreground">
+                        Enable if this is a local role
+                      </p>
                     </div>
                     <FormControl>
                       <Switch
@@ -141,13 +152,14 @@ const RoleFormModal = ({
 
               <FormField
                 control={form.control}
-                name="file_management"
+                name="is_portal"
                 render={({ field }) => (
                   <FormItem className="flex flex-row items-center justify-between">
                     <div className="space-y-0.5">
-                      <FormLabel className="text-base">
-                        File Management
-                      </FormLabel>
+                      <FormLabel className="text-base">Is Portal</FormLabel>
+                      <p className="text-sm text-muted-foreground">
+                        Enable if this is a portal role
+                      </p>
                     </div>
                     <FormControl>
                       <Switch
@@ -155,134 +167,6 @@ const RoleFormModal = ({
                         onCheckedChange={field.onChange}
                       />
                     </FormControl>
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="history"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between">
-                    <div className="space-y-0.5">
-                      <FormLabel className="text-base">History</FormLabel>
-                    </div>
-                    <FormControl>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="chat_attachment"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between">
-                    <div className="space-y-0.5">
-                      <FormLabel className="text-base">
-                        Chat Attachment
-                      </FormLabel>
-                    </div>
-                    <FormControl>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="user_management"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between">
-                    <div className="space-y-0.5">
-                      <FormLabel className="text-base">
-                        User Management
-                      </FormLabel>
-                    </div>
-                    <FormControl>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-
-              {/* Numeric permissions using Input */}
-              <FormField
-                control={form.control}
-                name="max_chat_topic"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Max Chat Topics</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        min={1}
-                        max={100}
-                        placeholder="Enter max chat topics"
-                        value={field.value || ''}
-                        onChange={(e) =>
-                          field.onChange(parseInt(e.target.value) || 0)
-                        }
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="chat_topic_expired_days"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Chat Topic Expired Days</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        min={1}
-                        max={365}
-                        placeholder="Enter expired days"
-                        value={field.value || ''}
-                        onChange={(e) =>
-                          field.onChange(parseInt(e.target.value) || 0)
-                        }
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="max_chat"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Max Chats</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        min={1}
-                        max={1000}
-                        placeholder="Enter max chats"
-                        value={field.value || ''}
-                        onChange={(e) =>
-                          field.onChange(parseInt(e.target.value) || 0)
-                        }
-                      />
-                    </FormControl>
-                    <FormMessage />
                   </FormItem>
                 )}
               />

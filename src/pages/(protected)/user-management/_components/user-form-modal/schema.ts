@@ -1,7 +1,7 @@
 import * as z from 'zod';
 
 const BaseUserSchemaObject = z.object({
-  originalName: z.string().optional(),
+  name: z.string().optional(),
   username: z
     .string({ message: 'Username is required' })
     .min(1, { message: 'Username is required' })
@@ -10,29 +10,23 @@ const BaseUserSchemaObject = z.object({
       message:
         'Username can only contain letters, numbers, hyphens and underscores'
     }),
-  isPortalUser: z.boolean().default(false),
-  role_id: z
-    .string({ message: 'Role is required' })
-    .min(1, { message: 'Please select a role' })
+  is_portal: z.boolean().default(false)
 });
 
 export const CreateUserSchema = BaseUserSchemaObject.extend({
   password: z.string().optional()
 }).superRefine((data, ctx) => {
-  // Check originalName requirement
-  if (
-    !data.isPortalUser &&
-    (!data.originalName || data.originalName.trim() === '')
-  ) {
+  // Check name requirement
+  if (!data.is_portal && (!data.name || data.name.trim() === '')) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
-      message: 'Original Name is required when Portal User is disabled',
-      path: ['originalName']
+      message: 'Name is required when Portal User is disabled',
+      path: ['name']
     });
   }
 
   // Check password requirement
-  if (!data.isPortalUser && (!data.password || data.password.trim() === '')) {
+  if (!data.is_portal && (!data.password || data.password.trim() === '')) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       message: 'Password is required when Portal User is disabled',
@@ -50,14 +44,11 @@ export const CreateUserSchema = BaseUserSchemaObject.extend({
 });
 
 export const EditUserSchema = BaseUserSchemaObject.superRefine((data, ctx) => {
-  if (
-    !data.isPortalUser &&
-    (!data.originalName || data.originalName.trim() === '')
-  ) {
+  if (!data.is_portal && (!data.name || data.name.trim() === '')) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
-      message: 'Original Name is required when Portal User is disabled',
-      path: ['originalName']
+      message: 'Name is required when Portal User is disabled',
+      path: ['name']
     });
   }
 });
