@@ -96,13 +96,9 @@ const Sidebar = ({ setShowModal }) => {
         >
           <div className="flex items-center justify-between">
             {isSidebarOpen && (
-              <button
-                onClick={() =>
-                  window.open('https://www.combiphar.com/id', '_blank')
-                }
-              >
+              <Link to="/">
                 <img src="/combiphar.png" className="h-auto max-w-24" />
-              </button>
+              </Link>
             )}
             <button
               className="flex h-8 w-8 items-center justify-center rounded-lg hover:bg-gray-400/20"
