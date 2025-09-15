@@ -149,8 +149,6 @@ const UserManagementModals = ({
           });
         }}
       />
-
-      {/* Delete Modals */}
       <DeleteModal
         open={modal === 'delete-user'}
         title="Delete User"

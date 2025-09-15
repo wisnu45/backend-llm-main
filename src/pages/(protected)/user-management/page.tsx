@@ -195,6 +195,10 @@ const UserManagementPage = () => {
           </Button>
           <Button
             variant="ghost"
+            disabled={
+              row.original.username === 'admin' ||
+              row.original.username === 'user'
+            }
             onClick={() => setModal('delete-user', row.original)}
           >
             Delete
@@ -229,40 +233,40 @@ const UserManagementPage = () => {
         <div className="min-w-48">{row.getValue('description')}</div>
       )
     },
-    {
-      accessorKey: 'is_local',
-      header: 'Local',
-      cell: ({ row }) => (
-        <div className="min-w-20">
-          <span
-            className={`inline-block rounded-lg px-2 py-1 text-xs ${
-              row.original.is_local
-                ? 'bg-green-50 text-green-600'
-                : 'bg-gray-50 text-gray-600'
-            }`}
-          >
-            {row.original.is_local ? 'Yes' : 'No'}
-          </span>
-        </div>
-      )
-    },
-    {
-      accessorKey: 'is_portal',
-      header: 'Portal',
-      cell: ({ row }) => (
-        <div className="min-w-20">
-          <span
-            className={`inline-block rounded-lg px-2 py-1 text-xs ${
-              row.original.is_portal
-                ? 'bg-blue-50 text-blue-600'
-                : 'bg-gray-50 text-gray-600'
-            }`}
-          >
-            {row.original.is_portal ? 'Yes' : 'No'}
-          </span>
-        </div>
-      )
-    },
+    // {
+    //   accessorKey: 'is_local',
+    //   header: 'Local',
+    //   cell: ({ row }) => (
+    //     <div className="min-w-20">
+    //       <span
+    //         className={`inline-block rounded-lg px-2 py-1 text-xs ${
+    //           row.original.is_local
+    //             ? 'bg-green-50 text-green-600'
+    //             : 'bg-gray-50 text-gray-600'
+    //         }`}
+    //       >
+    //         {row.original.is_local ? 'Yes' : 'No'}
+    //       </span>
+    //     </div>
+    //   )
+    // },
+    // {
+    //   accessorKey: 'is_portal',
+    //   header: 'Portal',
+    //   cell: ({ row }) => (
+    //     <div className="min-w-20">
+    //       <span
+    //         className={`inline-block rounded-lg px-2 py-1 text-xs ${
+    //           row.original.is_portal
+    //             ? 'bg-blue-50 text-blue-600'
+    //             : 'bg-gray-50 text-gray-600'
+    //         }`}
+    //       >
+    //         {row.original.is_portal ? 'Yes' : 'No'}
+    //       </span>
+    //     </div>
+    //   )
+    // },
     {
       header: 'Action',
       cell: ({ row }) => (
@@ -287,6 +291,9 @@ const UserManagementPage = () => {
           </Button>
           <Button
             variant="ghost"
+            disabled={
+              row.original.name === 'admin' || row.original.name === 'user'
+            }
             onClick={() => setModal('delete-role', null, row.original)}
           >
             Delete

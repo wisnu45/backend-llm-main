@@ -7,6 +7,8 @@ export type TSetting = {
   input: string;
   type: string;
   unit: string | null;
+  data_type: string;
+  value: string;
 };
 
 export type TResponseListSettings = TResponse<TSetting[]>;

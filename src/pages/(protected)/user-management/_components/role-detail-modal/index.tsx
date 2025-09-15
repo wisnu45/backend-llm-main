@@ -78,7 +78,7 @@ const RoleDetailModal = ({
           </div>
 
           <div>
-            <span className="mb-1 block text-sm font-semibold text-gray-500">
+            {/* <span className="mb-1 block text-sm font-semibold text-gray-500">
               Role Settings
             </span>
             <div className="space-y-2">
@@ -100,7 +100,7 @@ const RoleDetailModal = ({
                   {data?.is_portal === true ? 'Yes' : 'No'}
                 </span>
               </div>
-            </div>
+            </div> */}
           </div>
 
           <DialogFooter className="mt-2 sm:justify-start">

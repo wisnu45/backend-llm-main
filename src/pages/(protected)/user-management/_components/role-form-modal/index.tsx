@@ -121,7 +121,7 @@ const RoleFormModal = ({
               )}
             />
 
-            <FormField
+            {/* <FormField
               control={form.control}
               name="is_local"
               render={({ field }) => (
@@ -140,8 +140,8 @@ const RoleFormModal = ({
                   </FormControl>
                 </FormItem>
               )}
-            />
-
+            /> */}
+            {/* 
             <FormField
               control={form.control}
               name="is_portal"
@@ -161,7 +161,7 @@ const RoleFormModal = ({
                   </FormControl>
                 </FormItem>
               )}
-            />
+            /> */}
 
             <DialogFooter className="mt-2 sm:justify-start">
               <Button type="submit" className="w-full" disabled={loading}>

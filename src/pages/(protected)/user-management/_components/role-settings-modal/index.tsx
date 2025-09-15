@@ -38,24 +38,27 @@ const RoleSettingsModal = ({
   onSave,
   loading
 }: Props) => {
-  const [settingsValues, setSettingsValues] = useState<Record<string, string>>(
-    {}
-  );
+  const [settingsValues, setSettingsValues] = useState<
+    Record<string, string | boolean>
+  >({});
+
+  const [settingTogle, setSettingTogle] = useState(settingsValues.attachment);
   const settingsQuery = useGetSettings();
   const settings = settingsQuery.data?.data || [];
 
+  useEffect(() => {}, [settingTogle]);
+
   useEffect(() => {
     if (open && settings.length > 0) {
-      // Initialize settings values with defaults
       const initialValues: Record<string, string> = {};
       settings.forEach((setting) => {
-        initialValues[setting.name] = setting.input;
+        initialValues[setting.name] = setting.value;
       });
       setSettingsValues(initialValues);
     }
   }, [open, settings]);
 
-  const handleValueChange = (name: string, value: string) => {
+  const handleValueChange = (name: string, value: string | boolean) => {
     setSettingsValues((prev) => ({
       ...prev,
       [name]: value
@@ -70,7 +73,10 @@ const RoleSettingsModal = ({
       .map((setting) => ({
         role_id: roleData.id!,
         setting_id: setting.id,
-        value: settingsValues[setting.name] || setting.input
+        value:
+          typeof settingsValues[setting.name] === 'boolean'
+            ? settingsValues[setting.name].toString()
+            : (settingsValues[setting.name] as string) || setting.input
       }));
     onSave(settingsArray);
   };
@@ -117,14 +123,49 @@ const RoleSettingsModal = ({
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Input
-                        value={settingsValues[setting.name] || ''}
-                        onChange={(e) =>
-                          handleValueChange(setting.name, e.target.value)
-                        }
-                        placeholder="Enter value"
-                        className="w-full"
-                      />
+                      {setting.data_type === 'boolean' ? (
+                        <>
+                          <label className="relative inline-flex cursor-pointer items-center">
+                            <input
+                              type="checkbox"
+                              checked={!!settingTogle}
+                              onChange={(e) => {
+                                setSettingTogle(settingTogle ? false : true);
+                                handleValueChange(setting.name, !!settingTogle);
+                              }}
+                              className="sr-only"
+                            />
+                            <div
+                              className={`h-6 w-11 rounded-full transition-colors duration-300 ease-in-out ${
+                                settingTogle === true
+                                  ? 'bg-green-500'
+                                  : 'bg-gray-200'
+                              }`}
+                            >
+                              <div
+                                className={`${
+                                  settingTogle === true
+                                    ? 'translate-x-5'
+                                    : 'translate-x-0'
+                                } inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition-transform duration-300 ease-in-out`}
+                              ></div>
+                            </div>
+                          </label>
+                        </>
+                      ) : (
+                        <Input
+                          value={
+                            settingsValues[setting.name] !== undefined
+                              ? settingsValues[setting.name].toString()
+                              : ''
+                          }
+                          onChange={(e) =>
+                            handleValueChange(setting.name, e.target.value)
+                          }
+                          placeholder="Enter value"
+                          className="w-full"
+                        />
+                      )}
                     </TableCell>
                   </TableRow>
                 ))}
