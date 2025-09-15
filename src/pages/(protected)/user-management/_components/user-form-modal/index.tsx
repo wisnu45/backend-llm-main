@@ -80,6 +80,7 @@ const UserFormModal = ({
         name: '',
         username: '',
         password: '',
+        roles_id: '',
         is_portal: false
       });
     }
@@ -167,7 +168,7 @@ const UserFormModal = ({
             />
             <FormField
               control={form.control}
-              name="role"
+              name="roles_id"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Role *</FormLabel>
@@ -180,7 +181,7 @@ const UserFormModal = ({
                         <option value="">Select Username</option>
 
                         {rolesChoise?.map((item) => (
-                          <option value={item.name}>{item.name}</option>
+                          <option value={item.id}>{item.name}</option>
                         ))}
                       </select>
                     </div>

@@ -11,7 +11,7 @@ const BaseUserSchemaObject = z.object({
         'Username can only contain letters, numbers, hyphens and underscores'
     }),
   is_portal: z.boolean().default(false),
-  role: z.string().default('')
+  roles_id: z.string().default('')
 });
 
 export const CreateUserSchema = BaseUserSchemaObject.extend({
