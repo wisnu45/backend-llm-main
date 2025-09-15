@@ -1,103 +1,75 @@
 import { PencilIcon } from 'lucide-react';
-import { useState, useEffect } from 'react';
-
-type TSetting = {
-  config: string;
-  desc: string;
-  type: 'General' | 'Feature';
-  value: string;
-  information?: string;
-};
-
-const dummySettings: TSetting[] = [
-  {
-    config: 'Chat max text',
-    desc: 'Maksimum text yang dapat diketik',
-    type: 'General',
-    value: '1000'
-  },
-  {
-    config: 'Chat Greeting',
-    desc: 'Sapaan chat baru',
-    type: 'General',
-    value: 'Hai, [username] Apa yang bisa Vita...'
-  },
-  {
-    config: 'Prompt Example',
-    desc: 'Contoh2 prompt',
-    type: 'General',
-    value:
-      'Berikan 10 ide marketing produk obat batuk OBH Combi untuk meningkatkan brand awareness; Saya karyawan baru PT.Combiphar. Jelaskan kepada saya dengan lengkap tentang peraturan perusahaan, hak, kewajiban dan benefit yang saya dapatkan sebagai karyawan.; Buatkan saya kalimat email untuk menawarkan kerjasama dengan apotek baru bernama Apotek Sehat ;Bantu saya membuat formula excel'
-  },
-  {
-    config: 'Attachment',
-    desc: 'Attachment on/off',
-    type: 'Feature',
-    value: 'on/off'
-  },
-  {
-    config: 'Attachment File Types',
-    desc: 'Attachment allowed file types',
-    type: 'General',
-    value: 'Pdf, docx, pptx, xlsx, jpg, png, txt'
-  },
-  {
-    config: 'Max Chat Topic',
-    desc: 'Maksimum Jumlah Chat Topic (sidebar)',
-    type: 'Feature',
-    value: '50',
-    information: '(0 = unlimited)'
-  },
-  {
-    config: 'Chat Topic Expired Days',
-    desc: 'Batas max chat topic auto delete, dilihat dari last date chat per topic',
-    type: 'Feature',
-    value: '30',
-    information: '(days) (0 = unlimited)'
-  },
-  {
-    config: 'Max Chat',
-    desc: 'Batas max chat per topic',
-    type: 'Feature',
-    value: '100',
-    information: '(chats) (0 = unlimited)'
-  }
-];
+import { useState } from 'react';
+import { useFetchSetting } from './_hook/use-fetch-setting';
+import { TSettingDocument } from '@/api/settings/type';
+import useEditSetting from './_hook/use-mutate-edit-setting';
 
 export default function SettingTable() {
-  const [selectedSetting, setSelectedSetting] = useState<TSetting | null>(null);
+  const [selectedSetting, setSelectedSetting] =
+    useState<TSettingDocument | null>(null);
   const [modalType, setModalType] = useState<string | null>(null);
   const [inputValue, setInputValue] = useState<string>('');
 
-  useEffect(() => {
-    const debounceTimer = setTimeout(() => {
-      if (selectedSetting) {
-        selectedSetting.value = inputValue;
-      }
-    }, 300);
+  const query = useFetchSetting();
+  const mutate = useEditSetting(selectedSetting?.id || '');
 
-    return () => clearTimeout(debounceTimer);
-  }, [inputValue, selectedSetting]);
+  const dataSetting = query?.data?.data || [];
 
-  const openPopup = (row: TSetting) => {
+  const isLoading = query.isLoading || query.isFetching;
+
+  const openPopup = (row: TSettingDocument) => {
     setSelectedSetting(row);
     setInputValue(row.value);
 
     if (
-      row.config === 'Chat max text' ||
-      row.config === 'Max Chat Topic' ||
-      row.config === 'Chat Topic Expired Days' ||
-      row.config === 'Max Chat'
+      row.name === 'chat_max_text' ||
+      row.name === 'max_chat_topic' ||
+      row.name === 'chat_topic_expired_days' ||
+      row.name === 'max_chats'
     ) {
       setModalType('number');
-    } else if (row.config === 'Chat Greeting') {
+    } else if (row.name === 'chat_greeting') {
       setModalType('text');
-    } else if (row.config === 'Prompt Example') {
-      setModalType('cards');
-    } else if (row.config === 'Attachment') {
+    } else if (
+      row.name === 'prompt_example' ||
+      row.name === 'attachment_file_types'
+    ) {
+      setModalType('text');
+    } else if (row.name === 'attachment') {
       setModalType('toggle');
-    } else if (row.config === 'Attachment File Types') {
-      setModalType('dropdown');
+    }
+  };
+
+  const submit = () => {
+    if (selectedSetting) {
+      let data = inputValue;
+      if (selectedSetting.data_type === 'array') {
+        data = JSON.parse(inputValue);
+      }
+      const updatedSetting = {
+        ...selectedSetting,
+        value: data
+      };
+      const formData = new FormData();
+      Object.entries(updatedSetting).forEach(([key, value]) => {
+        if (Array.isArray(value)) {
+          value.forEach((item) => {
+            formData.append(`${key}[]`, item);
+          });
+        } else {
+          formData.append(key, value);
+        }
+      });
+      mutate.mutate(formData, {
+        onSuccess: () => {
+          setSelectedSetting(null);
+          setModalType(null);
+          console.log('Mutation successful!');
+        },
+        onError: (error) => {
+          console.error('Mutation failed:', error);
+        }
+      });
     }
   };
 
@@ -131,53 +103,70 @@ export default function SettingTable() {
             </tr>
           </thead>
           <tbody>
-            {dummySettings.map((row, idx) => (
-              <tr
-                key={idx}
-                className="border-b last:border-0 hover:bg-gray-100"
-              >
-                <td className="px-4 py-3 font-medium">{row.config}</td>
-                <td className="px-4 py-3 text-sm text-gray-600">{row.desc}</td>
-                <td className="px-4 py-3">
-                  <span
-                    className={`rounded-full px-2 py-1 text-xs font-semibold ${
-                      row.type === 'General'
-                        ? 'bg-blue-100 text-blue-600'
-                        : 'bg-yellow-100 text-yellow-600'
-                    }`}
-                  >
-                    {row.type}
-                  </span>
-                </td>
-                <td className="px-4 py-3 text-sm">
-                  {row.value.split(';').map((item, idx) => (
-                    <span key={idx}>
-                      {item}
-                      {idx < row.value.split(';').length - 1 && <br />}{' '}
-                    </span>
-                  ))}
-                  {row.information && <span>{row.information}</span>}
-                </td>
-                <td className="px-4 py-3">
-                  <div className="flex items-center justify-center gap-2">
-                    <button
-                      className="rounded-full bg-yellow-100 p-2 hover:bg-yellow-200"
-                      onClick={() => openPopup(row)}
+            {!isLoading &&
+              dataSetting?.map((row) => (
+                <tr
+                  key={row.id}
+                  className="border-b last:border-0 hover:bg-gray-100"
+                >
+                  <td className="px-4 py-3 font-medium">{row.name}</td>
+                  <td className="px-4 py-3 text-sm text-gray-600">
+                    {row.description}
+                  </td>
+                  <td className="px-4 py-3">
+                    <span
+                      className={`rounded-full px-2 py-1 text-xs font-semibold ${
+                        row.type === 'general'
+                          ? 'bg-blue-100 text-blue-600'
+                          : 'bg-yellow-100 text-yellow-600'
+                      }`}
                     >
-                      <PencilIcon className="h-4 w-4 text-yellow-600" />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
+                      {row.type}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 text-sm">
+                    {row.data_type === 'array' ? (
+                      <>
+                        {JSON.parse(row.value).map(
+                          (item: string, index: number) => (
+                            <div key={index}>
+                              {item},
+                              <br key={index} />
+                            </div>
+                          )
+                        )}
+                      </>
+                    ) : (
+                      <span>{row.value}</span>
+                    )}
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="flex items-center justify-center gap-2">
+                      <button
+                        className="rounded-full bg-yellow-100 p-2 hover:bg-yellow-200"
+                        onClick={() => {
+                          openPopup(row);
+                        }}
+                      >
+                        <PencilIcon className="h-4 w-4 text-yellow-600" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
           </tbody>
         </table>
+        {isLoading && (
+          <div className="flex items-center justify-center py-4">
+            <span>Loading...</span> {/* You can use a spinner here */}
+          </div>
+        )}
       </div>
       {selectedSetting && modalType && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
           <div className="w-[400px] rounded-lg bg-white p-6">
             <h2 className="mb-4 text-xl font-semibold">
-              Edit Setting: {selectedSetting.config}
+              Edit Setting: {selectedSetting.name}
             </h2>
             {modalType === 'number' && (
               <div>
@@ -194,7 +183,7 @@ export default function SettingTable() {
                 <textarea
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
-                  className="h-16 w-full rounded-lg border-2 border-gray-300 bg-white p-4 text-gray-700 shadow-md transition-all duration-300 ease-in-out placeholder:text-gray-400 hover:shadow-lg focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500"
+                  className="h-60 w-full rounded-lg border-2 border-gray-300 bg-white p-4 text-gray-700 shadow-md transition-all duration-300 ease-in-out placeholder:text-gray-400 hover:shadow-lg focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500"
                   placeholder="Enter your text here"
                   onInput={(e) => {
                     const textarea = e.target as HTMLTextAreaElement;
@@ -206,50 +195,28 @@ export default function SettingTable() {
               </div>
             )}
 
-            {modalType === 'cards' && (
-              <div>
-                {inputValue.split(';').map((item, index) => (
-                  <div key={index} className="mb-2">
-                    <textarea
-                      value={item}
-                      onChange={(e) => {
-                        const newValue = [...inputValue.split(';')];
-                        newValue[index] = e.target.value;
-                        setInputValue(newValue.join(';'));
-                      }}
-                      onInput={(e) => {
-                        const textarea = e.target as HTMLTextAreaElement;
-                        textarea.style.height = 'auto';
-                        textarea.style.height = `${textarea.scrollHeight}px`;
-                      }}
-                      className="w-full rounded border p-2"
-                      rows={3}
-                    />
-                  </div>
-                ))}
-              </div>
-            )}
-
             {modalType === 'toggle' && (
               <div className="flex items-center space-x-4">
                 <span className="text-sm">Attachment: </span>
                 <label className="relative inline-flex cursor-pointer items-center">
                   <input
                     type="checkbox"
-                    checked={inputValue === 'on'}
+                    checked={inputValue === 'true'}
                     onChange={() =>
-                      setInputValue(inputValue === 'on' ? 'off' : 'on')
+                      setInputValue(inputValue === 'true' ? 'false' : 'true')
                     }
                     className="sr-only"
                   />
                   <div
                     className={`h-6 w-11 rounded-full transition-colors duration-300 ease-in-out ${
-                      inputValue === 'on' ? 'bg-green-500' : 'bg-gray-200'
+                      inputValue === 'true' ? 'bg-green-500' : 'bg-gray-200'
                     }`}
                   >
                     <div
                       className={`${
-                        inputValue === 'on' ? 'translate-x-5' : 'translate-x-0'
+                        inputValue === 'true'
+                          ? 'translate-x-5'
+                          : 'translate-x-0'
                       } inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition-transform duration-300 ease-in-out`}
                     ></div>
                   </div>
@@ -271,7 +238,7 @@ export default function SettingTable() {
                   }}
                   className="scrollbar-thin scrollbar-thumb-blue-500 scrollbar-track-gray-100 h-32 w-full gap-2 rounded-xl border border-gray-300 bg-white p-3 text-gray-700 transition-all duration-300 ease-in-out hover:border-blue-300 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
-                  {fileTypes.map((type, index) => (
+                  {fileTypes?.map((type, index) => (
                     <option
                       key={index}
                       value={type.value}
@@ -292,7 +259,7 @@ export default function SettingTable() {
                 Cancel
               </button>
               <button
-                onClick={closePopup}
+                onClick={submit}
                 className="ml-2 rounded-lg bg-blue-500 px-4 py-2 text-white"
               >
                 Save

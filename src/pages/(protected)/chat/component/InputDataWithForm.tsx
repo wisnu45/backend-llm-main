@@ -8,7 +8,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { ArrowRightIcon, Cross2Icon } from '@radix-ui/react-icons';
 import clsx from 'clsx';
 import Cookies from 'js-cookie';
-import { Globe, Mic, Paperclip } from 'lucide-react';
+import { Globe, Mic, Paperclip, Columns4Icon } from 'lucide-react';
 import { useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { TSetPromptType } from '../page';
@@ -34,6 +34,7 @@ const InputDataWithForm = ({
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [popupFile, setPopupFile] = useState<File | null>(null);
   const defaultIsBrowse = Cookies.get('search_internet') === 'true';
+  const defaultIsCompanyPolicy = Cookies.get('is_company_policy') === 'true';
 
   // Combined mobile detection and scroll state
   const { shouldHideOnScroll } = useMobileScroll(50, scrollContainerRef);
@@ -46,7 +47,7 @@ const InputDataWithForm = ({
     handleSubmit,
     watch,
     setValue,
-    formState: { isValid },
+    formState: { isValid, errors },
     reset,
     trigger
   } = useForm<TChatFormData>({
@@ -55,12 +56,15 @@ const InputDataWithForm = ({
     defaultValues: {
       prompt: initialPrompt,
       attachments: [],
-      is_browse: defaultIsBrowse
+      with_document: [],
+      is_browse: defaultIsBrowse,
+      is_company_policy: defaultIsCompanyPolicy
     },
     mode: 'onChange'
   });
 
   const watchedAttachments = watch('attachments');
+  const watch_with_document = watch('with_document');
   const watchedPrompt = watch('prompt');
 
   const openPopup = (file: File) => {
@@ -73,12 +77,34 @@ const InputDataWithForm = ({
     setPopupFile(null);
   };
 
+  const convertFileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        resolve(reader.result as string); // Return Base64 string
+      };
+      reader.onerror = (error) => reject(error);
+      reader.readAsDataURL(file); // Convert file to Base64
+    });
+  };
+
   const handleFileDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     if (e.dataTransfer && e.dataTransfer.files) {
       const droppedFiles = Array.from(e.dataTransfer.files);
       const currentAttachments = watchedAttachments || [];
       setValue('attachments', [...currentAttachments, ...droppedFiles]);
+      Promise.all(droppedFiles.map((file) => convertFileToBase64(file)))
+        .then((base64Files) => {
+          // Mengupdate nilai 'with_document' setelah konversi selesai
+          setValue('with_document', [
+            ...(watch('with_document') || []),
+            ...base64Files
+          ]);
+        })
+        .catch((error) => {
+          console.error('Error converting files to Base64:', error);
+        });
     }
   };
 
@@ -88,6 +114,16 @@ const InputDataWithForm = ({
       const newFiles = Array.from(selectedFiles);
       const currentAttachments = watchedAttachments || [];
       setValue('attachments', [...currentAttachments, ...newFiles]);
+      Promise.all(newFiles.map((file) => convertFileToBase64(file)))
+        .then((base64Files) => {
+          setValue('with_document', [
+            ...(watch('with_document') || []),
+            ...base64Files
+          ]);
+        })
+        .catch((error) => {
+          console.error('Error converting files to Base64:', error);
+        });
     }
   };
 
@@ -99,15 +135,20 @@ const InputDataWithForm = ({
     const currentAttachments = watchedAttachments || [];
     const updatedAttachments = currentAttachments.filter((_, i) => i !== index);
     setValue('attachments', updatedAttachments);
+    const currentDocuments = watch('with_document') || [];
+    const updatedDocuments = currentDocuments.filter((_, i) => i !== index);
+    setValue('with_document', updatedDocuments);
   };
 
   const onFormSubmit = (data: TChatFormData) => {
+    console.log('testing', data);
     onSubmit(data);
-    // reset();
     reset({
       prompt: '',
       attachments: [],
-      is_browse: Cookies.get('search_internet') === 'true'
+      with_document: [],
+      is_browse: Cookies.get('search_internet') === 'true',
+      is_company_policy: Cookies.get('is_company_policy') === 'true'
     });
   };
 
@@ -138,7 +179,7 @@ const InputDataWithForm = ({
         (window as any).webkitSpeechRecognition;
       recognitionRef.current = new SpeechRecognition();
       recognitionRef.current.continuous = false;
-      recognitionRef.current.lang = 'id-ID'; // ✅ set bahasa Indonesia
+      recognitionRef.current.lang = 'id-ID';
       recognitionRef.current.interimResults = true;
 
       recognitionRef.current.onresult = (event: any) => {
@@ -263,7 +304,7 @@ const InputDataWithForm = ({
             )}
           />
 
-          <div className="mt-4 flex items-center justify-between text-sm text-gray-800">
+          <div className="mt-4 flex flex-col items-start justify-between text-sm text-gray-800 sm:flex-row sm:items-center">
             <div className="flex flex-col items-start gap-2 sm:flex-row sm:gap-2">
               <button
                 type="button"
@@ -285,6 +326,50 @@ const InputDataWithForm = ({
                   disabled={isLoading}
                 />
               </button>
+              <Controller
+                name="is_company_policy"
+                control={control}
+                render={({ field }) => {
+                  const { value, onChange } = field;
+                  return (
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <div
+                          className="group relative w-max cursor-pointer"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            if (!isLoading) {
+                              const newValue = !value;
+                              onChange(newValue);
+                              Cookies.set(
+                                'is_company_policy',
+                                newValue ? 'true' : 'false'
+                              );
+                            }
+                          }}
+                        >
+                          <div
+                            className={`flex items-center gap-2 rounded-xl px-4 py-2 shadow-md transition-all duration-300 ${
+                              value
+                                ? 'bg-[#772f8e] text-white hover:text-purple-200 hover:shadow-lg'
+                                : 'shadow-lg'
+                            }`}
+                          >
+                            <Columns4Icon className="h-5 w-5" />
+                            <span className="text-sm font-medium md:inline">
+                              Combiphar & Kebijakan Perusahaan
+                            </span>
+                          </div>
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent className="hidden sm:block">
+                        Search Combiphar & Kebijakan Perusahaan
+                      </TooltipContent>
+                    </Tooltip>
+                  );
+                }}
+              />
               <Controller
                 name="is_browse"
                 control={control}
@@ -312,10 +397,8 @@ const InputDataWithForm = ({
                             className={`flex items-center gap-2 rounded-xl px-4 py-2 shadow-md transition-all duration-300 ${
                               value
                                 ? 'bg-[#772f8e] text-white hover:text-purple-200 hover:shadow-lg'
-                                : ' shadow-lg'
-                            }
-                            // ${isLoading ? 'cursor-not-allowed opacity-50' : ''}
-                            `}
+                                : 'shadow-lg'
+                            }`}
                           >
                             <Globe className="h-5 w-5" />
                             <span className="text-sm font-medium">
@@ -332,7 +415,7 @@ const InputDataWithForm = ({
                 }}
               />
             </div>
-            <div className="flex items-center gap-3">
+            <div className="mt-3 flex w-full flex-col items-center gap-3 sm:mt-0 sm:w-auto sm:flex-row">
               <Tooltip>
                 <TooltipTrigger>
                   <button
@@ -357,16 +440,18 @@ const InputDataWithForm = ({
                   Ucapkan pertanyaanmu
                 </TooltipContent>
               </Tooltip>
-              <span className="text-sm text-gray-900">
-                {watchedPrompt?.length || 0}/1000
-              </span>
-              <button
-                type="submit"
-                disabled={!isValid || isLoading}
-                className="flex h-8 w-8 items-center justify-center rounded-md bg-[#7051f8] text-white transition hover:bg-[#5b3de4] disabled:cursor-not-allowed disabled:bg-gray-400"
-              >
-                <ArrowRightIcon />
-              </button>
+              <div className="mt-3 flex w-full items-center justify-end gap-2 sm:mt-0 sm:w-auto sm:justify-end">
+                <span className="text-sm text-gray-900">
+                  {watchedPrompt?.length || 0}/1000
+                </span>
+                <button
+                  type="submit"
+                  disabled={!isValid || isLoading}
+                  className="flex h-8 w-8 items-center justify-center rounded-md bg-[#7051f8] text-white transition hover:bg-[#5b3de4] disabled:cursor-not-allowed disabled:bg-gray-400"
+                >
+                  <ArrowRightIcon />
+                </button>
+              </div>
             </div>
           </div>
 

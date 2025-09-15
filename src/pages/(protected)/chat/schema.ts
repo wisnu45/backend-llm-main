@@ -6,7 +6,9 @@ export const ChatFormSchema = z.object({
     .min(1, { message: 'Prompt is required' })
     .max(1000, { message: 'Prompt must be less than 1000 characters' }),
   attachments: z.array(z.instanceof(File)).optional().default([]),
-  is_browse: z.boolean().default(false)
+  with_document: z.array(z.string()).optional().default([]),
+  is_browse: z.boolean().default(false),
+  is_company_policy: z.boolean().default(false)
 });
 
 export type TChatFormData = z.infer<typeof ChatFormSchema>;

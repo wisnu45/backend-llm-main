@@ -1,7 +1,29 @@
 import api from '@/lib/api';
-import { TResponseListSettings } from './type';
+import {
+  TRequestEditSetting,
+  TResponseListSettings,
+  TResponseSettingDocument
+} from './type';
+import { TDefaultResponse } from '@/commons/types/response';
 
 export const getFeatureSettings = async (): Promise<TResponseListSettings> => {
   const res = await api.get<TResponseListSettings>('/settings/feature');
+  return res.data;
+};
+
+export const getSettings = async (): Promise<TResponseSettingDocument> => {
+  const res = await api.get<TResponseSettingDocument>('/settings');
+  return res.data;
+};
+
+export const editSetting = async (
+  req: TRequestEditSetting,
+  params: { id: string }
+): Promise<TDefaultResponse> => {
+  const res = await api.put<TDefaultResponse>(`/setting/${params.id}`, req, {
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  });
   return res.data;
 };

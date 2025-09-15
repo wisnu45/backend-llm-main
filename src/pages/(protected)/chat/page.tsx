@@ -19,6 +19,7 @@ import { ModernLoadingIndicator } from './component/loading-indicator';
 import InputDataWithForm from './component/InputDataWithForm';
 import { TChatFormData } from './schema';
 import Cookies from 'js-cookie';
+import { useFetchSetting } from '../setting/_hook/use-fetch-setting';
 
 const promptSuggestions = [
   {
@@ -53,6 +54,16 @@ const ChatPage = () => {
   const createNewChat = useCreateNewChat();
   const queryHistorySideBar = useGetFiles();
 
+  const query = useFetchSetting();
+
+  const dataSetting = query?.data?.data || [];
+  const promsExample =
+    dataSetting.find((item) => item.name === 'prompt_example')?.value &&
+    JSON.parse(
+      dataSetting.find((item) => item.name === 'prompt_example')?.value || ''
+    );
+  const dataProms = promsExample ? promsExample : promptSuggestions;
+
   const navigate = useNavigate();
   const currentPath = useLocation().pathname;
 
@@ -70,7 +81,6 @@ const ChatPage = () => {
   const handleFormSubmit = async (formData: TChatFormData) => {
     const trimmedQuestion = formData.prompt.trim();
 
-    // Show preview before sending
     setPreviewPrompt(trimmedQuestion);
     setPreviewFiles(formData.attachments || []);
     setShowPreview(true);
@@ -93,6 +103,7 @@ const ChatPage = () => {
           session_id: sessionId,
           question: trimmedQuestion,
           is_browse: formData.is_browse,
+          is_company_policy: formData.is_company_policy,
           attachments: formData.attachments
         },
         {
@@ -145,14 +156,14 @@ const ChatPage = () => {
 
             <ScrollArea className="mb-2 w-full md:mb-8">
               <div className="flex w-full flex-col gap-4 py-2 md:w-max md:flex-row md:gap-4">
-                {promptSuggestions.map((prompt, index) => (
+                {dataProms?.map((prompt: any, index: number) => (
                   <div
                     key={index}
-                    onClick={() => handleClickItem(prompt.text)}
+                    onClick={() => handleClickItem(prompt.text || prompt)}
                     className="flex min-h-20 w-full shrink-0 cursor-pointer flex-col items-start rounded-md border border-gray-200 p-2 hover:bg-gray-50 md:w-52 md:rounded-lg md:p-4"
                   >
                     <p className="flex-1 text-xs text-gray-700 md:text-sm">
-                      {prompt.text}
+                      {prompt.text || prompt}
                     </p>
                     {prompt.icon}
                   </div>

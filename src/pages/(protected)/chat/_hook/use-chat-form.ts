@@ -26,6 +26,7 @@ export const useChatForm = ({ chatId }: UseChatFormProps) => {
       question: formData.prompt,
       session_id: chatId,
       is_browse: formData.is_browse,
+      is_company_policy: formData.is_company_policy,
       attachments: formData.attachments
     };
   };

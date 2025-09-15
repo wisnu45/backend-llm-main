@@ -10,3 +10,17 @@ export type TSetting = {
 };
 
 export type TResponseListSettings = TResponse<TSetting[]>;
+
+export type TSettingDocument = {
+  data_type: string;
+  description: string;
+  id: string;
+  name: string;
+  type: string;
+  unit: any | null;
+  value: string;
+};
+
+export type TResponseSettingDocument = TResponse<TSettingDocument[]>;
+
+export type TRequestEditSetting = FormData;
