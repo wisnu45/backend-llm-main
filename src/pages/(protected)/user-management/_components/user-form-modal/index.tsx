@@ -20,6 +20,13 @@ import {
 } from '@/components/ui/form';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/select';
 import { useEffect } from 'react';
 import {
   TRequestCreateUser,
@@ -171,20 +178,23 @@ const UserFormModal = ({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Role *</FormLabel>
-                  <FormControl>
-                    <div>
-                      <select
-                        {...field} // Menambahkan field control untuk select
-                        className="mt-2 w-full rounded border p-2"
-                      >
-                        <option value="">Select Username</option>
-
-                        {rolesChoise?.map((item) => (
-                          <option value={item.name}>{item.name}</option>
-                        ))}
-                      </select>
-                    </div>
-                  </FormControl>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select Role" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {rolesChoise?.map((item) => (
+                        <SelectItem key={item.id} value={item.name}>
+                          {item.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}

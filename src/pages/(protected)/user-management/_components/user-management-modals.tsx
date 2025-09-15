@@ -86,7 +86,8 @@ const UserManagementModals = ({
         defaultValues={{
           name: userDetailQuery.data?.data.name,
           username: userDetailQuery.data?.data.username,
-          is_portal: userDetailQuery.data?.data.is_portal
+          is_portal: userDetailQuery.data?.data.is_portal,
+          role: userDetailQuery.data?.data.role
         }}
       />
 
