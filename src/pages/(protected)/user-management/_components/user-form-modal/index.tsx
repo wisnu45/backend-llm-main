@@ -26,6 +26,7 @@ import {
   TRequestUpdateUser
 } from '@/api/user-management/type';
 import { Loader2 } from 'lucide-react';
+import useGetRoles from '../../_hooks/get-roles';
 
 interface Props {
   loading?: boolean;
@@ -61,7 +62,12 @@ const UserFormModal = ({
   });
 
   const handleSubmit = (data: TUserFormData) => {
-    // onSubmit(data);
+    const payload = {
+      ...data,
+      name: data.name ?? '',
+      password: data.password ?? ''
+    };
+    onSubmit(payload);
   };
 
   const watchPortalUser = form.watch('is_portal');
@@ -78,6 +84,17 @@ const UserFormModal = ({
       });
     }
   }, [defaultValues, form, open]);
+
+  const rolesQuery = useGetRoles({
+    search: '',
+    page: 1,
+    page_size: 10
+  });
+
+  const rolesChoise = rolesQuery?.data?.data.map((item) => ({
+    name: item.name,
+    id: item.id
+  }));
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -148,26 +165,52 @@ const UserFormModal = ({
                 </FormItem>
               )}
             />
+            <FormField
+              control={form.control}
+              name="role"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Role *</FormLabel>
+                  <FormControl>
+                    <div>
+                      <select
+                        {...field} // Menambahkan field control untuk select
+                        className="mt-2 w-full rounded border p-2"
+                      >
+                        <option value="">Select Username</option>
+
+                        {rolesChoise?.map((item) => (
+                          <option value={item.name}>{item.name}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             {mode === 'create' && (
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Password {!watchPortalUser && '*'}</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="password"
-                        placeholder="Enter password"
-                        disabled={watchPortalUser}
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <>
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Password {!watchPortalUser && '*'}</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="password"
+                          placeholder="Enter password"
+                          disabled={watchPortalUser}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </>
             )}
 
             <DialogFooter className="mt-2 sm:justify-start">
