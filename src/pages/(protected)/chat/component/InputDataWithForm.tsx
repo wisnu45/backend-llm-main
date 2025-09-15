@@ -47,7 +47,7 @@ const InputDataWithForm = ({
     handleSubmit,
     watch,
     setValue,
-    formState: { isValid, errors },
+    formState: { isValid },
     reset,
     trigger
   } = useForm<TChatFormData>({
@@ -64,7 +64,6 @@ const InputDataWithForm = ({
   });
 
   const watchedAttachments = watch('attachments');
-  const watch_with_document = watch('with_document');
   const watchedPrompt = watch('prompt');
 
   const openPopup = (file: File) => {
