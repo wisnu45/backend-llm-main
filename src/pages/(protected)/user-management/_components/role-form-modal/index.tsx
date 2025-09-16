@@ -120,48 +120,6 @@ const RoleFormModal = ({
               )}
             />
 
-            {/* <FormField
-              control={form.control}
-              name="is_local"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-center justify-between">
-                  <div className="space-y-0.5">
-                    <FormLabel className="text-base">Is Local</FormLabel>
-                    <p className="text-sm text-muted-foreground">
-                      Enable if this is a local role
-                    </p>
-                  </div>
-                  <FormControl>
-                    <Switch
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                </FormItem>
-              )}
-            /> */}
-            {/* 
-            <FormField
-              control={form.control}
-              name="is_portal"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-center justify-between">
-                  <div className="space-y-0.5">
-                    <FormLabel className="text-base">Is Portal</FormLabel>
-                    <p className="text-sm text-muted-foreground">
-                      Enable if this is a portal role
-                    </p>
-                  </div>
-                  <FormControl>
-                    <Switch
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                </FormItem>
-              )}
-            /> */}
-
             <DialogFooter className="mt-2 sm:justify-start">
               <Button type="submit" className="w-full" disabled={loading}>
                 {loading ? (
