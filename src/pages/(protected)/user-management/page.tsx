@@ -210,7 +210,7 @@ const UserManagementPage = () => {
                 </span>
               </TooltipTrigger>
               <TooltipContent className="hidden sm:block">
-                Username Tidak dapat dihapus
+                User Tidak dapat dihapus
               </TooltipContent>
             </Tooltip>
           ) : (
