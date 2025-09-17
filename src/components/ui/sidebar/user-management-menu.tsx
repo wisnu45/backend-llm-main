@@ -24,9 +24,9 @@ const UserManagementMenu = ({ isSidebarOpen }: Props) => {
             <PersonIcon className="font-bold" />
             <span className="truncate font-semibold">User Management</span>
           </div>
-          <div className="w-12 rounded-full bg-[#B9B7C5] p-1 text-center text-xs text-[#5C47DB]">
+          {/* <div className="w-12 rounded-full bg-[#B9B7C5] p-1 text-center text-xs text-[#5C47DB]">
             {queryUsers.data?.pagination?.total || 0}
-          </div>
+          </div> */}
         </div>
       ) : (
         <PersonIcon className="font-bold" />
