@@ -1,4 +1,3 @@
-import useGetUsers from '@/pages/(protected)/user-management/_hooks/get-users';
 import { PersonIcon } from '@radix-ui/react-icons';
 import { Link, useLocation } from 'react-router-dom';
 
@@ -7,7 +6,6 @@ interface Props {
 }
 
 const UserManagementMenu = ({ isSidebarOpen }: Props) => {
-  const queryUsers = useGetUsers();
   const location = useLocation();
   const isActive = location.pathname === '/user-management';
 
@@ -24,9 +22,6 @@ const UserManagementMenu = ({ isSidebarOpen }: Props) => {
             <PersonIcon className="font-bold" />
             <span className="truncate font-semibold">User Management</span>
           </div>
-          {/* <div className="w-12 rounded-full bg-[#B9B7C5] p-1 text-center text-xs text-[#5C47DB]">
-            {queryUsers.data?.pagination?.total || 0}
-          </div> */}
         </div>
       ) : (
         <PersonIcon className="font-bold" />
