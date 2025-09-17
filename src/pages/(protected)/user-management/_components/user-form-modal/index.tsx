@@ -87,6 +87,7 @@ const UserFormModal = ({
         name: '',
         username: '',
         password: '',
+        role: '',
         roles_id: '',
         is_portal: false
       });

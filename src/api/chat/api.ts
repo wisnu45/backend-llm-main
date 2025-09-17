@@ -43,7 +43,7 @@ export const newChat = async (): Promise<TNewSesionResponse> => {
 };
 
 export const getHistory = async (): Promise<TGetHistoryRequest> => {
-  const res = await api.get<TGetHistoryRequest>('/chats/history');
+  const res = await api.get<TGetHistoryRequest>('/chats');
   return res.data;
 };
 

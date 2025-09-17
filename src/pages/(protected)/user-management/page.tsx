@@ -17,6 +17,12 @@ import useGetUsers from './_hooks/get-users';
 
 import { TRole, TUser } from '@/api/user-management/type';
 
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger
+} from '@/components/ui/tooltip';
+
 type TModal =
   | 'delete-user'
   | 'delete-role'
@@ -193,16 +199,28 @@ const UserManagementPage = () => {
           >
             Edit
           </Button>
-          <Button
-            variant="ghost"
-            disabled={
-              row.original.username === 'admin' ||
-              row.original.username === 'user'
-            }
-            onClick={() => setModal('delete-user', row.original)}
-          >
-            Delete
-          </Button>
+
+          {row.original.is_protected ? (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span>
+                  <Button variant="ghost" disabled>
+                    Delete
+                  </Button>
+                </span>
+              </TooltipTrigger>
+              <TooltipContent className="hidden sm:block">
+                Username Tidak dapat dihapus
+              </TooltipContent>
+            </Tooltip>
+          ) : (
+            <Button
+              variant="ghost"
+              onClick={() => setModal('delete-user', row.original)}
+            >
+              Delete
+            </Button>
+          )}
         </div>
       )
     }
@@ -267,6 +285,40 @@ const UserManagementPage = () => {
     //     </div>
     //   )
     // },
+    // {
+    //   header: 'Action',
+    //   cell: ({ row }) => (
+    //     <div className="flex space-x-2">
+    //       <Button
+    //         variant="ghost"
+    //         onClick={() => setModal('detail-role', null, row.original)}
+    //       >
+    //         View
+    //       </Button>
+    //       <Button
+    //         variant="ghost"
+    //         onClick={() => setModal('edit-role', null, row.original)}
+    //       >
+    //         Edit
+    //       </Button>
+    //       <Button
+    //         variant="ghost"
+    //         onClick={() => setModal('setting-role', null, row.original)}
+    //       >
+    //         Setting
+    //       </Button>
+    //       <Button
+    //         variant="ghost"
+    //         disabled={
+    //           row.original.name === 'admin' || row.original.name === 'user'
+    //         }
+    //         onClick={() => setModal('delete-role', null, row.original)}
+    //       >
+    //         Delete
+    //       </Button>
+    //     </div>
+    //   )
+    // }
     {
       header: 'Action',
       cell: ({ row }) => (
@@ -283,21 +335,35 @@ const UserManagementPage = () => {
           >
             Edit
           </Button>
+
           <Button
             variant="ghost"
             onClick={() => setModal('setting-role', null, row.original)}
           >
             Setting
           </Button>
-          <Button
-            variant="ghost"
-            disabled={
-              row.original.name === 'admin' || row.original.name === 'user'
-            }
-            onClick={() => setModal('delete-role', null, row.original)}
-          >
-            Delete
-          </Button>
+
+          {row.original.is_protected ? (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span>
+                  <Button variant="ghost" disabled>
+                    Delete
+                  </Button>
+                </span>
+              </TooltipTrigger>
+              <TooltipContent className="hidden sm:block">
+                Role Tidak dapat dihapus
+              </TooltipContent>
+            </Tooltip>
+          ) : (
+            <Button
+              variant="ghost"
+              onClick={() => setModal('delete-user', null, row.original)}
+            >
+              Delete
+            </Button>
+          )}
         </div>
       )
     }

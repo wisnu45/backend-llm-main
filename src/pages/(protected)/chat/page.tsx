@@ -57,11 +57,13 @@ const ChatPage = () => {
   const query = useFetchSetting();
 
   const dataSetting = query?.data?.data || [];
+  const promptValue = dataSetting.find(
+    (item) => item.name === 'Prompt example'
+  )?.value;
   const promsExample =
-    dataSetting.find((item) => item.name === 'prompt_example')?.value &&
-    JSON.parse(
-      dataSetting.find((item) => item.name === 'prompt_example')?.value || ''
-    );
+    typeof promptValue === 'string' && promptValue.trim() !== ''
+      ? JSON.parse(promptValue)
+      : undefined;
   const dataProms = promsExample ? promsExample : promptSuggestions;
 
   const navigate = useNavigate();

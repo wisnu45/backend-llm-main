@@ -10,6 +10,7 @@ import { SessionUser } from '@/lib/local-storage';
 import { useLogin } from '@/hooks/auth/use-login';
 import { useLoginSSO } from '@/hooks/auth/login-sso';
 import { TErrorResponse } from '@/commons/types/response';
+import { getRoleById } from '@/api/user-management/api';
 
 type Session = {
   signin: (payload: TLoginRequest) => void;
@@ -76,15 +77,10 @@ const SessionProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
 
     try {
       const res = await loginMutation.mutateAsync(payload);
+
+      console.log('CEK DISINI', res);
       setSessionData({
         access_token: res.data.access_token,
-        refresh_token: res.data.refresh_token
-      });
-      SessionToken.set({
-        access_token: res.data.access_token,
-        username: res.data.userdata.username,
-        role: res.data.userdata.role,
-        name: res.data.userdata.name,
         refresh_token: res.data.refresh_token
       });
       setStatus('authenticated');
@@ -102,30 +98,33 @@ const SessionProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
 
     try {
       const res = await loginSSO.mutateAsync(payload);
-      setSessionData({
-        access_token: res.data.access_token,
-        refresh_token: res.data.refresh_token
-      });
+      const { access_token, refresh_token, userdata } = res.data;
+      let roleName = userdata.role;
+      try {
+        const roleDetail = await getRoleById(userdata.roles_id, access_token);
+        roleName = roleDetail?.data?.name || roleName;
+      } catch (err) {
+        console.error('Failed to fetch role detail:', err);
+      }
+      setSessionData({ access_token, refresh_token });
       SessionToken.set({
-        access_token: res.data.access_token,
-        username: res.data.userdata.username,
-        role: res.data.userdata.role,
-        name: res.data.userdata.name,
-        refresh_token: res.data.refresh_token
+        access_token,
+        refresh_token,
+        username: userdata.username,
+        name: userdata.name,
+        role: roleName,
+        roles_id: userdata.roles_id
       });
       setStatus('authenticated');
       setErrorMessage(null);
       navigate('/chat', { replace: true });
-
       return res;
     } catch (error) {
       const err = error as TErrorResponse;
       const message = err.response?.data.message || error;
 
       setStatus('unauthenticated');
-      navigate(`/auth/signin?error=${message}`, {
-        replace: true
-      });
+      navigate(`/auth/signin?error=${message}`, { replace: true });
     }
   };
 

@@ -29,7 +29,12 @@ async function refreshAccessToken() {
   if (!refreshToken) return null;
 
   try {
-    const { username = '', name = '', role = '' } = Cookies.get();
+    const {
+      username = '',
+      name = '',
+      role = '',
+      roles_id = ''
+    } = Cookies.get();
 
     const response = await axios.post(
       `${import.meta.env.VITE_API_ENDPOINT}/auth/refresh`,
@@ -44,7 +49,8 @@ async function refreshAccessToken() {
       refresh_token: refreshToken,
       username,
       name,
-      role
+      role,
+      roles_id
     });
 
     return newAccessToken;

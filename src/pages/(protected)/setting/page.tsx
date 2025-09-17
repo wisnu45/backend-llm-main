@@ -1,7 +1,7 @@
 import { PencilIcon } from 'lucide-react';
 import { useState } from 'react';
 import { useFetchSetting } from './_hook/use-fetch-setting';
-import { TSettingDocument } from '@/api/settings/type';
+import { TSettingDocument, TSettingInput } from '@/api/settings/type';
 import useEditSetting from './_hook/use-mutate-edit-setting';
 
 export default function SettingTable() {
@@ -9,6 +9,7 @@ export default function SettingTable() {
     useState<TSettingDocument | null>(null);
   const [modalType, setModalType] = useState<string | null>(null);
   const [inputValue, setInputValue] = useState<string>('');
+  const [inputValueBoolean, setInputValueBoolean] = useState<boolean>(false);
 
   const query = useFetchSetting();
   const mutate = useEditSetting(selectedSetting?.id || '');
@@ -19,58 +20,53 @@ export default function SettingTable() {
 
   const openPopup = (row: TSettingDocument) => {
     setSelectedSetting(row);
-    setInputValue(row.value);
+    setInputValue(String(row.value));
 
-    if (
-      row.name === 'chat_max_text' ||
-      row.name === 'max_chat_topic' ||
-      row.name === 'chat_topic_expired_days' ||
-      row.name === 'max_chats'
-    ) {
+    if (row.data_type === 'integer') {
       setModalType('number');
-    } else if (row.name === 'chat_greeting') {
+    } else if (row.data_type === 'string' || row.data_type === 'array') {
       setModalType('text');
-    } else if (
-      row.name === 'prompt_example' ||
-      row.name === 'attachment_file_types'
-    ) {
-      setModalType('text');
-    } else if (row.name === 'attachment') {
+    } else if (row.data_type === 'boolean') {
       setModalType('toggle');
     }
   };
+  const openPopupBoolean = (row: TSettingDocument) => {
+    setSelectedSetting(row);
+    setInputValueBoolean(Boolean(row.value));
+    setModalType('toggle');
+  };
 
   const submit = () => {
-    if (selectedSetting) {
-      let data = inputValue;
-      if (selectedSetting.data_type === 'array') {
+    if (!selectedSetting) return;
+    let data: any = inputValue;
+    try {
+      if (selectedSetting.data_type === 'boolean') {
+        data = inputValueBoolean;
+      } else if (selectedSetting.data_type === 'array') {
         data = JSON.parse(inputValue);
+      } else {
+        data = inputValue; // default untuk tipe lain
       }
-      const updatedSetting = {
-        ...selectedSetting,
-        value: data
-      };
-      const formData = new FormData();
-      Object.entries(updatedSetting).forEach(([key, value]) => {
-        if (Array.isArray(value)) {
-          value.forEach((item) => {
-            formData.append(`${key}[]`, item);
-          });
-        } else {
-          formData.append(key, value);
-        }
-      });
-      mutate.mutate(formData, {
-        onSuccess: () => {
-          setSelectedSetting(null);
-          setModalType(null);
-          console.log('Mutation successful!');
-        },
-        onError: (error) => {
-          console.error('Mutation failed:', error);
-        }
-      });
+    } catch (err) {
+      console.error('Invalid JSON input:', err);
+      return;
     }
+    const updatedSetting: TSettingInput = {
+      ...selectedSetting,
+      value: data
+    };
+    mutate.mutate(updatedSetting, {
+      onSuccess: () => {
+        setSelectedSetting(null);
+        setModalType(null);
+        console.log('Mutation successful!');
+      },
+      onError: (error) => {
+        setSelectedSetting(null);
+        setModalType(null);
+        console.error('Mutation failed:', error);
+      }
+    });
   };
 
   const closePopup = () => {
@@ -127,17 +123,26 @@ export default function SettingTable() {
                   <td className="px-4 py-3 text-sm">
                     {row.data_type === 'array' ? (
                       <>
-                        {JSON.parse(row.value).map(
-                          (item: string, index: number) => (
-                            <div key={index}>
-                              {item},
-                              <br key={index} />
-                            </div>
-                          )
-                        )}
+                        {typeof row.value === 'string' &&
+                        Array.isArray(JSON.parse(row.value))
+                          ? JSON.parse(row.value).map(
+                              (item: string, index: number) => (
+                                <div key={index}>
+                                  {item},
+                                  <br key={index} />
+                                </div>
+                              )
+                            )
+                          : null}
                       </>
                     ) : (
-                      <span>{row.value}</span>
+                      <span>
+                        {row.data_type === 'boolean'
+                          ? row.value
+                            ? 'ON'
+                            : 'OFF'
+                          : row.value}
+                      </span>
                     )}
                   </td>
                   <td className="px-4 py-3">
@@ -145,7 +150,9 @@ export default function SettingTable() {
                       <button
                         className="rounded-full bg-yellow-100 p-2 hover:bg-yellow-200"
                         onClick={() => {
-                          openPopup(row);
+                          row.data_type === 'boolean'
+                            ? openPopupBoolean(row)
+                            : openPopup(row);
                         }}
                       >
                         <PencilIcon className="h-4 w-4 text-yellow-600" />
@@ -201,22 +208,18 @@ export default function SettingTable() {
                 <label className="relative inline-flex cursor-pointer items-center">
                   <input
                     type="checkbox"
-                    checked={inputValue === 'true'}
-                    onChange={() =>
-                      setInputValue(inputValue === 'true' ? 'false' : 'true')
-                    }
+                    checked={inputValueBoolean}
+                    onChange={() => setInputValueBoolean(!inputValueBoolean)}
                     className="sr-only"
                   />
                   <div
                     className={`h-6 w-11 rounded-full transition-colors duration-300 ease-in-out ${
-                      inputValue === 'true' ? 'bg-green-500' : 'bg-gray-200'
+                      inputValueBoolean ? 'bg-green-500' : 'bg-gray-200'
                     }`}
                   >
                     <div
                       className={`${
-                        inputValue === 'true'
-                          ? 'translate-x-5'
-                          : 'translate-x-0'
+                        inputValueBoolean ? 'translate-x-5' : 'translate-x-0'
                       } inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition-transform duration-300 ease-in-out`}
                     ></div>
                   </div>

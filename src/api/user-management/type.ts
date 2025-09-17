@@ -6,6 +6,8 @@ export type TRole = {
   description: string;
   is_local: boolean;
   is_portal: boolean;
+  is_protected: boolean;
+  data?: TRole;
 };
 
 export type TUser = {
@@ -14,6 +16,7 @@ export type TUser = {
   name: string;
   username: string;
   role: string;
+  is_protected: boolean;
   created_at: string;
   updated_at: string;
 };
