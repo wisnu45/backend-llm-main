@@ -10,5 +10,6 @@ export interface ChatItemData {
   created_at: string | Date;
   file_links?: FileLink[];
   session_id: string;
+  chat_id: string;
   feedback: '1' | '-1' | null;
 }

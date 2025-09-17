@@ -17,7 +17,7 @@ const isRecentMessage = (createdAt: string | Date) => {
 };
 
 export const ChatItem = ({ data }: ChatItemProps) => {
-  const { question, answer, created_at, file_links, id, session_id, feedback } =
+  const { question, answer, created_at, file_links, id, chat_id, feedback } =
     data;
   const cleanedAnswer = (answer ?? '')
     .replace(/([.])\n(?=•)/g, '$1\n\n')
@@ -51,7 +51,7 @@ export const ChatItem = ({ data }: ChatItemProps) => {
             <IconBar
               text={answer}
               id={id}
-              session_id={session_id}
+              session_id={chat_id}
               feedback={feedback}
             />
           </>

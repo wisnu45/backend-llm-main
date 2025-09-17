@@ -71,6 +71,7 @@ export interface Daum {
   id: string;
   question: string;
   session_id: string;
+  chat_id: string;
   user_id: string;
   source_documents: string;
   file_links: {
