@@ -66,19 +66,30 @@ api.interceptors.response.use(
     const originalRequest = error.config as typeof error.config & {
       _retry?: boolean;
     };
+    //   if (error.response?.status === 401 && !originalRequest?._retry) {
+    //     originalRequest._retry = true;
 
-    console.log('CEK', originalRequest);
+    //     const newToken = await refreshAccessToken();
+
+    //     if (newToken) {
+    //       originalRequest.headers.Authorization = `Bearer ${newToken}`;
+    //       return api(originalRequest);
+    //     } else {
+    //       SessionToken.remove();
+    //       Cookies.remove('refresh_token');
+    //       window.location.href =
+    //         '/auth/signin?error=Session expired. Please log in again.';
+    //     }
+    //   }
+
+    //   return Promise.reject(error);
     if (error.response?.status === 401 && !originalRequest?._retry) {
       originalRequest._retry = true;
 
-      const newToken = await refreshAccessToken();
-
-      if (newToken) {
-        originalRequest.headers.Authorization = `Bearer ${newToken}`;
+      try {
+        await api.post('/auth/refresh', {}, { withCredentials: true });
         return api(originalRequest);
-      } else {
-        SessionToken.remove();
-        Cookies.remove('refresh_token');
+      } catch (refreshError) {
         window.location.href =
           '/auth/signin?error=Session expired. Please log in again.';
       }

@@ -7,7 +7,9 @@ import {
 } from './type';
 
 export const login = async (req: TLoginRequest): Promise<TLoginResponse> => {
-  const res = await baseAxios.post<TLoginResponse>('/auth/login', req);
+  const res = await baseAxios.post<TLoginResponse>('/auth/login', req, {
+    withCredentials: true
+  });
   return res.data;
 };
 
