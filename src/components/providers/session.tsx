@@ -17,7 +17,7 @@ type Session = {
   signout: () => void;
   updateSession: (data: TLoginResponse['data']['userdata']) => void;
   session?: {
-    refresh_token: string;
+    // refresh_token: string;
     access_token: string;
   };
   status?: 'authenticated' | 'authenticating' | 'unauthenticated';
@@ -77,10 +77,9 @@ const SessionProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     try {
       const res = await loginMutation.mutateAsync(payload);
 
-      console.log('CEK DISINI', res);
       setSessionData({
-        access_token: res.data.access_token,
-        refresh_token: res.data.refresh_token
+        access_token: res.data.access_token
+        // refresh_token: res.data.refresh_token
       });
       setStatus('authenticated');
       setErrorMessage(null);
@@ -97,11 +96,11 @@ const SessionProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
 
     try {
       const res = await loginSSO.mutateAsync(payload);
-      const { access_token, refresh_token, userdata } = res.data;
-      setSessionData({ access_token, refresh_token });
+      const { access_token, userdata } = res.data;
+      setSessionData({ access_token });
       SessionToken.set({
         access_token,
-        refresh_token,
+        // refresh_token,
         username: userdata.username,
         name: userdata.name,
         role: userdata.role.name,

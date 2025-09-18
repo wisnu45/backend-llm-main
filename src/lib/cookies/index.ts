@@ -2,7 +2,7 @@ import Cookies from 'js-cookie';
 
 type TCookies = {
   access_token: string;
-  refresh_token: string;
+  // refresh_token: string;
   username: string;
   role: string;
   roles_id: string;
@@ -16,7 +16,7 @@ export const SessionToken = {
     Cookies.set('name', values.name);
     Cookies.set('role', values.role);
     Cookies.set('roles_id', values.roles_id);
-    Cookies.set('refresh_token', values.refresh_token);
+    // Cookies.set('refresh_token', values.refresh_token);
   },
   get: (): string | undefined => {
     const token = Cookies.get('token');
