@@ -1,5 +1,5 @@
 import axios, { AxiosError } from 'axios';
-import Cookies from 'js-cookie';
+// import Cookies from 'js-cookie';
 import { SessionToken } from './cookies'; // penyimpanan access_token
 
 const api = axios.create({
