@@ -102,7 +102,7 @@ const UserFormModal = ({
 
   const rolesChoise = rolesQuery?.data?.data.map((item) => ({
     name: item.name,
-    id: item.id
+    value_id: item.id
   }));
 
   return (
@@ -190,8 +190,11 @@ const UserFormModal = ({
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {rolesChoise?.map((item) => (
-                        <SelectItem key={item.id} value={item.name}>
+                      {rolesChoise?.map((item, index) => (
+                        <SelectItem
+                          key={index}
+                          value={item.value_id?.toString() ?? ''}
+                        >
                           {item.name}
                         </SelectItem>
                       ))}
@@ -202,28 +205,28 @@ const UserFormModal = ({
               )}
             />
 
-            {mode === 'create' && (
-              <>
-                <FormField
-                  control={form.control}
-                  name="password"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Password {!watchPortalUser && '*'}</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="password"
-                          placeholder="Enter password"
-                          disabled={watchPortalUser}
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </>
-            )}
+            {/* {mode === 'create' && ( */}
+            <>
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Password {!watchPortalUser && '*'}</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="password"
+                        placeholder="Enter password"
+                        disabled={watchPortalUser}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </>
+            {/* )} */}
 
             <DialogFooter className="mt-2 sm:justify-start">
               <Button type="submit" className="w-full" disabled={loading}>

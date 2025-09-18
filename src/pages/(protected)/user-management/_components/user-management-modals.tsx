@@ -14,6 +14,7 @@ import RoleFormModal from './role-form-modal';
 import RoleSettingsModal from './role-settings-modal';
 import UserDetailModal from './user-detail-modal';
 import UserFormModal from './user-form-modal';
+import { toast } from '@/components/ui/use-toast';
 
 type TModal =
   | 'delete-user'
@@ -67,7 +68,23 @@ const UserManagementModals = ({
         onOpenChange={() => setModal(null)}
         onSubmit={(data) => {
           createUserMutation.mutate(data as TRequestCreateUser, {
-            onSuccess: () => setModal(null)
+            onSuccess: () => setModal(null),
+            onError: (error: unknown) => {
+              let errorMessage = 'An unexpected error occurred';
+              if (
+                typeof error === 'object' &&
+                error !== null &&
+                'response' in error &&
+                typeof (error as any).response?.data?.error === 'string'
+              ) {
+                errorMessage = (error as any).response.data.error;
+              }
+              toast({
+                title: 'Failed to Create User',
+                description: errorMessage,
+                variant: 'destructive'
+              });
+            }
           });
         }}
       />
@@ -80,7 +97,23 @@ const UserManagementModals = ({
         onOpenChange={() => setModal(null)}
         onSubmit={(data) => {
           updateUserMutation.mutate(data, {
-            onSuccess: () => setModal(null)
+            onSuccess: () => setModal(null),
+            onError: (error: unknown) => {
+              let errorMessage = 'An unexpected error occurred';
+              if (
+                typeof error === 'object' &&
+                error !== null &&
+                'response' in error &&
+                typeof (error as any).response?.data?.error === 'string'
+              ) {
+                errorMessage = (error as any).response.data.error;
+              }
+              toast({
+                title: 'Failed to Create User',
+                description: errorMessage,
+                variant: 'destructive'
+              });
+            }
           });
         }}
         defaultValues={{

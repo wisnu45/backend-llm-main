@@ -39,7 +39,7 @@ export const updateUser = async (
   req: TRequestUpdateUser,
   params: { id: string }
 ): Promise<TDefaultResponse> => {
-  const res = await api.patch<TDefaultResponse>(`/user/${params.id}`, req);
+  const res = await api.put<TDefaultResponse>(`/user/${params.id}`, req);
   return res.data;
 };
 

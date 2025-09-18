@@ -45,7 +45,9 @@ export const CreateUserSchema = BaseUserSchemaObject.extend({
   }
 });
 
-export const EditUserSchema = BaseUserSchemaObject.superRefine((data, ctx) => {
+export const EditUserSchema = BaseUserSchemaObject.extend({
+  password: z.string().optional()
+}).superRefine((data, ctx) => {
   if (!data.is_portal && (!data.name || data.name.trim() === '')) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
@@ -58,5 +60,4 @@ export const EditUserSchema = BaseUserSchemaObject.superRefine((data, ctx) => {
 export const UserFormSchema = BaseUserSchemaObject.extend({
   password: z.string().optional()
 });
-
 export type TUserFormData = z.infer<typeof UserFormSchema>;
