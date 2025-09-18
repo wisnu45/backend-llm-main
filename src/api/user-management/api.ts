@@ -81,15 +81,3 @@ export const deleteRole = async (params: {
   const res = await api.delete<TDefaultResponse>(`/role/${params.id}`);
   return res.data;
 };
-
-export const getRoleById = async (
-  roleId: string | number,
-  accessToken: string
-): Promise<TRole> => {
-  const res = await api.get<TRole>(`/role/${roleId}`, {
-    headers: {
-      Authorization: `Bearer ${accessToken}`
-    }
-  });
-  return res.data;
-};

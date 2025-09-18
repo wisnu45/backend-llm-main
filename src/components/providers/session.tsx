@@ -10,7 +10,6 @@ import { SessionUser } from '@/lib/local-storage';
 import { useLogin } from '@/hooks/auth/use-login';
 import { useLoginSSO } from '@/hooks/auth/login-sso';
 import { TErrorResponse } from '@/commons/types/response';
-import { getRoleById } from '@/api/user-management/api';
 
 type Session = {
   signin: (payload: TLoginRequest) => void;
@@ -99,21 +98,14 @@ const SessionProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     try {
       const res = await loginSSO.mutateAsync(payload);
       const { access_token, refresh_token, userdata } = res.data;
-      let roleName = userdata.role;
-      try {
-        const roleDetail = await getRoleById(userdata.roles_id, access_token);
-        roleName = roleDetail?.data?.name || roleName;
-      } catch (err) {
-        console.error('Failed to fetch role detail:', err);
-      }
       setSessionData({ access_token, refresh_token });
       SessionToken.set({
         access_token,
         refresh_token,
         username: userdata.username,
         name: userdata.name,
-        role: roleName,
-        roles_id: userdata.roles_id
+        role: userdata.role.name,
+        roles_id: userdata.role.id
       });
       setStatus('authenticated');
       setErrorMessage(null);

@@ -12,7 +12,10 @@ export type TLoginResponse = {
     token_type: string;
     expires_in: number;
     userdata: {
-      role: string;
+      role: {
+        id: string;
+        name: string;
+      };
       roles_id: string;
       username: string;
       name: string;
