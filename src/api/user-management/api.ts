@@ -8,7 +8,6 @@ import {
   TResponseDetailUser,
   TResponseListRoles,
   TResponseListUsers,
-  TRole,
   TRoleParams,
   TUserParams
 } from './type';
