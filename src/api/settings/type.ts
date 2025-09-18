@@ -1,14 +1,14 @@
 import { TResponse } from '@/commons/types/response';
 
 export type TSetting = {
-  id: string;
-  name: string;
-  description: string;
-  input: string;
-  type: string;
-  unit: string | null;
   data_type: string;
-  value: string;
+  description: string;
+  name: string;
+  role_id: string;
+  setting_id: string;
+  type: string;
+  unit: string;
+  value: boolean | string | number;
 };
 
 export type TResponseListSettings = TResponse<TSetting[]>;
