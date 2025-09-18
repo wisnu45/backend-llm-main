@@ -24,41 +24,41 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-async function refreshAccessToken() {
-  const refreshToken = Cookies.get('refresh_token');
-  if (!refreshToken) return null;
+// async function refreshAccessToken() {
+//   const refreshToken = Cookies.get('refresh_token');
+//   if (!refreshToken) return null;
 
-  try {
-    const {
-      username = '',
-      name = '',
-      role = '',
-      roles_id = ''
-    } = Cookies.get();
+//   try {
+//     const {
+//       username = '',
+//       name = '',
+//       role = '',
+//       roles_id = ''
+//     } = Cookies.get();
 
-    const response = await axios.post(
-      `${import.meta.env.VITE_API_ENDPOINT}/auth/refresh`,
-      { refresh_token: refreshToken },
-      { headers: { 'Content-Type': 'application/json' } }
-    );
+//     const response = await axios.post(
+//       `${import.meta.env.VITE_API_ENDPOINT}/auth/refresh`,
+//       { refresh_token: refreshToken },
+//       { headers: { 'Content-Type': 'application/json' } }
+//     );
 
-    const newAccessToken = response.data.data.access_token;
+//     const newAccessToken = response.data.data.access_token;
 
-    SessionToken.set({
-      access_token: newAccessToken,
-      refresh_token: refreshToken,
-      username,
-      name,
-      role,
-      roles_id
-    });
+//     SessionToken.set({
+//       access_token: newAccessToken,
+//       refresh_token: refreshToken,
+//       username,
+//       name,
+//       role,
+//       roles_id
+//     });
 
-    return newAccessToken;
-  } catch (err) {
-    console.error('Refresh token failed:', err);
-    return null;
-  }
-}
+//     return newAccessToken;
+//   } catch (err) {
+//     console.error('Refresh token failed:', err);
+//     return null;
+//   }
+// }
 
 api.interceptors.response.use(
   (response) => response,
