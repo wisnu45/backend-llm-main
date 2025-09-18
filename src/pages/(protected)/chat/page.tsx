@@ -106,7 +106,8 @@ const ChatPage = () => {
           question: trimmedQuestion,
           is_browse: formData.is_browse,
           is_company_policy: formData.is_company_policy,
-          attachments: formData.attachments
+          attachments: formData.attachments,
+          with_document: formData.with_document
         },
         {
           onSuccess: () => {
