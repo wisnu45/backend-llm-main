@@ -168,6 +168,7 @@ const RoleSettingsModal = ({
                                     </div>
                                   ) : (
                                     <Input
+                                      type="number"
                                       value={field.value?.toString() || ''}
                                       onChange={(e) =>
                                         field.onChange(e.target.value)
