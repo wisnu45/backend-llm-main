@@ -1,6 +1,8 @@
 import { Button } from '@/components/ui/button';
 import { toast } from '@/components/ui/use-toast';
 import { MagnifyingGlassIcon } from '@radix-ui/react-icons';
+import useGetDocumentFromPortal from '../_hooks/get-doument-from-portal';
+import { TErrorResponse } from '@/commons/types/response';
 
 type TModal = 'delete' | 'edit' | 'create' | 'detail' | null;
 
@@ -11,6 +13,27 @@ interface IFilesPageHeader {
 }
 
 const FilesPageHeader = ({ setModal, setInput, tab }: IFilesPageHeader) => {
+  const { mutateAsync, isPending } = useGetDocumentFromPortal();
+
+  const handleSyncPortal = async () => {
+    try {
+      const res = await mutateAsync();
+      if (res) {
+        toast({
+          title: 'Success',
+          description: 'Documents synced successfully from portal.'
+        });
+      }
+    } catch (error) {
+      const err = error as TErrorResponse;
+      console.log('CEK CEK123 ');
+      toast({
+        title: 'Error',
+        description: `Failed to sync documents. ${err.response?.data.message}`,
+        variant: 'destructive'
+      });
+    }
+  };
   return (
     <>
       <div className="mb-8 flex flex-wrap items-center justify-between">
@@ -39,15 +62,9 @@ const FilesPageHeader = ({ setModal, setInput, tab }: IFilesPageHeader) => {
         <div className="flex gap-3">
           <Button
             className={`w-full bg-red-400 hover:bg-red-600 sm:w-auto ${tab !== 'metadata' ? 'hidden' : ''}`}
-            onClick={() =>
-              toast({
-                title: 'Featur cooming soon',
-                description: 'Saat ini sedang di kerjakan',
-                variant: 'destructive'
-              })
-            }
+            onClick={handleSyncPortal}
           >
-            Sync Portal
+            {isPending ? 'Syncing...' : 'Sync Portal'}
           </Button>
           <Button
             className="w-full bg-green-500 hover:bg-green-600 sm:w-auto"
