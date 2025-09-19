@@ -13,6 +13,7 @@ import { useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { TSetPromptType } from '../page';
 import { ChatFormSchema, TChatFormData } from '../schema';
+import { toast } from '@/components/ui/use-toast';
 
 interface InputDataWithFormProps {
   onSubmit: (data: TChatFormData) => void;
@@ -91,6 +92,21 @@ const InputDataWithForm = ({
     e.preventDefault();
     if (e.dataTransfer && e.dataTransfer.files) {
       const droppedFiles = Array.from(e.dataTransfer.files);
+      const validFiles = droppedFiles.filter((file) => {
+        if (file.size > 2 * 1024 * 1024) {
+          toast({
+            variant: 'destructive',
+            title: 'Upload gagal',
+            description: `File "${file.name}" terlalu besar (max 2 MB).`
+          });
+          return false;
+        }
+        return true;
+      });
+
+      if (validFiles.length === 0) {
+        return; // semua file invalid → stop
+      }
       const currentAttachments = watchedAttachments || [];
       setValue('attachments', [...currentAttachments, ...droppedFiles]);
       Promise.all(droppedFiles.map((file) => convertFileToBase64(file)))
