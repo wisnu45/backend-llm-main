@@ -25,9 +25,6 @@ api.interceptors.request.use((config) => {
 });
 
 async function refreshAccessToken() {
-  const refreshToken = Cookies.get('refresh_token');
-  if (!refreshToken) return null;
-
   try {
     const {
       username = '',
@@ -38,8 +35,9 @@ async function refreshAccessToken() {
 
     const response = await axios.post(
       `${import.meta.env.VITE_API_ENDPOINT}/auth/refresh`,
-      { refresh_token: refreshToken },
-      { headers: { 'Content-Type': 'application/json' } }
+      {},
+      { withCredentials: true }
+      // { headers: { 'Content-Type': 'application/json' } },
     );
 
     const newAccessToken = response.data.data.access_token;
@@ -65,6 +63,7 @@ api.interceptors.response.use(
     const originalRequest = error.config as typeof error.config & {
       _retry?: boolean;
     };
+
     if (error.response?.status === 401 && !originalRequest?._retry) {
       originalRequest._retry = true;
 

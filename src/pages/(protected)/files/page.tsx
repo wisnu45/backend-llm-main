@@ -237,6 +237,7 @@ const FilesPage = () => {
       <FilesPageHeader
         setModal={(modal) => setModal(modal, null)}
         setInput={setInput}
+        tab={tab}
       />
       <Tabs
         defaultValue="all"

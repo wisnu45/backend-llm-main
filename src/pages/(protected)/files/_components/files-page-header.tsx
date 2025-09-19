@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button';
+import { toast } from '@/components/ui/use-toast';
 import { MagnifyingGlassIcon } from '@radix-ui/react-icons';
 
 type TModal = 'delete' | 'edit' | 'create' | 'detail' | null;
@@ -6,9 +7,10 @@ type TModal = 'delete' | 'edit' | 'create' | 'detail' | null;
 interface IFilesPageHeader {
   setModal: (modal: TModal) => void;
   setInput: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  tab: string;
 }
 
-const FilesPageHeader = ({ setModal, setInput }: IFilesPageHeader) => {
+const FilesPageHeader = ({ setModal, setInput, tab }: IFilesPageHeader) => {
   return (
     <>
       <div className="mb-8 flex flex-wrap items-center justify-between">
@@ -34,26 +36,26 @@ const FilesPageHeader = ({ setModal, setInput }: IFilesPageHeader) => {
             <MagnifyingGlassIcon className="h-5 w-5 text-gray-500" />
           </button>
         </div>
-        {/* TODO: waiting for confirm */}
-        {/*
-        <div className="flex-1 sm:w-auto">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button className="inline-flex items-center justify-between gap-2 rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none">
-                Filter Document Files
-                <ChevronDownIcon className="h-4 w-4" />
-              </button>
-            </DropdownMenuTrigger>
-          </DropdownMenu>
+        <div className="flex gap-3">
+          <Button
+            className={`w-full bg-red-400 hover:bg-red-600 sm:w-auto ${tab !== 'metadata' ? 'hidden' : ''}`}
+            onClick={() =>
+              toast({
+                title: 'Featur cooming soon',
+                description: 'Saat ini sedang di kerjakan',
+                variant: 'destructive'
+              })
+            }
+          >
+            Sync Portal
+          </Button>
+          <Button
+            className="w-full bg-green-500 hover:bg-green-600 sm:w-auto"
+            onClick={() => setModal('create')}
+          >
+            Add New File
+          </Button>
         </div>
-        */}
-
-        <Button
-          className="w-full bg-green-500 hover:bg-green-600 sm:w-auto"
-          onClick={() => setModal('create')}
-        >
-          Add New File
-        </Button>
       </div>
     </>
   );
