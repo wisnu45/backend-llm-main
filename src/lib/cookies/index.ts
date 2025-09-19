@@ -7,6 +7,7 @@ type TCookies = {
   role: string;
   roles_id: string;
   name: string;
+  error_connection: string;
 };
 
 export const SessionToken = {
@@ -17,6 +18,7 @@ export const SessionToken = {
     Cookies.set('role', values.role);
     Cookies.set('roles_id', values.roles_id);
     // Cookies.set('refresh_token', values.refresh_token);
+    Cookies.set('error_connection', values.error_connection);
   },
   get: (): string | undefined => {
     const token = Cookies.get('token');

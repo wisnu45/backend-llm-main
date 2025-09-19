@@ -15,8 +15,10 @@ export const useLogin = () => {
         username: res.data.userdata.username,
         name: res.data.userdata.name,
         role: res.data.userdata.role.name,
-        roles_id: res.data.userdata.role.id
+        roles_id: res.data.userdata.role.id,
         // refresh_token: res.data.refresh_token
+        error_connection:
+          'Sambungan terputus. Coba periksa jaringan Anda dan muat ulang halaman'
       });
       navigate('/chat', { replace: true });
     },
