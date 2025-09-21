@@ -15,7 +15,8 @@ export interface Metadata {
 
 export interface TChatRequest {
   question: string;
-  session_id: string;
+  session_id?: string;
+  chat_id?: string;
   is_browse: boolean;
   is_company_policy: boolean;
   attachments?: File[];

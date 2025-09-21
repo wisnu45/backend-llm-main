@@ -71,15 +71,21 @@ const DetailPage = () => {
     const payload = handleSubmit(formData);
 
     if (payload) {
-      mutation.mutate(payload, {
-        onSuccess: () => {
-          resetForm();
-          query.refetch();
+      mutation.mutate(
+        {
+          ...payload,
+          chat_id: chatId || ''
         },
-        onError: () => {
-          resetForm();
+        {
+          onSuccess: () => {
+            resetForm();
+            query.refetch();
+          },
+          onError: () => {
+            resetForm();
+          }
         }
-      });
+      );
     }
   };
 
