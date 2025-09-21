@@ -179,7 +179,14 @@ const UserManagementModals = ({
         loading={saveRoleSettingsMutation.isPending}
         onSave={(settings) => {
           saveRoleSettingsMutation.mutate(settings, {
-            onSuccess: () => setModal(null)
+            onSuccess: () => setModal(null),
+            onError: (error) => {
+              toast({
+                title: 'Failed to edit Role Settings',
+                description: error?.message || 'An unexpected error occurred',
+                variant: 'destructive'
+              });
+            }
           });
         }}
       />
