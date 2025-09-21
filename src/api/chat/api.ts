@@ -9,12 +9,23 @@ import {
   TGetHistoryRequest,
   TNewSesionResponse,
   TRenameChatRequest,
-  TPinChatRequest
+  TPinChatRequest,
+  TChatResponse
 } from './type';
 import { TDefaultResponse } from '@/commons/types/response';
 
-export const chat = async (req: TChatRequest): Promise<TDefaultResponse> => {
-  const res = await api.post<TDefaultResponse>('/chats/ask', req);
+// export const chat = async (req: TChatRequest): Promise<TDefaultResponse<TChatResponse>> => {
+//   const res = await api.post<TDefaultResponse>('/chats/ask', req);
+//   return res.data;
+// };
+
+export const chat = async (
+  req: TChatRequest
+): Promise<TDefaultResponse<TChatResponse>> => {
+  const res = await api.post<TDefaultResponse<TChatResponse>>(
+    '/chats/ask',
+    req
+  );
   return res.data;
 };
 

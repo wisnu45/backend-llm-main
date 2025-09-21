@@ -82,6 +82,9 @@ export interface Daum {
   data?: Daum[];
 }
 
+export type TChatResponse = {
+  chat_id: string;
+};
 export interface TGetDetailHistoryData {
   data: Daum[];
   session_id: string;

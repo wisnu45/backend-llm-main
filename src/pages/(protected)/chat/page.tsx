@@ -13,7 +13,6 @@ import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
 
 import useCreateChat from './_hook/use-create-chat';
-import useCreateNewChat from './_hook/use-create-new-chat';
 import { PromptPreview, FileType } from './component/prompt-preview';
 import { ModernLoadingIndicator } from './component/loading-indicator';
 import InputDataWithForm from './component/InputDataWithForm';
@@ -51,7 +50,6 @@ const ChatPage = () => {
   const [previewFiles, setPreviewFiles] = useState<FileType[]>([]);
   const [showPreview, setShowPreview] = useState<boolean>(false);
   const mutation = useCreateChat();
-  const createNewChat = useCreateNewChat();
   const queryHistorySideBar = useGetFiles();
 
   const query = useFetchSetting();
@@ -89,20 +87,9 @@ const ChatPage = () => {
     setLoading(true);
 
     try {
-      const sessionResponse = await createNewChat.mutateAsync();
-
-      const sessionId = sessionResponse?.data?.session_id;
-      if (!sessionId) {
-        setLoading(false);
-        setShowPreview(false);
-        setPreviewPrompt('');
-        setPreviewFiles([]);
-        return;
-      }
-
       mutation.mutate(
         {
-          session_id: sessionId,
+          session_id: '',
           question: trimmedQuestion,
           is_browse: formData.is_browse,
           is_company_policy: formData.is_company_policy,
@@ -110,13 +97,16 @@ const ChatPage = () => {
           with_document: formData.with_document
         },
         {
-          onSuccess: () => {
+          onSuccess: (data) => {
+            const chatId = data?.data?.chat_id || '';
             queryHistorySideBar.refetch();
             setLoading(false);
             setShowPreview(false);
             setPreviewPrompt('');
             setPreviewFiles([]);
-            navigate(`${currentPath}/${sessionId}`);
+            if (chatId) {
+              navigate(`${currentPath}/${chatId || ''}`);
+            }
           },
           onError: (err) => {
             console.error('Chat mutation failed', err);
