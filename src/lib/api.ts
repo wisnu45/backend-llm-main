@@ -1,6 +1,7 @@
 import axios, { AxiosError } from 'axios';
 import Cookies from 'js-cookie';
 import { SessionToken } from './cookies'; // penyimpanan access_token
+// import { toast } from '@/components/ui/use-toast';
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_ENDPOINT,
@@ -81,6 +82,18 @@ api.interceptors.response.use(
           '/auth/signin?error=Session expired. Please log in again.';
       }
     }
+    // if (error.response?.status === 403) {
+    //   toast({
+    //     title: 'Tidak Memiliki Akses',
+    //     description: 'Anda tidak memiliki akses ke sumber daya ini.',
+    //     variant: 'destructive'
+    //   });
+    //   SessionToken.remove();
+    //     Cookies.remove('refresh_token');
+    //    window.location.href =
+    //       '/auth/signin?error=Session expired. Please log in again.';
+    //   window.location.href = '/auth/signin';
+    // }
 
     return Promise.reject(error);
   }

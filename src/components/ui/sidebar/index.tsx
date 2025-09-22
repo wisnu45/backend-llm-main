@@ -1,5 +1,9 @@
 import { DropdownMenuTrigger } from '@radix-ui/react-dropdown-menu';
-import { HamburgerMenuIcon, PlusIcon } from '@radix-ui/react-icons';
+import {
+  HamburgerMenuIcon,
+  MagnifyingGlassIcon,
+  PlusIcon
+} from '@radix-ui/react-icons';
 import Cookies from 'js-cookie';
 import { Edit, MoreVertical, Pin, PinOff, TrashIcon } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
@@ -140,11 +144,7 @@ const Sidebar = ({ setShowModal }) => {
               <PlusIcon className="text-gray-800" />
             )}
           </Link>
-          {documentSideBar && <DocumentMenu isSidebarOpen={isSidebarOpen} />}
-          {documentSideBar && (
-            <UserManagementMenu isSidebarOpen={isSidebarOpen} />
-          )}
-          {isSidebarOpen && (
+          {isSidebarOpen ? (
             <div className="mb-2 mt-2 pl-2">
               <input
                 type="text"
@@ -153,6 +153,14 @@ const Sidebar = ({ setShowModal }) => {
                 onChange={(e) => setTextSearch(e.target.value)}
               />
             </div>
+          ) : (
+            <Link
+              to=""
+              onClick={toggleSidebar}
+              className={`mt-2 flex w-full items-center gap-2 rounded-lg bg-gray-400/40 p-2 text-left text-black hover:bg-gray-400/20`}
+            >
+              <MagnifyingGlassIcon className="text-gray-800" />
+            </Link>
           )}
           {isSidebarOpen && (
             <h2 className="mb-2 p-2 text-xs font-semibold uppercase tracking-wider text-gray-500">
@@ -297,30 +305,34 @@ const Sidebar = ({ setShowModal }) => {
         <div
           className={`absolute bottom-0 left-0 right-0 mt-auto w-full  ${isSidebarOpen ? 'p-4' : 'p-2'} bg-[#D2D2D2]`}
         >
+          {documentSideBar && <DocumentMenu isSidebarOpen={isSidebarOpen} />}
+          {documentSideBar && (
+            <UserManagementMenu isSidebarOpen={isSidebarOpen} />
+          )}
           <Link
             to="/history"
-            className="flex items-center justify-between gap-3 rounded-lg p-2 text-sm text-gray-600 transition-colors duration-200 hover:bg-neutral-300/60"
+            className="flex items-center gap-3 rounded-lg p-2 text-sm text-gray-600 transition-colors duration-200 hover:bg-neutral-300/60"
           >
-            {isSidebarOpen && (
-              <span className="truncate">See Full Chat History</span>
-            )}
             <img
               src="/icons/see_more_icon.png"
               alt="See more history"
               className="h-4 w-4"
             />
+            {isSidebarOpen && (
+              <span className="truncate">See Full Chat History</span>
+            )}
           </Link>
           {documentSideBar && (
             <Link
               to="/setting"
-              className="flex items-center justify-between gap-3 rounded-lg p-2 text-sm text-gray-600 transition-colors duration-200 hover:bg-neutral-300/60"
+              className="flex items-center gap-3 rounded-lg p-2 text-sm text-gray-600 transition-colors duration-200 hover:bg-neutral-300/60"
             >
-              {isSidebarOpen && <span className="truncate">Setting</span>}
               <img
                 src="/icons/setting.png"
                 alt="See more history"
                 className="h-4 w-4"
               />
+              {isSidebarOpen && <span className="truncate">Setting</span>}
             </Link>
           )}
           <button
