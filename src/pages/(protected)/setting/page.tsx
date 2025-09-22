@@ -137,11 +137,21 @@ export default function SettingTable() {
                       </>
                     ) : (
                       <span>
-                        {row.data_type === 'boolean'
-                          ? row.value
-                            ? 'ON'
-                            : 'OFF'
-                          : row.value}
+                        {row.data_type === 'boolean' ? (
+                          <button
+                            className={`relative inline-flex h-6 w-12 items-center rounded-full transition-colors duration-300 ${
+                              row.value ? 'bg-green-500' : 'bg-gray-300'
+                            }`}
+                          >
+                            <span
+                              className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform duration-300 ${
+                                row.value ? 'translate-x-6' : 'translate-x-1'
+                              }`}
+                            />
+                          </button>
+                        ) : (
+                          row.value
+                        )}
                       </span>
                     )}
                   </td>
@@ -204,7 +214,7 @@ export default function SettingTable() {
 
             {modalType === 'toggle' && (
               <div className="flex items-center space-x-4">
-                <span className="text-sm">Attachment: </span>
+                <span className="text-sm">{selectedSetting.name}: </span>
                 <label className="relative inline-flex cursor-pointer items-center">
                   <input
                     type="checkbox"
