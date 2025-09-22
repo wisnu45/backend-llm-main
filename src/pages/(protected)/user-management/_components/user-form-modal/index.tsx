@@ -13,6 +13,7 @@ import { Input } from '@/components/ui/input';
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -105,6 +106,10 @@ const UserFormModal = ({
     value_id: item.id
   }));
 
+  const defaultRole = rolesChoise?.find(
+    (item) => item.name === defaultValues?.role
+  )?.value_id;
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
@@ -182,7 +187,7 @@ const UserFormModal = ({
                   <FormLabel>Role *</FormLabel>
                   <Select
                     onValueChange={field.onChange}
-                    defaultValue={field.value}
+                    defaultValue={field.value || defaultRole?.toString()}
                   >
                     <FormControl>
                       <SelectTrigger>
@@ -216,11 +221,18 @@ const UserFormModal = ({
                     <FormControl>
                       <Input
                         type="password"
-                        placeholder="Enter password"
+                        placeholder={
+                          mode === 'create' ? 'Enter password' : 'XXXXXXXX'
+                        }
                         disabled={watchPortalUser}
                         {...field}
                       />
                     </FormControl>
+                    {mode === 'edit' && (
+                      <FormDescription className="text-red-500">
+                        Kosongkan jika tidak ingin mengubah password
+                      </FormDescription>
+                    )}
                     <FormMessage />
                   </FormItem>
                 )}
