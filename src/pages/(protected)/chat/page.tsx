@@ -55,6 +55,11 @@ const ChatPage = () => {
   const query = useFetchSetting();
 
   const dataSetting = query?.data?.data || [];
+  const dataGreating =
+    dataSetting
+      .find((item) => item.name === 'Chat greeting')
+      ?.value.toString()
+      .split('[username]') || '';
   const promptValue = dataSetting.find(
     (item) => item.name === 'Prompt example'
   )?.value;
@@ -138,10 +143,12 @@ const ChatPage = () => {
               className="w-32"
             />
             <h2 className="text-gradient-light mb-1 text-2xl font-bold md:mb-2 md:text-3xl lg:text-4xl">
-              Hai, {Cookies.get('name')}
+              {dataGreating[0] || ''}, {Cookies.get('name') || ''}
             </h2>
             <h3 className="text-gradient-light mb-1 text-2xl font-bold md:mb-8 md:text-3xl lg:text-4xl">
-              Apa yang bisa Vita bantu hari ini?
+              {dataGreating[1]
+                ? dataGreating[1]
+                : 'Apa yang bisa Vita bantu hari ini?'}
             </h3>
             <p className="mb-4 text-gray-500 md:mb-10">
               Tuliskan pertanyaanmu atau gunakan salah satu dari contoh di bawah
