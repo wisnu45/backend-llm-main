@@ -14,6 +14,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { TSetPromptType } from '../page';
 import { ChatFormSchema, TChatFormData } from '../schema';
 import { toast } from '@/components/ui/use-toast';
+import { useFetchSetting } from '../../setting/_hook/use-fetch-setting';
 
 interface InputDataWithFormProps {
   onSubmit: (data: TChatFormData) => void;
@@ -36,12 +37,17 @@ const InputDataWithForm = ({
   const [popupFile, setPopupFile] = useState<File | null>(null);
   const defaultIsBrowse = Cookies.get('search_internet') === 'true';
   const defaultIsCompanyPolicy = Cookies.get('is_company_policy') === 'true';
-
-  // Combined mobile detection and scroll state
   const { shouldHideOnScroll } = useMobileScroll(50, scrollContainerRef);
-
-  // Determine if form should be hidden
   const shouldHide = shouldHideOnScroll && isFloating;
+
+  const query = useFetchSetting();
+
+  const dataSetting = query?.data?.data || [];
+  const maxText =
+    dataSetting.find((item) => item.name === 'Chat max text')?.value || 1000;
+  const fileSize =
+    dataSetting.find((item) => item.name === 'Attachment file size')?.value ||
+    10;
 
   const {
     control,
@@ -81,10 +87,10 @@ const InputDataWithForm = ({
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onloadend = () => {
-        resolve(reader.result as string); // Return Base64 string
+        resolve(reader.result as string);
       };
       reader.onerror = (error) => reject(error);
-      reader.readAsDataURL(file); // Convert file to Base64
+      reader.readAsDataURL(file);
     });
   };
 
@@ -93,7 +99,7 @@ const InputDataWithForm = ({
     if (e.dataTransfer && e.dataTransfer.files) {
       const droppedFiles = Array.from(e.dataTransfer.files);
       const validFiles = droppedFiles.filter((file) => {
-        if (file.size > 2 * 1024 * 1024) {
+        if (file.size > Number(fileSize) * 1024 * 1024) {
           toast({
             variant: 'destructive',
             title: 'Upload gagal',
@@ -105,13 +111,12 @@ const InputDataWithForm = ({
       });
 
       if (validFiles.length === 0) {
-        return; // semua file invalid → stop
+        return;
       }
       const currentAttachments = watchedAttachments || [];
       setValue('attachments', [...currentAttachments, ...droppedFiles]);
       Promise.all(droppedFiles.map((file) => convertFileToBase64(file)))
         .then((base64Files) => {
-          // Mengupdate nilai 'with_document' setelah konversi selesai
           setValue('with_document', [
             ...(watch('with_document') || []),
             ...base64Files
@@ -311,7 +316,7 @@ const InputDataWithForm = ({
                   className="w-full resize-none border-none text-sm outline-none placeholder:text-gray-400"
                   rows={4}
                   placeholder="Ask Vita"
-                  maxLength={1000}
+                  maxLength={maxText ? Number(maxText) : 1000}
                   onKeyDown={handleKeyDown}
                   disabled={isLoading}
                 />
@@ -457,7 +462,7 @@ const InputDataWithForm = ({
               </Tooltip>
               <div className="mt-3 flex w-full items-center justify-end gap-2 sm:mt-0 sm:w-auto sm:justify-end">
                 <span className="text-sm text-gray-900">
-                  {watchedPrompt?.length || 0}/1000
+                  {watchedPrompt?.length || 0}/{maxText || 1000}
                 </span>
                 <button
                   type="submit"

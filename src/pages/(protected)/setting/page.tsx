@@ -150,7 +150,9 @@ export default function SettingTable() {
                             />
                           </button>
                         ) : (
-                          row.value
+                          <>
+                            {row.value} {row.unit || ''}
+                          </>
                         )}
                       </span>
                     )}
