@@ -1,13 +1,13 @@
-import FormModal from './form-modal';
-import DetailModal from './detail-modal';
-import DeleteModal from './delete-modal';
-import useCreateDocument from '../_hooks/create-document';
 import { TDocItem } from '@/api/document/type';
-import useDeleteDocument from '../_hooks/delete-document';
 import { useFiles } from '@/hooks/use-files';
-import useGetDetailDocument from '../_hooks/get-detail-document';
-import useEditDocument from '../_hooks/edit-document';
 import { useEffect } from 'react';
+import useCreateDocument from '../_hooks/create-document';
+import useDeleteDocument from '../_hooks/delete-document';
+import useEditDocument from '../_hooks/edit-document';
+import useGetDetailDocument from '../_hooks/get-detail-document';
+import DeleteModal from './delete-modal';
+import DetailModal from './detail-modal';
+import FormModal from './form-modal';
 
 type TModal = 'delete' | 'edit' | 'create' | 'detail' | null;
 
@@ -64,8 +64,8 @@ const FilesPageModals = ({ modal, setModal, data }: IFilesPageModals) => {
           });
         }}
         defaultValues={{
-          document_name: detailQuery.data?.data.document_name,
-          document_path: detailQuery.data?.data.document_name,
+          document_name: detailQuery.data?.data.metadata?.Title,
+          document_path: detailQuery.data?.data.metadata?.Title,
           portal_id: detailQuery.data?.data.portal_id ?? ''
         }}
       />
@@ -85,8 +85,7 @@ const FilesPageModals = ({ modal, setModal, data }: IFilesPageModals) => {
       <DeleteModal
         open={modal === 'delete'}
         data={{
-          document_name:
-            detailQuery.data?.data.document_name || data?.document_name
+          document_name: detailQuery.data?.data.metadata?.Title
         }}
         loading={deleteMutation.isPending}
         onDelete={() => {

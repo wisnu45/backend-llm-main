@@ -1,3 +1,5 @@
+import { TDocItem } from '@/api/document/type';
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -6,10 +8,8 @@ import {
   DialogHeader,
   DialogTitle
 } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { TDocItem } from '@/api/document/type';
-import { Link } from 'react-router-dom';
 import { useOpenPdf } from '@/hooks/use-donwload-file';
+import { Link } from 'react-router-dom';
 
 interface Props {
   open?: boolean;
@@ -62,7 +62,7 @@ const DetailModal = ({ onEdit, onDelete, data, open, onOpenChange }: Props) => {
               }}
             >
               <p className="text-gray-800 text-primary underline">
-                {data?.document_name ?? '-'}
+                {data?.metadata?.Title ?? '-'}
               </p>
             </Link>
           </div>

@@ -1,18 +1,18 @@
-import { Suspense, useState, useEffect } from 'react';
-import { ColumnDef } from '@tanstack/react-table';
-import { DataTable } from '@/components/shared/data-table';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
-import { LoaderCircle } from '@/components/shared/loader';
 import { TDocItem, TDocParams } from '@/api/document/type';
-import useGetListDocument from './_hooks/get-list-document';
+import { DataTable } from '@/components/shared/data-table';
+import { LoaderCircle } from '@/components/shared/loader';
 import { Button } from '@/components/ui/button';
-import FilesPageHeader from './_components/files-page-header';
-import FilesPageModals from './_components/files-page-modals';
-import { useDebounce } from 'use-debounce';
-import { Link, useSearchParams } from 'react-router-dom'; // Import useSearchParams
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useOpenPdf } from '@/hooks/use-donwload-file';
 import { formatDate } from '@/lib/date';
+import { ColumnDef } from '@tanstack/react-table';
+import { Suspense, useEffect, useState } from 'react';
+import { Link, useSearchParams } from 'react-router-dom'; // Import useSearchParams
+import { useDebounce } from 'use-debounce';
+import FilesPageHeader from './_components/files-page-header';
+import FilesPageModals from './_components/files-page-modals';
+import useGetListDocument from './_hooks/get-list-document';
 
 type TModal = 'delete' | 'edit' | 'create' | 'detail' | null;
 
@@ -129,7 +129,7 @@ const FilesPage = () => {
       header: 'document name',
       cell: ({ row }) => (
         <div className="flex min-w-40 flex-col">
-          <span>{row.original.document_name?.split('.pdf')[0]}</span>
+          <span>{row.original.metadata?.Title}</span>
           <Link
             to="#"
             onClick={(e) => {
