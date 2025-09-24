@@ -41,7 +41,7 @@ const useUserManagementPage = () => {
   const [roleData, setRoleData] = useState<TRole | null>(null);
   const [tab, setTab] = useState<'users' | 'roles'>('users');
   const [textSearch, setTextSearch] = useState<string>('');
-  const [pageIndex, setPageIndex] = useState(0);
+  const [pageIndex, setPageIndex] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [debouncedValue] = useDebounce(textSearch, 1000);
 
@@ -59,7 +59,7 @@ const useUserManagementPage = () => {
 
   const pageFromURL = searchParams.get('page')
     ? Number(searchParams.get('page'))
-    : 0;
+    : 1;
   const limitFromURL = searchParams.get('page_size')
     ? Number(searchParams.get('page_size'))
     : 10;
@@ -71,13 +71,13 @@ const useUserManagementPage = () => {
 
   const usersQuery = useGetUsers({
     search: debouncedValue,
-    page: pageIndex + 1,
+    page: pageIndex,
     page_size: pageSize
   });
 
   const rolesQuery = useGetRoles({
     search: debouncedValue,
-    page: pageIndex + 1,
+    page: pageIndex,
     page_size: pageSize
   });
 
@@ -90,7 +90,7 @@ const useUserManagementPage = () => {
   };
 
   useEffect(() => {
-    setPageIndex(0);
+    setPageIndex(1);
   }, [textSearch, tab]);
 
   return {
@@ -378,7 +378,7 @@ const UserManagementPage = () => {
   const rolesColumns = getRolesColumns(setModal, startFrom);
 
   const setInput = (value: React.ChangeEvent<HTMLInputElement>) => {
-    setPageIndex(0);
+    setPageIndex(1);
     setTextSearch(value.target.value);
   };
 
@@ -405,7 +405,8 @@ const UserManagementPage = () => {
         value={tab}
         onValueChange={(val) => {
           setTab(val as 'users' | 'roles');
-          setPageIndex(0);
+          setPageIndex(1);
+          updateURLParams(1, pageSize);
         }}
       >
         <ScrollArea className="w-full">

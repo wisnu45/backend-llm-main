@@ -21,8 +21,8 @@ import {
   getCoreRowModel,
   getFilteredRowModel,
   getPaginationRowModel,
-  useReactTable,
-  PaginationState
+  PaginationState,
+  useReactTable
 } from '@tanstack/react-table';
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
 import { LoaderCircle } from './loader';
@@ -168,7 +168,7 @@ export function DataTable<TData, TValue>({
               variant="outline"
               className="h-8 w-8 p-0"
               onClick={() => setPageIndex(pageIndex - 1)}
-              disabled={pageIndex <= 0}
+              disabled={pageIndex <= 1}
             >
               <ChevronLeftIcon className="h-4 w-4" aria-hidden="true" />
             </Button>
