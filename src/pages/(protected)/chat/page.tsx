@@ -143,7 +143,7 @@ const ChatPage = () => {
               className="w-32"
             />
             <h2 className="text-gradient-light mb-1 text-2xl font-bold md:mb-2 md:text-3xl lg:text-4xl">
-              {dataGreating[0] || ''}, {Cookies.get('name') || ''}
+              {dataGreating[0] || 'Hi'}, {Cookies.get('name') || ''}
             </h2>
             <h3 className="text-gradient-light mb-1 text-2xl font-bold md:mb-8 md:text-3xl lg:text-4xl">
               {dataGreating[1]

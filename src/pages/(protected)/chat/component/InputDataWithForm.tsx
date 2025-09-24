@@ -48,6 +48,9 @@ const InputDataWithForm = ({
   const settingAttachment = getMenuValue('Attachment') || false;
   const maxText = getMenuValue('Max chats') || 1000;
   const fileSize = getMenuValue('Attachment file size') || 10;
+  const rawFileTypes = getMenuValue('Attachment file types');
+  const fileTypeAllow: string[] =
+    typeof rawFileTypes === 'string' ? JSON.parse(rawFileTypes) : [];
 
   const {
     control,
@@ -94,10 +97,35 @@ const InputDataWithForm = ({
     });
   };
 
+  const validateFile = (file: File) => {
+    const fileExtension = file.name.split('.').pop()?.toLowerCase();
+    if (file.size > Number(fileSize) * 1024 * 1024) {
+      toast({
+        variant: 'destructive',
+        title: 'Upload gagal',
+        description: `File "${file.name}" terlalu besar (max ${fileSize} MB).`
+      });
+      return false;
+    }
+    if (!fileTypeAllow.includes(fileExtension || '')) {
+      toast({
+        variant: 'destructive',
+        title: 'Upload gagal',
+        description: `File "${file.name}" tidak diizinkan. Format yang diperbolehkan: ${fileTypeAllow.join(', ')}`
+      });
+      return false;
+    }
+
+    return true;
+  };
+
   const handleFileDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     if (e.dataTransfer && e.dataTransfer.files) {
       const droppedFiles = Array.from(e.dataTransfer.files);
+      const validTypeFile = droppedFiles.filter(validateFile);
+      if (validTypeFile.length === 0) return;
+
       const validFiles = droppedFiles.filter((file) => {
         if (file.size > Number(fileSize) * 1024 * 1024) {
           toast({
@@ -129,10 +157,15 @@ const InputDataWithForm = ({
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log('handleFileChange called');
     const selectedFiles = e.target.files;
     if (selectedFiles) {
       const newFiles = Array.from(selectedFiles);
       const currentAttachments = watchedAttachments || [];
+
+      const validFiles = newFiles.filter(validateFile);
+      if (validFiles.length === 0) return;
+
       setValue('attachments', [...currentAttachments, ...newFiles]);
       Promise.all(newFiles.map((file) => convertFileToBase64(file)))
         .then((base64Files) => {
@@ -325,20 +358,25 @@ const InputDataWithForm = ({
 
           <div className="mt-4 flex flex-col items-start justify-between text-sm text-gray-800 sm:flex-row sm:items-center">
             <div className="flex flex-col items-start gap-2 sm:flex-row sm:gap-2">
-              <button
-                type="button"
-                className={`flex cursor-pointer items-center gap-1 rounded-xl bg-gradient-to-r px-4 py-2 shadow-md transition duration-300 ${!settingAttachment ? 'cursor-not-allowed opacity-50 shadow-none' : 'hover:text-purple-600 hover:shadow-lg'}`}
+              <label
+                htmlFor="file-upload"
+                className={`flex cursor-pointer items-center gap-1 rounded-xl bg-gradient-to-r px-4 py-2 shadow-md transition duration-300 ${
+                  !settingAttachment
+                    ? 'cursor-not-allowed opacity-50 shadow-none'
+                    : 'hover:text-purple-600 hover:shadow-lg'
+                }`}
               >
                 <Paperclip size={18} />
-                <input
-                  id="file-upload"
-                  type="file"
-                  multiple
-                  className="hidden"
-                  onChange={handleFileChange}
-                  disabled={isLoading || settingAttachment === false}
-                />
-              </button>
+              </label>
+
+              <input
+                id="file-upload"
+                type="file"
+                multiple
+                className="hidden"
+                onChange={handleFileChange}
+                disabled={isLoading || !settingAttachment}
+              />
               <Controller
                 name="is_company_policy"
                 control={control}
