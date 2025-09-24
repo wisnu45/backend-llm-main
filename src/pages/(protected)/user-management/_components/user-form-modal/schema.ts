@@ -6,9 +6,9 @@ const BaseUserSchemaObject = z.object({
     .string({ message: 'Username is required' })
     .min(1, { message: 'Username is required' })
     .min(3, { message: 'Username must be at least 3 characters' })
-    .regex(/^[a-zA-Z0-9_-]+$/, {
+    .regex(/^[a-zA-Z0-9_.-]+$/, {
       message:
-        'Username can only contain letters, numbers, hyphens and underscores'
+        'Username can only contain letters, numbers, dots, hyphens and underscores'
     }),
   is_portal: z.boolean().default(false),
   roles_id: z.string().default(''),
