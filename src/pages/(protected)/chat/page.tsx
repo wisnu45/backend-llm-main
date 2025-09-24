@@ -8,17 +8,18 @@ import {
 import { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-import { useGetFiles } from '@/components/ui/sidebar/_hook/use-get-history-chat';
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
+import { useGetFiles } from '@/components/ui/sidebar/_hook/use-get-history-chat';
 
-import useCreateChat from './_hook/use-create-chat';
-import { PromptPreview, FileType } from './component/prompt-preview';
-import { ModernLoadingIndicator } from './component/loading-indicator';
-import InputDataWithForm from './component/InputDataWithForm';
-import { TChatFormData } from './schema';
 import Cookies from 'js-cookie';
 import { useFetchSetting } from '../setting/_hook/use-fetch-setting';
+import { useFetchSettingFeature } from '../setting/_hook/use-fetch-setting-feature';
+import useCreateChat from './_hook/use-create-chat';
+import InputDataWithForm from './component/InputDataWithForm';
+import { ModernLoadingIndicator } from './component/loading-indicator';
+import { FileType, PromptPreview } from './component/prompt-preview';
+import { TChatFormData } from './schema';
 
 const promptSuggestions = [
   {
@@ -53,13 +54,18 @@ const ChatPage = () => {
   const queryHistorySideBar = useGetFiles();
 
   const query = useFetchSetting();
+  const queryFeature = useFetchSettingFeature();
 
   const dataSetting = query?.data?.data || [];
+  const settingFeature = queryFeature?.data?.data;
+  const getMenuValue = (name) =>
+    settingFeature?.find((menu) => menu.name.toLocaleLowerCase() === name)
+      ?.value;
   const dataGreating =
     dataSetting
       .find((item) => item.name === 'Chat greeting')
       ?.value.toString()
-      .split('[username]') || '';
+      .split(', [username]') || '';
   const promptValue = dataSetting.find(
     (item) => item.name === 'Prompt example'
   )?.value;
@@ -68,6 +74,10 @@ const ChatPage = () => {
       ? JSON.parse(promptValue)
       : undefined;
   const dataProms = promsExample ? promsExample : promptSuggestions;
+
+  const maxChatTopic = Number(getMenuValue('max chat topic')) || 0;
+  const currentChatCount = queryHistorySideBar.data?.data.length || 0;
+  const isLimitExceeded = maxChatTopic > 0 && currentChatCount >= maxChatTopic;
 
   const navigate = useNavigate();
   const currentPath = useLocation().pathname;
@@ -84,6 +94,10 @@ const ChatPage = () => {
   }, []);
 
   const handleFormSubmit = async (formData: TChatFormData) => {
+    if (isLimitExceeded) {
+      return;
+    }
+
     const trimmedQuestion = formData.prompt.trim();
 
     setPreviewPrompt(trimmedQuestion);
@@ -143,7 +157,7 @@ const ChatPage = () => {
               className="w-32"
             />
             <h2 className="text-gradient-light mb-1 text-2xl font-bold md:mb-2 md:text-3xl lg:text-4xl">
-              {dataGreating[0] || 'Hi'}, {Cookies.get('name') || ''}
+              {dataGreating[0] || 'Hi'} {` ${Cookies.get('name')}`},
             </h2>
             <h3 className="text-gradient-light mb-1 text-2xl font-bold md:mb-8 md:text-3xl lg:text-4xl">
               {dataGreating[1]
@@ -155,28 +169,35 @@ const ChatPage = () => {
               ini
             </p>
 
-            <ScrollArea className="mb-2 w-full md:mb-8">
-              <div className="flex w-full flex-col gap-4 py-2 md:w-max md:flex-row md:gap-4">
-                {dataProms?.map((prompt: any, index: number) => (
-                  <div
-                    key={index}
-                    onClick={() => handleClickItem(prompt.text || prompt)}
-                    className="flex min-h-20 w-full shrink-0 cursor-pointer flex-col items-start rounded-md border border-gray-200 p-2 hover:bg-gray-50 md:w-52 md:rounded-lg md:p-4"
-                  >
-                    <p className="flex-1 text-xs text-gray-700 md:text-sm">
-                      {prompt.text || prompt}
-                    </p>
-                    {prompt.icon}
+            {!isLimitExceeded && (
+              <>
+                <ScrollArea className="mb-2 w-full md:mb-8">
+                  <div className="flex w-full flex-col gap-4 py-2 md:w-max md:flex-row md:gap-4">
+                    {dataProms?.map((prompt: any, index: number) => (
+                      <div
+                        key={index}
+                        onClick={() => handleClickItem(prompt.text || prompt)}
+                        className="flex min-h-20 w-full shrink-0 cursor-pointer flex-col items-start rounded-md border border-gray-200 p-2 hover:bg-gray-50 md:w-52 md:rounded-lg md:p-4"
+                      >
+                        <p className="flex-1 text-xs text-gray-700 md:text-sm">
+                          {prompt.text || prompt}
+                        </p>
+                        {prompt.icon}
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-              <ScrollBar orientation="horizontal" className="hidden md:block" />
-            </ScrollArea>
+                  <ScrollBar
+                    orientation="horizontal"
+                    className="hidden md:block"
+                  />
+                </ScrollArea>
 
-            <Button variant="ghost" className="mb-2 flex text-sm md:mb-3">
-              <ReloadIcon className="mr-2" />
-              Refresh prompts
-            </Button>
+                <Button variant="ghost" className="mb-2 flex text-sm md:mb-3">
+                  <ReloadIcon className="mr-2" />
+                  Refresh prompts
+                </Button>
+              </>
+            )}
           </div>
         )}
         {showPreview && (
@@ -189,10 +210,41 @@ const ChatPage = () => {
             <ModernLoadingIndicator />
           </div>
         )}
+        {isLimitExceeded && (
+          <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-4">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <svg
+                  className="h-5 w-5 text-red-400"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <h3 className="text-sm font-medium text-red-800">
+                  Batas Chat Tercapai
+                </h3>
+                <div className="mt-2 text-sm text-red-700">
+                  <p>
+                    Anda telah mencapai batas maksimum topik chat (
+                    {currentChatCount}/{maxChatTopic}). Silakan hapus beberapa
+                    chat yang sudah ada untuk membuat yang baru.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
         <div className="">
           <InputDataWithForm
             onSubmit={handleFormSubmit}
-            isLoading={loading}
+            isLoading={loading || isLimitExceeded}
             setPrompRef={setPromptRef}
           />
         </div>

@@ -8,6 +8,7 @@ import Cookies from 'js-cookie';
 import { Edit, MoreVertical, Pin, PinOff, TrashIcon } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 import { AlertModal } from '../../shared/alert-modal';
 import RenameModal from '../alert-edit';
 import {
@@ -20,24 +21,17 @@ import { ScrollArea } from '../scroll-area';
 import { Skeleton } from '../skeleton';
 import UserCard from '../user-card';
 import { useDeleteChat } from './_hook/use-delete-chat';
-import { useRenameChat } from './_hook/use-rename-chat';
-import { usePinChat } from './_hook/use-pin-chat';
 import { useGetFiles } from './_hook/use-get-history-chat';
+import { useGetMenuBar } from './_hook/use-get-menubar';
+import { usePinChat } from './_hook/use-pin-chat';
+import { useRenameChat } from './_hook/use-rename-chat';
 import DocumentMenu from './document-menu';
 import UserManagementMenu from './user-management-menu';
-import { useGetMenuBar } from './_hook/use-get-menubar';
-
-type TRecentChats = {
-  session_id: string;
-  title: string;
-  id: string;
-  pinned: boolean;
-};
 
 const Sidebar = ({ setShowModal }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const query = useGetFiles();
-  const dataResult = query.data?.data as TRecentChats[] | undefined;
+  const dataResult = query.data?.data || [];
   const [topHeight, setTopHeight] = useState<number>();
   const location = useLocation();
   const topRef = useRef<HTMLDivElement | null>(null);
@@ -54,6 +48,7 @@ const Sidebar = ({ setShowModal }) => {
   const renameMutation = useRenameChat();
   const pinMutation = usePinChat();
   const getMenuBar = useGetMenuBar();
+  const queryClient = useQueryClient();
 
   const menuSidebar = getMenuBar?.data?.data;
 
@@ -193,8 +188,8 @@ const Sidebar = ({ setShowModal }) => {
                     <Skeleton className="h-8 w-full" />
                   </li>
                 )}
-                {Array.isArray(dataResult) && dataResult.length > 0
-                  ? (filteredData ?? []).map((chat: TRecentChats) => (
+                {dataResult.length > 0
+                  ? (filteredData ?? []).map((chat) => (
                       <div key={chat.session_id}>
                         <li
                           key={chat.session_id}
@@ -371,6 +366,10 @@ const Sidebar = ({ setShowModal }) => {
               onSuccess: () => {
                 setShowDeleteModal(false);
                 query.refetch();
+                queryClient.invalidateQueries({
+                  queryKey: ['fetch-setting-feature'],
+                  type: 'all'
+                });
                 if (activeId === params.chatId) {
                   navigate('/chat');
                 }

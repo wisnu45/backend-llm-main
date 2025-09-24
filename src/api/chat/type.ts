@@ -46,14 +46,15 @@ export interface TPinChatRequest {
   pinned: boolean;
 }
 
+export type TRecentChats = {
+  session_id: string;
+  title: string;
+  id: string;
+  pinned: boolean;
+};
 export interface TGetHistoryRequest {
-  result: string[];
+  data: TRecentChats[];
   message: string;
-  index: number;
-  data: {
-    data: string[];
-    message: string;
-  };
 }
 
 export interface TNewSesionResponse {
