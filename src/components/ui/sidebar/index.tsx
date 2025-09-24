@@ -25,6 +25,7 @@ import { usePinChat } from './_hook/use-pin-chat';
 import { useGetFiles } from './_hook/use-get-history-chat';
 import DocumentMenu from './document-menu';
 import UserManagementMenu from './user-management-menu';
+import { useGetMenuBar } from './_hook/use-get-menubar';
 
 type TRecentChats = {
   session_id: string;
@@ -39,7 +40,6 @@ const Sidebar = ({ setShowModal }) => {
   const dataResult = query.data?.data as TRecentChats[] | undefined;
   const [topHeight, setTopHeight] = useState<number>();
   const location = useLocation();
-  const documentSideBar = Cookies.get('role') === 'admin';
   const topRef = useRef<HTMLDivElement | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showEditName, setShowEditName] = useState(false);
@@ -53,6 +53,16 @@ const Sidebar = ({ setShowModal }) => {
   const deleteMutation = useDeleteChat();
   const renameMutation = useRenameChat();
   const pinMutation = usePinChat();
+  const getMenuBar = useGetMenuBar();
+
+  const menuSidebar = getMenuBar?.data?.data;
+
+  const getMenuValue = (name) =>
+    menuSidebar?.find((menu) => menu.name === name)?.value || false;
+
+  const documentSideBarMenu = getMenuValue('Menu document');
+  const settingSideBarMenu = getMenuValue('Menu setting');
+  const userSideBarMenu = getMenuValue('Menu user');
 
   useEffect(() => {
     requestAnimationFrame(() => {
@@ -305,8 +315,10 @@ const Sidebar = ({ setShowModal }) => {
         <div
           className={`absolute bottom-0 left-0 right-0 mt-auto w-full  ${isSidebarOpen ? 'p-4' : 'p-2'} bg-[#D2D2D2]`}
         >
-          {documentSideBar && <DocumentMenu isSidebarOpen={isSidebarOpen} />}
-          {documentSideBar && (
+          {documentSideBarMenu && (
+            <DocumentMenu isSidebarOpen={isSidebarOpen} />
+          )}
+          {userSideBarMenu && (
             <UserManagementMenu isSidebarOpen={isSidebarOpen} />
           )}
           <Link
@@ -322,7 +334,7 @@ const Sidebar = ({ setShowModal }) => {
               <span className="truncate">See Full Chat History</span>
             )}
           </Link>
-          {documentSideBar && (
+          {settingSideBarMenu && (
             <Link
               to="/setting"
               className="flex items-center gap-3 rounded-lg p-2 text-sm text-gray-600 transition-colors duration-200 hover:bg-neutral-300/60"

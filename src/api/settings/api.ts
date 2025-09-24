@@ -27,3 +27,19 @@ export const editSetting = async (
   });
   return res.data;
 };
+
+export const getMenuSettings = async (
+  role_id: string
+): Promise<TResponseListSettings> => {
+  const res = await api.get<TResponseListSettings>(
+    `/role/settings/${role_id}/menu`
+  );
+  return res.data;
+};
+
+export const getSettingsFeature = async (
+  role_id: string
+): Promise<TResponseListSettings> => {
+  const res = await api.get<TResponseListSettings>(`/role/settings/${role_id}`);
+  return res.data;
+};

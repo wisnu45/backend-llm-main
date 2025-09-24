@@ -14,7 +14,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { TSetPromptType } from '../page';
 import { ChatFormSchema, TChatFormData } from '../schema';
 import { toast } from '@/components/ui/use-toast';
-import { useFetchSetting } from '../../setting/_hook/use-fetch-setting';
+import { useFetchSettingFeature } from '../../setting/_hook/use-fetch-setting-feature';
 
 interface InputDataWithFormProps {
   onSubmit: (data: TChatFormData) => void;
@@ -40,14 +40,14 @@ const InputDataWithForm = ({
   const { shouldHideOnScroll } = useMobileScroll(50, scrollContainerRef);
   const shouldHide = shouldHideOnScroll && isFloating;
 
-  const query = useFetchSetting();
+  const queryFeature = useFetchSettingFeature();
+  const settingFeature = queryFeature?.data?.data;
+  const getMenuValue = (name) =>
+    settingFeature?.find((menu) => menu.name === name)?.value;
 
-  const dataSetting = query?.data?.data || [];
-  const maxText =
-    dataSetting.find((item) => item.name === 'Chat max text')?.value || 1000;
-  const fileSize =
-    dataSetting.find((item) => item.name === 'Attachment file size')?.value ||
-    10;
+  const settingAttachment = getMenuValue('Attachment') || false;
+  const maxText = getMenuValue('Max chats') || 1000;
+  const fileSize = getMenuValue('Attachment file size') || 10;
 
   const {
     control,
@@ -161,7 +161,6 @@ const InputDataWithForm = ({
   };
 
   const onFormSubmit = (data: TChatFormData) => {
-    console.log('testing', data);
     onSubmit(data);
     reset({
       prompt: '',
@@ -328,22 +327,16 @@ const InputDataWithForm = ({
             <div className="flex flex-col items-start gap-2 sm:flex-row sm:gap-2">
               <button
                 type="button"
-                className="flex cursor-pointer items-center gap-1 rounded-xl bg-gradient-to-r px-4 py-2 shadow-md transition duration-300 hover:text-purple-600 hover:shadow-lg"
+                className={`flex cursor-pointer items-center gap-1 rounded-xl bg-gradient-to-r px-4 py-2 shadow-md transition duration-300 ${!settingAttachment ? 'cursor-not-allowed opacity-50 shadow-none' : 'hover:text-purple-600 hover:shadow-lg'}`}
               >
                 <Paperclip size={18} />
-                {/* <label
-                  htmlFor="file-upload"
-                  className="cursor-pointer md:inline"
-                >
-                  Add photos & files
-                </label> */}
                 <input
                   id="file-upload"
                   type="file"
                   multiple
                   className="hidden"
                   onChange={handleFileChange}
-                  disabled={isLoading}
+                  disabled={isLoading || settingAttachment === false}
                 />
               </button>
               <Controller
@@ -378,13 +371,13 @@ const InputDataWithForm = ({
                           >
                             <Columns4Icon className="h-5 w-5" />
                             <span className="text-sm font-medium md:inline">
-                              Combiphar & Kebijakan Perusahaan
+                              Company Insights
                             </span>
                           </div>
                         </div>
                       </TooltipTrigger>
                       <TooltipContent className="hidden sm:block">
-                        Search Combiphar & Kebijakan Perusahaan
+                        Search Company Insights
                       </TooltipContent>
                     </Tooltip>
                   );
