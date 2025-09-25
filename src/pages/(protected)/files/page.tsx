@@ -19,7 +19,7 @@ type TModal = 'delete' | 'edit' | 'create' | 'detail' | null;
 const useFilesPage = () => {
   const [modal, setModal] = useState<TModal>(null);
   const [data, setData] = useState<TDocItem | null>(null);
-  const [tab, setTab] = useState<TDocParams['doc_type']>('all');
+  const [tab, setTab] = useState<TDocParams['source_type']>('all');
   const [textSearch, setTextSearch] = useState<string>('');
   const [pageIndex, setPageIndex] = useState(0);
   const [pageSize, setPageSize] = useState(10);
@@ -47,7 +47,8 @@ const useFilesPage = () => {
     search: debouncedValue,
     page: pageIndex,
     page_size: pageSize,
-    doc_type: tab
+    doc_type: tab,
+    source_type: tab
   });
 
   const updateURLParams = (newPageIndex: number, newPageSize: number) => {
@@ -164,7 +165,7 @@ const FilesPage = () => {
       accessorKey: 'metadata',
       header: '',
       cell: ({ row }) => {
-        const isMetadata = row.original.portal_id;
+        const isMetadata = row.original.source_type === 'portal';
 
         return (
           <div className="min-w-40">
@@ -250,10 +251,10 @@ const FilesPage = () => {
             <TabsTrigger value="all" className="w-full sm:w-auto">
               All Document Files
             </TabsTrigger>
-            <TabsTrigger value="metadata" className="w-full sm:w-auto">
+            <TabsTrigger value="portal" className="w-full sm:w-auto">
               Metadata Document
             </TabsTrigger>
-            <TabsTrigger value="upload" className="w-full sm:w-auto">
+            <TabsTrigger value="admin" className="w-full sm:w-auto">
               Upload Document
             </TabsTrigger>
           </TabsList>
