@@ -1,3 +1,5 @@
+import { ChatItemData } from '@/pages/(protected)/chat/component/types';
+
 export interface Result {
   answer: string;
   source_documents: SourceDocument[];
@@ -66,28 +68,11 @@ export interface TNewSesionResponse {
   };
 }
 
-export interface Daum {
-  answer: string;
-  created_at: string;
-  id: string;
-  question: string;
-  chat_id: string;
-  // chat_id: string;
-  user_id: string;
-  source_documents: string;
-  file_links: {
-    filename: string;
-    download_url: string;
-  }[];
-  feedback: '1' | '-1' | null;
-  data?: Daum[];
-}
-
 export type TChatResponse = {
   chat_id: string;
 };
 export interface TGetDetailHistoryData {
-  data: Daum[];
+  data: ChatItemData[];
   chat_id: string;
   message: string;
 }

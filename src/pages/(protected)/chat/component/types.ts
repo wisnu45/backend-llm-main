@@ -1,6 +1,6 @@
 export interface FileLink {
-  filename: string;
-  download_url: string;
+  title: string;
+  url: string;
 }
 
 export interface ChatItemData {
@@ -9,6 +9,8 @@ export interface ChatItemData {
   answer: string;
   created_at: string | Date;
   file_links?: FileLink[];
+  // metadata?: FileLink[];
+  source_documents?: FileLink[];
   chat_id: string;
   feedback: '1' | '-1' | null;
 }

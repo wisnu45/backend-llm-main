@@ -61,7 +61,7 @@ const FilesPageHeader = ({ setModal, setInput, tab }: IFilesPageHeader) => {
         </div>
         <div className="flex gap-3">
           <Button
-            className={`w-full bg-red-400 hover:bg-red-600 sm:w-auto ${tab !== 'metadata' ? 'hidden' : ''}`}
+            className={`w-full bg-red-400 hover:bg-red-600 sm:w-auto ${tab !== 'portal' ? 'hidden' : ''}`}
             onClick={handleSyncPortal}
           >
             {isPending ? 'Syncing...' : 'Sync Portal'}

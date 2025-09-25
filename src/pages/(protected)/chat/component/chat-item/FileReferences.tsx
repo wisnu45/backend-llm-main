@@ -15,15 +15,15 @@ export const FileReferences = ({ fileLinks }: { fileLinks: FileLink[] }) => {
       <div className="flex flex-col space-y-1">
         {fileLinks.map((item, index) => (
           <a
-            key={item.download_url}
+            key={item.url || index}
             href="#"
             onClick={(e) => {
               e.preventDefault();
-              openPdf.mutate(item.download_url);
+              openPdf.mutate(item.url);
             }}
             className="overflow-wrap-anywhere inline-block max-w-full cursor-pointer break-words rounded-md px-2 py-1 text-blue-400 hover:underline"
           >
-            {index + 1}. {item.filename}
+            {index + 1}. {item.title}
           </a>
         ))}
       </div>

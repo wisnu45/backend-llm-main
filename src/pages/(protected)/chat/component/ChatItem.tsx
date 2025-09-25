@@ -17,8 +17,15 @@ const isRecentMessage = (createdAt: string | Date) => {
 };
 
 export const ChatItem = ({ data }: ChatItemProps) => {
-  const { question, answer, created_at, file_links, id, chat_id, feedback } =
-    data;
+  const {
+    question,
+    answer,
+    created_at,
+    id,
+    chat_id,
+    feedback,
+    source_documents
+  } = data;
   const cleanedAnswer = (answer ?? '')
     .replace(/([.])\n(?=•)/g, '$1\n\n')
     .replace(/\n{1,}(?=\s*-\s)/g, '\n');
@@ -47,7 +54,7 @@ export const ChatItem = ({ data }: ChatItemProps) => {
         )}
         {(isTypingComplete || !isRecentMessage(created_at)) && (
           <>
-            <FileReferences fileLinks={file_links || []} />
+            <FileReferences fileLinks={source_documents || []} />
             <IconBar
               text={answer}
               id={id}
