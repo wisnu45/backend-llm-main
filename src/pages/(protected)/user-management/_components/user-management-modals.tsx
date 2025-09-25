@@ -183,7 +183,13 @@ const UserManagementModals = ({
             onError: (error) => {
               toast({
                 title: 'Failed to edit Role Settings',
-                description: error?.message || 'An unexpected error occurred',
+                description:
+                  typeof error === 'object' &&
+                  error !== null &&
+                  'response' in error &&
+                  typeof (error as any).response?.data?.error === 'string'
+                    ? (error as any).response.data.error
+                    : 'An unexpected error occurred',
                 variant: 'destructive'
               });
             }
