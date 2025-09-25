@@ -190,20 +190,17 @@ const Sidebar = ({ setShowModal }) => {
                 )}
                 {dataResult.length > 0
                   ? (filteredData ?? []).map((chat) => (
-                      <div key={chat.session_id}>
-                        <li
-                          key={chat.session_id}
-                          className="group/outer relative"
-                        >
+                      <div key={chat.chat_id}>
+                        <li key={chat.chat_id} className="group/outer relative">
                           <DropdownMenu
                             onOpenChange={(open) => {
                               if (!open) setActive(null);
                             }}
                           >
                             <Link
-                              to={`/chat/${chat.session_id}`}
-                              className={`flex items-center justify-between rounded-lg p-2 text-sm hover:bg-gray-400/20 ${active === chat.session_id ? 'bg-gray-400/30' : ''} ${
-                                location.pathname === `/chat/${chat.session_id}`
+                              to={`/chat/${chat.chat_id}`}
+                              className={`flex items-center justify-between rounded-lg p-2 text-sm hover:bg-gray-400/20 ${active === chat.chat_id ? 'bg-gray-400/30' : ''} ${
+                                location.pathname === `/chat/${chat.chat_id}`
                                   ? 'bg-gray-400/40 text-black'
                                   : 'text-gray-700'
                               }`}
@@ -212,7 +209,7 @@ const Sidebar = ({ setShowModal }) => {
                                   setIsSidebarOpen(false);
                                 }
                               }}
-                              onMouseEnter={() => setActive(chat.session_id)}
+                              onMouseEnter={() => setActive(chat.chat_id)}
                               onMouseLeave={() => setActive(null)}
                             >
                               <span className="flex w-11/12 items-center gap-1">
@@ -226,15 +223,14 @@ const Sidebar = ({ setShowModal }) => {
                             </Link>
                             <DropdownMenuTrigger asChild>
                               <button
-                                className={`group/inner absolute right-1 top-1/2 h-6 w-6 -translate-y-1/2 cursor-pointer rounded-full hover:bg-slate-700/10 ${active === chat.session_id ? 'bg-slate-700/10' : ''}`}
+                                className={`group/inner absolute right-1 top-1/2 h-6 w-6 -translate-y-1/2 cursor-pointer rounded-full hover:bg-slate-700/10 ${active === chat.chat_id ? 'bg-slate-700/10' : ''}`}
                                 aria-label="More options"
-                                onClick={() => setActive(chat.session_id)}
-                                onMouseEnter={() => setActive(chat.session_id)}
+                                onClick={() => setActive(chat.chat_id)}
+                                onMouseEnter={() => setActive(chat.chat_id)}
                               >
                                 <MoreVertical
                                   style={{
-                                    opacity:
-                                      active === chat.session_id ? 100 : 0
+                                    opacity: active === chat.chat_id ? 100 : 0
                                   }}
                                   className="h-4  "
                                 />
@@ -245,7 +241,7 @@ const Sidebar = ({ setShowModal }) => {
                               <DropdownMenuItem
                                 className="cursor-pointer"
                                 onClick={() => {
-                                  setActiveId(chat.session_id);
+                                  setActiveId(chat.chat_id);
                                   setShowDeleteModal(true);
                                 }}
                               >
@@ -257,7 +253,7 @@ const Sidebar = ({ setShowModal }) => {
                               <DropdownMenuItem
                                 className="cursor-pointer"
                                 onClick={() => {
-                                  setActiveId(chat.session_id);
+                                  setActiveId(chat.chat_id);
                                   setChatId(chat.id);
                                   setActiveChat(chat.title);
                                   setShowEditName(true);
@@ -361,7 +357,7 @@ const Sidebar = ({ setShowModal }) => {
         onClose={() => setShowDeleteModal(false)}
         onConfirm={() => {
           deleteMutation.mutate(
-            { session_id: activeId! },
+            { chat_id: activeId! },
             {
               onSuccess: () => {
                 setShowDeleteModal(false);

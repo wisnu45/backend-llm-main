@@ -51,7 +51,7 @@ export const ChatItem = ({ data }: ChatItemProps) => {
             <IconBar
               text={answer}
               id={id}
-              session_id={chat_id}
+              chat_id={chat_id}
               feedback={feedback}
             />
           </>

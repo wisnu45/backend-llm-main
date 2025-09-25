@@ -15,7 +15,6 @@ export interface Metadata {
 
 export interface TChatRequest {
   question: string;
-  session_id?: string;
   chat_id?: string;
   is_browse: boolean;
   is_company_policy: boolean;
@@ -29,11 +28,11 @@ export interface TChatResponseRequest {
 }
 
 export interface TClearChatRequest {
-  session_id: string;
+  chat_id: string;
 }
 
 export interface TDeleteBulkChatRequest {
-  session_ids: string[];
+  chat_id: string[];
 }
 
 export interface TRenameChatRequest {
@@ -47,7 +46,7 @@ export interface TPinChatRequest {
 }
 
 export type TRecentChats = {
-  session_id: string;
+  chat_id: string;
   title: string;
   id: string;
   pinned: boolean;
@@ -59,11 +58,11 @@ export interface TGetHistoryRequest {
 
 export interface TNewSesionResponse {
   message: string;
-  session_id: string;
+  chat_id: string;
   user_id: string;
   data: {
     message: string;
-    session_id: string;
+    chat_id: string;
   };
 }
 
@@ -72,8 +71,8 @@ export interface Daum {
   created_at: string;
   id: string;
   question: string;
-  session_id: string;
   chat_id: string;
+  // chat_id: string;
   user_id: string;
   source_documents: string;
   file_links: {
@@ -89,6 +88,6 @@ export type TChatResponse = {
 };
 export interface TGetDetailHistoryData {
   data: Daum[];
-  session_id: string;
+  chat_id: string;
   message: string;
 }

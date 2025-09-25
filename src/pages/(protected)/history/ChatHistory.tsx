@@ -7,7 +7,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useBulkDeleteChat } from './_hook/use-delete-bulk-chat';
 
 type TRecentChats = {
-  session_id: string;
+  chat_id: string;
   title: string;
 };
 
@@ -34,13 +34,13 @@ export default function ChatHistory() {
 
   const handleSelectAll = () => {
     if (dataHistory) {
-      setSelected(dataHistory.map((chat) => chat.session_id));
+      setSelected(dataHistory.map((chat) => chat.chat_id));
     }
   };
   const handleClear = () => setSelected([]);
   const handleDelete = () => {
     deleteBulkChat.mutate(
-      { session_ids: selected },
+      { chat_id: selected },
       {
         onSuccess: () => {
           setSelected([]);
@@ -107,21 +107,21 @@ export default function ChatHistory() {
           {Array.isArray(filteredChats) && filteredChats.length > 0
             ? filteredChats.map((chat) => (
                 <div
-                  key={chat.session_id}
+                  key={chat.chat_id}
                   className={`group relative flex items-start gap-3 rounded-md border p-4 hover:cursor-pointer ${
-                    selected.includes(chat.session_id)
+                    selected.includes(chat.chat_id)
                       ? 'border-blue-400 bg-[#d1d1d1]'
                       : 'border-[#333]'
                   }`}
                 >
                   <input
                     type="checkbox"
-                    checked={selected.includes(chat?.session_id)}
-                    onChange={() => toggleSelect(chat?.session_id)}
+                    checked={selected.includes(chat?.chat_id)}
+                    onChange={() => toggleSelect(chat?.chat_id)}
                     className="self-center"
                   />
 
-                  <Link to={`/chat/${chat.session_id}`}>
+                  <Link to={`/chat/${chat.chat_id}`}>
                     <p className="font-medium">{chat.title}</p>
                     <p className="text-sm text-gray-400">
                       {/* Pesan terakhir {chat.timestamp} */}
@@ -130,7 +130,7 @@ export default function ChatHistory() {
                   {selected.length == 0 && (
                     <button
                       onClick={() => {
-                        setActiveId(chat.session_id);
+                        setActiveId(chat.chat_id);
                         setShowDeleteModal(true);
                       }}
                       className="absolute right-2 top-2  px-2 py-1 text-xs text-white opacity-0 transition-opacity group-hover:opacity-100"
@@ -151,7 +151,7 @@ export default function ChatHistory() {
         onClose={() => setShowDeleteModal(false)}
         onConfirm={() => {
           deleteMutation.mutate(
-            { session_id: activeId! },
+            { chat_id: activeId! },
             {
               onSuccess: () => {
                 setShowDeleteModal(false);

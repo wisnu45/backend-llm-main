@@ -44,7 +44,7 @@ export const chatFeedback = async (
 export const clearChat = async (
   req: TClearChatRequest
 ): Promise<TDefaultResponse> => {
-  const res = await api.delete<TDefaultResponse>(`/chats/${req.session_id}`);
+  const res = await api.delete<TDefaultResponse>(`/chats/${req.chat_id}`);
   return res.data;
 };
 
@@ -61,7 +61,7 @@ export const getHistory = async (): Promise<TGetHistoryRequest> => {
 export const getDetailHistory = async (
   req: TClearChatRequest
 ): Promise<TGetDetailHistoryData> => {
-  const res = await api.get<TGetDetailHistoryData>(`/chats/${req.session_id}`);
+  const res = await api.get<TGetDetailHistoryData>(`/chats/${req.chat_id}`);
   return res.data;
 };
 

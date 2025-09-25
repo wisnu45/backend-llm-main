@@ -1,5 +1,5 @@
 export type LogoutInput = {
-  session_id: string;
+  chat_id: string;
 };
 
 export type LoginInput = {

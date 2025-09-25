@@ -7,14 +7,14 @@ import { useGetDetailHistory } from '../../_hook/use-get-history-chat';
 interface IconBarProps {
   text: string;
   id: string;
-  session_id: string;
+  chat_id: string;
   feedback: '1' | '-1' | null;
 }
 
-export const IconBar = ({ text, id, session_id, feedback }: IconBarProps) => {
+export const IconBar = ({ text, id, chat_id, feedback }: IconBarProps) => {
   const [isCopied, setIsCopied] = useState(false);
   const { mutate } = useCreateFeedbackChat();
-  const query = useGetDetailHistory({ session_id: session_id || '' });
+  const query = useGetDetailHistory({ chat_id: chat_id || '' });
 
   const handleCopy = () => {
     const textToCopy = formatMarkdownToPlainText(text);

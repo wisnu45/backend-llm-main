@@ -16,7 +16,7 @@ const DetailPage = () => {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLElement | null>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
-  const query = useGetDetailHistory({ session_id: chatId || '' });
+  const query = useGetDetailHistory({ chat_id: chatId || '' });
   const mutation = useCreateChat();
   const navigate = useNavigate();
 
