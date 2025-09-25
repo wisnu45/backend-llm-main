@@ -114,17 +114,17 @@ const FilesPage = () => {
         <div className="max-w-[150px]">{row.getValue('id')}</div>
       )
     },
-    ...(tab !== 'upload'
-      ? [
-          {
-            accessorKey: 'portal_id',
-            header: 'PORTAL ID',
-            cell: ({ row }) => (
-              <div className="min-w-28">{row.getValue('portal_id') ?? '-'}</div>
-            )
-          }
-        ]
-      : []),
+    // ...(tab !== 'upload'
+    //   ? [
+    //       {
+    //         accessorKey: 'portal_id',
+    //         header: 'PORTAL ID',
+    //         cell: ({ row }) => (
+    //           <div className="min-w-28">{row.getValue('portal_id') ?? '-'}</div>
+    //         )
+    //       }
+    //     ]
+    //   : []),
     {
       id: 'document-info',
       header: 'document name',
