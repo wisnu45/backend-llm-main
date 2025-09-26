@@ -9,9 +9,16 @@ interface IconBarProps {
   id: string;
   chat_id: string;
   feedback: '1' | '-1' | null;
+  isQuestion?: boolean;
 }
 
-export const IconBar = ({ text, id, chat_id, feedback }: IconBarProps) => {
+export const IconBar = ({
+  text,
+  id,
+  chat_id,
+  feedback,
+  isQuestion
+}: IconBarProps) => {
   const [isCopied, setIsCopied] = useState(false);
   const { mutate } = useCreateFeedbackChat();
   const query = useGetDetailHistory({ chat_id: chat_id || '' });
@@ -52,7 +59,8 @@ export const IconBar = ({ text, id, chat_id, feedback }: IconBarProps) => {
           Salin
         </span>
       </div>
-      {(feedback === '1' || feedback === null) && (
+
+      {(feedback === '1' || feedback === null) && !isQuestion && (
         <div className="group relative">
           <button
             onClick={() => handleFeedback('1')}
@@ -65,7 +73,7 @@ export const IconBar = ({ text, id, chat_id, feedback }: IconBarProps) => {
           </span>
         </div>
       )}
-      {(feedback === '-1' || feedback === null) && (
+      {(feedback === '-1' || feedback === null) && !isQuestion && (
         <div className="group relative">
           <button
             onClick={() => handleFeedback('-1')}

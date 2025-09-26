@@ -40,6 +40,13 @@ export const ChatItem = ({ data }: ChatItemProps) => {
       <div className="flex justify-end">
         <div className="rounded-xl bg-gray-200 px-4 py-2 text-sm text-gray-900">
           {question}
+          <IconBar
+            text={question}
+            id={id}
+            chat_id={chat_id}
+            feedback={feedback}
+            isQuestion={true}
+          />
         </div>
       </div>
       <div className="col-auto flex flex-col items-start space-y-3 overflow-hidden">
@@ -60,6 +67,7 @@ export const ChatItem = ({ data }: ChatItemProps) => {
               id={id}
               chat_id={chat_id}
               feedback={feedback}
+              isQuestion={false}
             />
           </>
         )}

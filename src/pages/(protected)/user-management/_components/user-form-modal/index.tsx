@@ -82,7 +82,10 @@ const UserFormModal = ({
 
   useEffect(() => {
     if (defaultValues) {
-      form.reset(defaultValues);
+      const defaultRole = rolesChoise?.find(
+        (item) => item.name === defaultValues?.role
+      )?.value_id;
+      form.reset({ ...defaultValues, roles_id: defaultRole?.toString() });
     } else {
       form.reset({
         name: '',
@@ -135,6 +138,7 @@ const UserFormModal = ({
                     <Checkbox
                       checked={field.value}
                       onCheckedChange={field.onChange}
+                      disabled={mode === 'edit'}
                     />
                   </FormControl>
                   <div className="space-y-1 leading-none">
@@ -173,6 +177,7 @@ const UserFormModal = ({
                       type="text"
                       placeholder="Enter username"
                       {...field}
+                      disabled={mode === 'edit' || watchPortalUser}
                     />
                   </FormControl>
                   <FormMessage />

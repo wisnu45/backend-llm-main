@@ -204,11 +204,26 @@ const UserManagementModals = ({
         itemName={userDetailQuery.data?.data.name || userData?.name}
         loading={deleteUserMutation.isPending}
         onDelete={() => {
-          const id = userDetailQuery.data?.data.id || userData?.id;
+          const id = roleData?.id;
+          console.log('Deleting user with id:', userDetailQuery.data);
           deleteUserMutation.mutate(
-            { id: id! },
+            { id: id?.toString()! },
             {
-              onSuccess: () => setModal(null)
+              onSuccess: () => setModal(null),
+              onError: (error) => {
+                setModal(null);
+                toast({
+                  title: 'Failed to delete user',
+                  description:
+                    typeof error === 'object' &&
+                    error !== null &&
+                    'response' in error &&
+                    typeof (error as any).response?.data?.error === 'string'
+                      ? (error as any).response.data.error
+                      : 'An unexpected error occurred',
+                  variant: 'destructive'
+                });
+              }
             }
           );
         }}
@@ -221,11 +236,26 @@ const UserManagementModals = ({
         itemName={roleData?.name}
         loading={deleteRoleMutation.isPending}
         onDelete={() => {
+          console.log('Deleting role with id:', roleData);
           const id = roleData?.id;
           deleteRoleMutation.mutate(
             { id: id?.toString()! },
             {
-              onSuccess: () => setModal(null)
+              onSuccess: () => setModal(null),
+              onError: (error) => {
+                setModal(null);
+                toast({
+                  title: 'Failed to delete user',
+                  description:
+                    typeof error === 'object' &&
+                    error !== null &&
+                    'response' in error &&
+                    typeof (error as any).response?.data?.error === 'string'
+                      ? (error as any).response.data.error
+                      : 'An unexpected error occurred',
+                  variant: 'destructive'
+                });
+              }
             }
           );
         }}

@@ -130,7 +130,7 @@ const InputData = ({
               checked={isChecked}
               onChange={handleCheckboxChange}
             />
-            <span className="text-sm">Cari di internet</span>
+            <span className="text-sm">Search</span>
           </div>
         </div>
 

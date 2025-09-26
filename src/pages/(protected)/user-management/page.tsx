@@ -40,10 +40,14 @@ const useUserManagementPage = () => {
   const [userData, setUserData] = useState<TUser | null>(null);
   const [roleData, setRoleData] = useState<TRole | null>(null);
   const [tab, setTab] = useState<'users' | 'roles'>('users');
+
+  console.log('CEK CEK', tab);
   const [textSearch, setTextSearch] = useState<string>('');
   const [pageIndex, setPageIndex] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [debouncedValue] = useDebounce(textSearch, 1000);
+
+  console.log('RENDER PAGE 123', { modal, userData, roleData });
 
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -359,7 +363,7 @@ const UserManagementPage = () => {
           ) : (
             <Button
               variant="ghost"
-              onClick={() => setModal('delete-user', null, row.original)}
+              onClick={() => setModal('delete-role', null, row.original)}
             >
               Delete
             </Button>

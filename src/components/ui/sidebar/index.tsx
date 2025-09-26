@@ -306,12 +306,6 @@ const Sidebar = ({ setShowModal }) => {
         <div
           className={`absolute bottom-0 left-0 right-0 mt-auto w-full  ${isSidebarOpen ? 'p-4' : 'p-2'} bg-[#D2D2D2]`}
         >
-          {documentSideBarMenu && (
-            <DocumentMenu isSidebarOpen={isSidebarOpen} />
-          )}
-          {userSideBarMenu && (
-            <UserManagementMenu isSidebarOpen={isSidebarOpen} />
-          )}
           <Link
             to="/history"
             className="flex items-center gap-3 rounded-lg p-2 text-sm text-gray-600 transition-colors duration-200 hover:bg-neutral-300/60"
@@ -325,6 +319,13 @@ const Sidebar = ({ setShowModal }) => {
               <span className="truncate">See Full Chat History</span>
             )}
           </Link>
+          {documentSideBarMenu && (
+            <DocumentMenu isSidebarOpen={isSidebarOpen} />
+          )}
+          {userSideBarMenu && (
+            <UserManagementMenu isSidebarOpen={isSidebarOpen} />
+          )}
+
           {settingSideBarMenu && (
             <Link
               to="/setting"
