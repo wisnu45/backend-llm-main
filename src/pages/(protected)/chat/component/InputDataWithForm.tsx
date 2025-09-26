@@ -200,7 +200,8 @@ const InputDataWithForm = ({
       attachments: [],
       with_document: [],
       is_browse: Cookies.get('search_internet') === 'true',
-      is_company_policy: Cookies.get('is_company_policy') === 'true'
+      is_company_policy: Cookies.get('is_company_policy') === 'true',
+      is_general_policy: Cookies.get('is_general_policy') === 'true'
     });
   };
 
@@ -358,25 +359,29 @@ const InputDataWithForm = ({
 
           <div className="mt-4 flex flex-col items-start justify-between text-sm text-gray-800 sm:flex-row sm:items-center">
             <div className="flex flex-col items-start gap-2 sm:flex-row sm:gap-2">
-              <label
-                htmlFor="file-upload"
-                className={`flex cursor-pointer items-center gap-1 rounded-xl bg-gradient-to-r px-4 py-2 shadow-md transition duration-300 ${
-                  !settingAttachment
-                    ? 'cursor-not-allowed opacity-50 shadow-none'
-                    : 'hover:text-purple-600 hover:shadow-lg'
-                }`}
-              >
-                <Paperclip size={18} />
-              </label>
+              {settingAttachment && (
+                <>
+                  <label
+                    htmlFor="file-upload"
+                    className={`flex cursor-pointer items-center gap-1 rounded-xl bg-gradient-to-r px-4 py-2 shadow-md transition duration-300 ${
+                      !settingAttachment
+                        ? 'cursor-not-allowed opacity-50 shadow-none'
+                        : 'hover:text-purple-600 hover:shadow-lg'
+                    }`}
+                  >
+                    <Paperclip size={18} />
+                  </label>
 
-              <input
-                id="file-upload"
-                type="file"
-                multiple
-                className="hidden"
-                onChange={handleFileChange}
-                disabled={isLoading || !settingAttachment}
-              />
+                  <input
+                    id="file-upload"
+                    type="file"
+                    multiple
+                    className="hidden"
+                    onChange={handleFileChange}
+                    disabled={isLoading || !settingAttachment}
+                  />
+                </>
+              )}
               <Controller
                 name="is_company_policy"
                 control={control}
@@ -416,6 +421,50 @@ const InputDataWithForm = ({
                       </TooltipTrigger>
                       <TooltipContent className="hidden sm:block">
                         Search Company Insights
+                      </TooltipContent>
+                    </Tooltip>
+                  );
+                }}
+              />
+              <Controller
+                name="is_general_policy"
+                control={control}
+                render={({ field }) => {
+                  const { value, onChange } = field;
+                  return (
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <div
+                          className="group relative w-max cursor-pointer"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            if (!isLoading) {
+                              const newValue = !value;
+                              onChange(newValue);
+                              Cookies.set(
+                                'is_general_policy',
+                                newValue ? 'true' : 'false'
+                              );
+                            }
+                          }}
+                        >
+                          <div
+                            className={`flex items-center gap-2 rounded-xl px-4 py-2 shadow-md transition-all duration-300 ${
+                              value
+                                ? 'bg-[#772f8e] text-white hover:text-purple-200 hover:shadow-lg'
+                                : 'shadow-lg'
+                            }`}
+                          >
+                            <Columns4Icon className="h-5 w-5" />
+                            <span className="text-sm font-medium md:inline">
+                              General Insights
+                            </span>
+                          </div>
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent className="hidden sm:block">
+                        Search General Insights
                       </TooltipContent>
                     </Tooltip>
                   );

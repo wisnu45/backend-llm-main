@@ -8,7 +8,8 @@ export const ChatFormSchema = z.object({
   attachments: z.array(z.instanceof(File)).optional().default([]),
   with_document: z.array(z.string()).optional().default([]),
   is_browse: z.boolean().default(false),
-  is_company_policy: z.boolean().default(false)
+  is_company_policy: z.boolean().default(false),
+  is_general_policy: z.boolean().default(false)
 });
 
 export type TChatFormData = z.infer<typeof ChatFormSchema>;
