@@ -5,9 +5,10 @@ export const useOpenPdf = () => {
   return useMutation({
     mutationKey: ['download-file'],
     mutationFn: async (url: string) => {
-      const secureUrl = url.startsWith('http://')
-        ? url.replace('http://', 'https://')
-        : url;
+      // const secureUrl = url.startsWith('http://')
+      //   ? url.replace('http://', 'https://')
+      //   : url;
+      const secureUrl = url;
       const response = await fetch(secureUrl, {
         method: 'GET',
         headers: {

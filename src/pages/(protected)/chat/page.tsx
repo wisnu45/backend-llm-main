@@ -160,11 +160,6 @@ const ChatPage = () => {
                 ? dataGreating[1]
                 : 'Apa yang bisa Vita bantu hari ini?'}
             </h2>
-            <h3 className="text-gradient-light mb-1 text-2xl font-bold md:mb-8 md:text-3xl lg:text-4xl">
-              {dataGreating[1]
-                ? dataGreating[1]
-                : 'Apa yang bisa Vita bantu hari ini?'}
-            </h3>
             <p className="mb-4 text-gray-500 md:mb-10">
               Tuliskan pertanyaanmu atau gunakan salah satu dari contoh di bawah
               ini

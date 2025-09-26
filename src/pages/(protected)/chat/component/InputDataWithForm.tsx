@@ -8,7 +8,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { ArrowRightIcon, Cross2Icon } from '@radix-ui/react-icons';
 import clsx from 'clsx';
 import Cookies from 'js-cookie';
-import { Globe, Mic, Paperclip, Columns4Icon } from 'lucide-react';
+import { Globe, Mic, Paperclip, Lightbulb, Building } from 'lucide-react';
 import { useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { TSetPromptType } from '../page';
@@ -72,6 +72,16 @@ const InputDataWithForm = ({
     },
     mode: 'onChange'
   });
+
+  const is_company_policy = watch('is_company_policy');
+  const search_internet = watch('is_browse');
+  const is_general_policy = watch('is_general_policy');
+
+  useEffect(() => {
+    if (!is_company_policy && !search_internet && !is_general_policy) {
+      setValue('is_company_policy', true);
+    }
+  }, [is_company_policy, search_internet, is_general_policy, setValue]);
 
   const watchedAttachments = watch('attachments');
   const watchedPrompt = watch('prompt');
@@ -157,7 +167,6 @@ const InputDataWithForm = ({
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log('handleFileChange called');
     const selectedFiles = e.target.files;
     if (selectedFiles) {
       const newFiles = Array.from(selectedFiles);
@@ -252,7 +261,9 @@ const InputDataWithForm = ({
 
   useEffect(() => {
     const cookieValue = Cookies.get('search_internet') === 'true';
-    setValue('is_browse', cookieValue); // update nilai form
+    const is_company_policy = Cookies.get('search_internet') === 'true';
+    setValue('is_browse', cookieValue);
+    setValue('is_company_policy', is_company_policy);
   }, []);
 
   const toggleRecording = () => {
@@ -412,7 +423,7 @@ const InputDataWithForm = ({
                                 : 'shadow-lg'
                             }`}
                           >
-                            <Columns4Icon className="h-5 w-5" />
+                            <Building className="h-5 w-5" />
                             <span className="text-sm font-medium md:inline">
                               Company Insights
                             </span>
@@ -456,7 +467,7 @@ const InputDataWithForm = ({
                                 : 'shadow-lg'
                             }`}
                           >
-                            <Columns4Icon className="h-5 w-5" />
+                            <Lightbulb className="h-5 w-5" />
                             <span className="text-sm font-medium md:inline">
                               General Insights
                             </span>

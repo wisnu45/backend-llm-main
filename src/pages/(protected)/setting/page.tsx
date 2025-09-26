@@ -10,6 +10,7 @@ export default function SettingTable() {
   const [modalType, setModalType] = useState<string | null>(null);
   const [inputValue, setInputValue] = useState<string>('');
   const [inputValueBoolean, setInputValueBoolean] = useState<boolean>(false);
+  const [searchQuery, setSearchQuery] = useState<string>('');
 
   const query = useFetchSetting();
   const mutate = useEditSetting(selectedSetting?.id || '');
@@ -83,10 +84,22 @@ export default function SettingTable() {
     { value: 'png', label: 'png' },
     { value: 'txt', label: 'txt' }
   ];
+  const filteredDataSetting = dataSetting.filter(
+    (row) =>
+      row.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      row.description.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <div className="mx-auto w-full rounded-lg bg-white p-6 shadow">
       <h1 className="mb-4 text-2xl font-semibold">Pengaturan Aplikasi</h1>
+      <input
+        type="text"
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+        placeholder="Cari pengaturan..."
+        className="mb-6 mt-4 w-full rounded-lg border-2 border-gray-300 p-2"
+      />
       <div className="overflow-x-auto">
         <table className="w-full min-w-[600px] table-auto border-collapse overflow-hidden rounded-lg">
           <thead>
@@ -100,7 +113,7 @@ export default function SettingTable() {
           </thead>
           <tbody>
             {!isLoading &&
-              dataSetting?.map((row) => (
+              filteredDataSetting?.map((row) => (
                 <tr
                   key={row.id}
                   className="border-b last:border-0 hover:bg-gray-100"
