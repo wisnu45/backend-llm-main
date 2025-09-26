@@ -2,13 +2,13 @@ import {
   ChatBubbleIcon,
   EnvelopeClosedIcon,
   MixerHorizontalIcon,
-  PersonIcon,
-  ReloadIcon
+  PersonIcon
+  // ReloadIcon
 } from '@radix-ui/react-icons';
 import { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-import { Button } from '@/components/ui/button';
+// import { Button } from '@/components/ui/button';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { useGetFiles } from '@/components/ui/sidebar/_hook/use-get-history-chat';
 
