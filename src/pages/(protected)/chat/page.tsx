@@ -110,7 +110,8 @@ const ChatPage = () => {
         {
           question: trimmedQuestion,
           is_browse: formData.is_browse,
-          is_company_policy: formData.is_company_policy,
+          is_company: formData.is_company,
+          is_general: formData.is_general,
           attachments: formData.attachments,
           with_document: formData.with_document
         },

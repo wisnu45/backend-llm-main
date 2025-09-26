@@ -19,7 +19,8 @@ export interface TChatRequest {
   question: string;
   chat_id?: string;
   is_browse: boolean;
-  is_company_policy: boolean;
+  is_company: boolean;
+  is_general: boolean;
   attachments?: File[];
   with_document?: string[];
 }

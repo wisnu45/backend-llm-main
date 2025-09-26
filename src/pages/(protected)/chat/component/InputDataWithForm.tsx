@@ -35,8 +35,9 @@ const InputDataWithForm = ({
 }: InputDataWithFormProps) => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [popupFile, setPopupFile] = useState<File | null>(null);
-  const defaultIsBrowse = Cookies.get('search_internet') === 'true';
-  const defaultIsCompanyPolicy = Cookies.get('is_company_policy') === 'true';
+  const defaultIsBrowse = Cookies.get('search_internet') === 'false';
+  const defaultIsCompanyPolicy = Cookies.get('is_company') === 'true';
+  const defaultIsGeneralPolicy = Cookies.get('is_general') === 'false';
   const { shouldHideOnScroll } = useMobileScroll(50, scrollContainerRef);
   const shouldHide = shouldHideOnScroll && isFloating;
 
@@ -44,11 +45,13 @@ const InputDataWithForm = ({
   const settingFeature = queryFeature?.data?.data;
   const getMenuValue = (name) =>
     settingFeature?.find((menu) => menu.name === name)?.value;
-
-  const settingAttachment = getMenuValue('Attachment') || false;
+  const settingAttachment = getMenuValue('Attachment');
   const maxText = getMenuValue('Max chats') || 1000;
   const fileSize = getMenuValue('Attachment file size') || 10;
   const rawFileTypes = getMenuValue('Attachment file types');
+  const settingVoice = getMenuValue('Voice typing');
+  const settingSearchInternet = getMenuValue('Search internet');
+  const settingGeneralInsight = getMenuValue('General insight');
   const fileTypeAllow: string[] =
     typeof rawFileTypes === 'string' ? JSON.parse(rawFileTypes) : [];
 
@@ -68,18 +71,19 @@ const InputDataWithForm = ({
       attachments: [],
       with_document: [],
       is_browse: defaultIsBrowse,
-      is_company_policy: defaultIsCompanyPolicy
+      is_company: defaultIsCompanyPolicy,
+      is_general: defaultIsGeneralPolicy
     },
     mode: 'onChange'
   });
 
-  const is_company_policy = watch('is_company_policy');
+  const is_company_policy = watch('is_company');
   const search_internet = watch('is_browse');
-  const is_general_policy = watch('is_general_policy');
+  const is_general_policy = watch('is_general');
 
   useEffect(() => {
     if (!is_company_policy && !search_internet && !is_general_policy) {
-      setValue('is_company_policy', true);
+      setValue('is_company', true);
     }
   }, [is_company_policy, search_internet, is_general_policy, setValue]);
 
@@ -209,8 +213,8 @@ const InputDataWithForm = ({
       attachments: [],
       with_document: [],
       is_browse: Cookies.get('search_internet') === 'true',
-      is_company_policy: Cookies.get('is_company_policy') === 'true',
-      is_general_policy: Cookies.get('is_general_policy') === 'true'
+      is_company: Cookies.get('is_company') === 'true',
+      is_general: Cookies.get('is_general') === 'true'
     });
   };
 
@@ -261,9 +265,9 @@ const InputDataWithForm = ({
 
   useEffect(() => {
     const cookieValue = Cookies.get('search_internet') === 'true';
-    const is_company_policy = Cookies.get('search_internet') === 'true';
+    const is_company_policy = Cookies.get('is_company') === 'true';
     setValue('is_browse', cookieValue);
-    setValue('is_company_policy', is_company_policy);
+    setValue('is_company', is_company_policy);
   }, []);
 
   const toggleRecording = () => {
@@ -394,7 +398,7 @@ const InputDataWithForm = ({
                 </>
               )}
               <Controller
-                name="is_company_policy"
+                name="is_company"
                 control={control}
                 render={({ field }) => {
                   const { value, onChange } = field;
@@ -410,7 +414,7 @@ const InputDataWithForm = ({
                               const newValue = !value;
                               onChange(newValue);
                               Cookies.set(
-                                'is_company_policy',
+                                'is_company',
                                 newValue ? 'true' : 'false'
                               );
                             }
@@ -437,120 +441,126 @@ const InputDataWithForm = ({
                   );
                 }}
               />
-              <Controller
-                name="is_general_policy"
-                control={control}
-                render={({ field }) => {
-                  const { value, onChange } = field;
-                  return (
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <div
-                          className="group relative w-max cursor-pointer"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            if (!isLoading) {
-                              const newValue = !value;
-                              onChange(newValue);
-                              Cookies.set(
-                                'is_general_policy',
-                                newValue ? 'true' : 'false'
-                              );
-                            }
-                          }}
-                        >
+              {settingGeneralInsight && (
+                <Controller
+                  name="is_general"
+                  control={control}
+                  render={({ field }) => {
+                    const { value, onChange } = field;
+                    return (
+                      <Tooltip>
+                        <TooltipTrigger>
                           <div
-                            className={`flex items-center gap-2 rounded-xl px-4 py-2 shadow-md transition-all duration-300 ${
-                              value
-                                ? 'bg-[#772f8e] text-white hover:text-purple-200 hover:shadow-lg'
-                                : 'shadow-lg'
-                            }`}
+                            className="group relative w-max cursor-pointer"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              if (!isLoading) {
+                                const newValue = !value;
+                                onChange(newValue);
+                                Cookies.set(
+                                  'is_general',
+                                  newValue ? 'true' : 'false'
+                                );
+                              }
+                            }}
                           >
-                            <Lightbulb className="h-5 w-5" />
-                            <span className="text-sm font-medium md:inline">
-                              General Insights
-                            </span>
+                            <div
+                              className={`flex items-center gap-2 rounded-xl px-4 py-2 shadow-md transition-all duration-300 ${
+                                value
+                                  ? 'bg-[#772f8e] text-white hover:text-purple-200 hover:shadow-lg'
+                                  : 'shadow-lg'
+                              }`}
+                            >
+                              <Lightbulb className="h-5 w-5" />
+                              <span className="text-sm font-medium md:inline">
+                                General Insights
+                              </span>
+                            </div>
                           </div>
-                        </div>
-                      </TooltipTrigger>
-                      <TooltipContent className="hidden sm:block">
-                        Search General Insights
-                      </TooltipContent>
-                    </Tooltip>
-                  );
-                }}
-              />
-              <Controller
-                name="is_browse"
-                control={control}
-                render={({ field }) => {
-                  const { value, onChange } = field;
-                  return (
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <div
-                          className="group relative w-max cursor-pointer"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            if (!isLoading) {
-                              const newValue = !value;
-                              onChange(newValue);
-                              Cookies.set(
-                                'search_internet',
-                                newValue ? 'true' : 'false'
-                              );
-                            }
-                          }}
-                        >
+                        </TooltipTrigger>
+                        <TooltipContent className="hidden sm:block">
+                          Search General Insights
+                        </TooltipContent>
+                      </Tooltip>
+                    );
+                  }}
+                />
+              )}
+              {settingSearchInternet && (
+                <Controller
+                  name="is_browse"
+                  control={control}
+                  render={({ field }) => {
+                    const { value, onChange } = field;
+                    return (
+                      <Tooltip>
+                        <TooltipTrigger>
                           <div
-                            className={`flex items-center gap-2 rounded-xl px-4 py-2 shadow-md transition-all duration-300 ${
-                              value
-                                ? 'bg-[#772f8e] text-white hover:text-purple-200 hover:shadow-lg'
-                                : 'shadow-lg'
-                            }`}
+                            className="group relative w-max cursor-pointer"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              if (!isLoading) {
+                                const newValue = !value;
+                                onChange(newValue);
+                                Cookies.set(
+                                  'search_internet',
+                                  newValue ? 'true' : 'false'
+                                );
+                              }
+                            }}
                           >
-                            <Globe className="h-5 w-5" />
-                            <span className="text-sm font-medium">
-                              Cari di internet
-                            </span>
+                            <div
+                              className={`flex items-center gap-2 rounded-xl px-4 py-2 shadow-md transition-all duration-300 ${
+                                value
+                                  ? 'bg-[#772f8e] text-white hover:text-purple-200 hover:shadow-lg'
+                                  : 'shadow-lg'
+                              }`}
+                            >
+                              <Globe className="h-5 w-5" />
+                              <span className="text-sm font-medium">
+                                Cari di internet
+                              </span>
+                            </div>
                           </div>
-                        </div>
-                      </TooltipTrigger>
-                      <TooltipContent className="hidden sm:block">
-                        Search the web when necessary
-                      </TooltipContent>
-                    </Tooltip>
-                  );
-                }}
-              />
+                        </TooltipTrigger>
+                        <TooltipContent className="hidden sm:block">
+                          Search the web when necessary
+                        </TooltipContent>
+                      </Tooltip>
+                    );
+                  }}
+                />
+              )}
             </div>
             <div className="mt-3 flex w-full flex-col items-center gap-3 sm:mt-0 sm:w-auto sm:flex-row">
-              <Tooltip>
-                <TooltipTrigger>
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      toggleRecording();
-                    }}
-                    disabled={isLoading}
-                    className={`hidden items-center gap-2 rounded-xl px-4 py-2 shadow-md transition-all duration-300 md:flex ${
-                      isRecording
-                        ? 'animate-pulse bg-red-500 text-white'
-                        : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-                    }`}
-                  >
-                    <Mic className="h-5 w-5" />
-                    {isRecording && <span>{'Merekam...'}</span>}
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent className="hidden sm:block">
-                  Ucapkan pertanyaanmu
-                </TooltipContent>
-              </Tooltip>
+              {settingVoice && (
+                <Tooltip>
+                  <TooltipTrigger>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        toggleRecording();
+                      }}
+                      disabled={isLoading}
+                      className={`hidden items-center gap-2 rounded-xl px-4 py-2 shadow-md transition-all duration-300 md:flex ${
+                        isRecording
+                          ? 'animate-pulse bg-red-500 text-white'
+                          : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+                      }`}
+                    >
+                      <Mic className="h-5 w-5" />
+                      {isRecording && <span>{'Merekam...'}</span>}
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent className="hidden sm:block">
+                    Ucapkan pertanyaanmu
+                  </TooltipContent>
+                </Tooltip>
+              )}
               <div className="mt-3 flex w-full items-center justify-end gap-2 sm:mt-0 sm:w-auto sm:justify-end">
                 <span className="text-sm text-gray-900">
                   {watchedPrompt?.length || 0}/{maxText || 1000}

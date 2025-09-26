@@ -4,6 +4,9 @@ import { defineConfig } from 'vite';
 
 export default defineConfig({
   plugins: [react()],
+  server: {
+    allowedHosts: ['showcase.under.my.id', 'localhost'] // Menambahkan hostname yang diizinkan
+  },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src')
