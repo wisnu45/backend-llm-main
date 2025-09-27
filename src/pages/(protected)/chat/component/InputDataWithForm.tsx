@@ -219,10 +219,10 @@ const InputDataWithForm = ({
     reset({
       prompt: '',
       attachments: [],
-      with_document: [],
-      is_general: Cookies.get('is_general') === 'false',
-      is_browse: Cookies.get('is_browse') === 'false',
-      is_company: Cookies.get('is_company') === 'true'
+      with_document: []
+      // is_general: Cookies.get('is_general') === 'false',
+      // is_browse: Cookies.get('is_browse') === 'false',
+      // is_company: Cookies.get('is_company') === 'true'
     });
   };
 
