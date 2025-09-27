@@ -6,6 +6,7 @@ type TCookies = {
   username: string;
   role: string;
   roles_id: string;
+  is_company: string;
   name: string;
   error_connection: string;
 };
@@ -17,6 +18,7 @@ export const SessionToken = {
     Cookies.set('name', values.name);
     Cookies.set('role', values.role);
     Cookies.set('roles_id', values.roles_id);
+    Cookies.set('is_company', 'true');
     // Cookies.set('refresh_token', values.refresh_token);
     Cookies.set('error_connection', values.error_connection);
   },
@@ -33,5 +35,6 @@ export const SessionToken = {
     Cookies.remove('role');
     Cookies.remove('roles_id');
     Cookies.remove('refresh_token');
+    Cookies.remove('is_company');
   }
 };

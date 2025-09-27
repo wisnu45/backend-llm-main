@@ -105,6 +105,7 @@ const SessionProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
         name: userdata.name,
         role: userdata.role.name,
         roles_id: userdata.role.id,
+        is_company: 'true',
         error_connection:
           'Sambungan terputus. Coba periksa jaringan Anda dan muat ulang halaman'
       });

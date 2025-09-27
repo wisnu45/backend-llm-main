@@ -35,9 +35,9 @@ const InputDataWithForm = ({
 }: InputDataWithFormProps) => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [popupFile, setPopupFile] = useState<File | null>(null);
-  const defaultIsBrowse = Cookies.get('search_internet') === 'false';
+  const defaultIsBrowse = Cookies.get('is_browse') === 'true';
+  const defaultIsGeneralPolicy = Cookies.get('is_general') === 'true';
   const defaultIsCompanyPolicy = Cookies.get('is_company') === 'true';
-  const defaultIsGeneralPolicy = Cookies.get('is_general') === 'false';
   const { shouldHideOnScroll } = useMobileScroll(50, scrollContainerRef);
   const shouldHide = shouldHideOnScroll && isFloating;
 
@@ -77,15 +77,23 @@ const InputDataWithForm = ({
     mode: 'onChange'
   });
 
-  const is_company_policy = watch('is_company');
-  const search_internet = watch('is_browse');
-  const is_general_policy = watch('is_general');
+  const is_company_policy2 = watch('is_company');
+  const is_browse2 = watch('is_browse');
+  const is_general_policy2 = watch('is_general');
 
   useEffect(() => {
-    if (!is_company_policy && !search_internet && !is_general_policy) {
+    const is_company_policy = Cookies.get('is_company');
+    const is_browse = Cookies.get('is_browse');
+    const is_general_policy = Cookies.get('is_general');
+
+    if (!is_company_policy && !is_browse && !is_general_policy) {
       setValue('is_company', true);
+      Cookies.set('is_company', 'true');
+    } else if (!is_company_policy2 && !is_browse2 && !is_general_policy2) {
+      setValue('is_company', true);
+      Cookies.set('is_company', 'true');
     }
-  }, [is_company_policy, search_internet, is_general_policy, setValue]);
+  }, [setValue, is_company_policy2, is_browse2, is_general_policy2]);
 
   const watchedAttachments = watch('attachments');
   const watchedPrompt = watch('prompt');
@@ -212,9 +220,9 @@ const InputDataWithForm = ({
       prompt: '',
       attachments: [],
       with_document: [],
-      is_browse: Cookies.get('search_internet') === 'true',
-      is_company: Cookies.get('is_company') === 'true',
-      is_general: Cookies.get('is_general') === 'true'
+      is_general: Cookies.get('is_general') === 'false',
+      is_browse: Cookies.get('is_browse') === 'false',
+      is_company: Cookies.get('is_company') === 'true'
     });
   };
 
@@ -263,12 +271,12 @@ const InputDataWithForm = ({
     }
   }, [setValue, trigger]);
 
-  useEffect(() => {
-    const cookieValue = Cookies.get('search_internet') === 'true';
-    const is_company_policy = Cookies.get('is_company') === 'true';
-    setValue('is_browse', cookieValue);
-    setValue('is_company', is_company_policy);
-  }, []);
+  // useEffect(() => {
+  //   const cookieValue = Cookies.get('search_internet') === 'true';
+  //   const is_company_policy = Cookies.get('is_company') === 'true';
+  //   setValue('is_browse', cookieValue);
+  //   setValue('is_company', is_company_policy);
+  // }, []);
 
   const toggleRecording = () => {
     if (!recognitionRef.current) {
@@ -458,6 +466,7 @@ const InputDataWithForm = ({
                               if (!isLoading) {
                                 const newValue = !value;
                                 onChange(newValue);
+                                console.log('general', newValue);
                                 Cookies.set(
                                   'is_general',
                                   newValue ? 'true' : 'false'
@@ -505,7 +514,7 @@ const InputDataWithForm = ({
                                 const newValue = !value;
                                 onChange(newValue);
                                 Cookies.set(
-                                  'search_internet',
+                                  'is_browse',
                                   newValue ? 'true' : 'false'
                                 );
                               }

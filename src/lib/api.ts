@@ -32,7 +32,8 @@ async function refreshAccessToken() {
       name = '',
       role = '',
       roles_id = '',
-      error_connection = ''
+      error_connection = '',
+      is_company = 'true'
     } = Cookies.get();
 
     const response = await axios.post(
@@ -50,7 +51,8 @@ async function refreshAccessToken() {
       name,
       role,
       roles_id,
-      error_connection
+      error_connection,
+      is_company
     });
 
     return newAccessToken;
