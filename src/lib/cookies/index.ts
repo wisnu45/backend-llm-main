@@ -36,5 +36,9 @@ export const SessionToken = {
     Cookies.remove('roles_id');
     Cookies.remove('refresh_token');
     Cookies.remove('is_company');
+    Cookies.remove('is_browse');
+    Cookies.remove('is_general');
+    Cookies.remove('search_internet');
+    Cookies.remove('error_connection');
   }
 };
