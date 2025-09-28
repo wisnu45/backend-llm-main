@@ -23,7 +23,9 @@ const SeeFullHistory = ({ isSidebarOpen }: Props) => {
               alt="See more history"
               className="h-4 w-4"
             />
-            <span className="truncate font-semibold">Document File</span>
+            <span className="truncate font-semibold">
+              See Full Chat History
+            </span>
           </div>
         </div>
       ) : (
