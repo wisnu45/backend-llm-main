@@ -132,8 +132,6 @@ const Sidebar = ({ setShowModal }) => {
             to="/chat"
             onClick={() => {
               Cookies.remove('chat_id');
-              Cookies.remove('is_general');
-              Cookies.remove('is_browse');
             }}
             className={`mt-2 flex w-full items-center gap-2 rounded-lg p-2 text-left hover:bg-gray-400/20 ${
               location.pathname === '/chat'

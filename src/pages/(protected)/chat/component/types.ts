@@ -13,4 +13,7 @@ export interface ChatItemData {
   source_documents?: FileLink[];
   chat_id: string;
   feedback: '1' | '-1' | null;
+  is_browse?: boolean;
+  is_company?: boolean;
+  is_general?: boolean;
 }

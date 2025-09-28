@@ -88,6 +88,7 @@ const DetailPage = () => {
       );
     }
   };
+  const lastData = query?.data?.data.at(-1) || null;
 
   return (
     <>
@@ -128,6 +129,7 @@ const DetailPage = () => {
           isLoading={loading}
           scrollContainerRef={scrollContainerRef}
           isFloating={true}
+          lastData={lastData || undefined}
         />
       </ScrollArea>
     </>

@@ -7,7 +7,6 @@ import { useMobileScroll } from '@/hooks/use-mobile-scroll';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ArrowRightIcon, Cross2Icon } from '@radix-ui/react-icons';
 import clsx from 'clsx';
-import Cookies from 'js-cookie';
 import { Globe, Mic, Paperclip, Lightbulb, Building } from 'lucide-react';
 import { useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
@@ -15,6 +14,7 @@ import { TSetPromptType } from '../page';
 import { ChatFormSchema, TChatFormData } from '../schema';
 import { toast } from '@/components/ui/use-toast';
 import { useFetchSettingFeature } from '../../setting/_hook/use-fetch-setting-feature';
+import { ChatItemData } from './types';
 
 interface InputDataWithFormProps {
   onSubmit: (data: TChatFormData) => void;
@@ -24,6 +24,7 @@ interface InputDataWithFormProps {
   scrollContainerRef?: React.RefObject<HTMLElement>;
   isFloating?: boolean;
   isHistory?: boolean;
+  lastData?: ChatItemData;
 }
 
 const InputDataWithForm = ({
@@ -33,15 +34,15 @@ const InputDataWithForm = ({
   initialPrompt = '',
   setPrompRef,
   scrollContainerRef,
-  isHistory = true
+  isHistory = true,
+  lastData
 }: InputDataWithFormProps) => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [popupFile, setPopupFile] = useState<File | null>(null);
-  const defaultIsBrowse = Cookies.get('is_browse') === 'true';
-  const defaultIsGeneralPolicy = Cookies.get('is_general') === 'true';
-  const defaultIsCompanyPolicy = Cookies.get('is_company') === 'true';
   const { shouldHideOnScroll } = useMobileScroll(50, scrollContainerRef);
   const shouldHide = shouldHideOnScroll && isFloating;
+
+  console.log('CEK DISINI', shouldHideOnScroll);
 
   const queryFeature = useFetchSettingFeature();
   const settingFeature = queryFeature?.data?.data;
@@ -72,38 +73,35 @@ const InputDataWithForm = ({
       prompt: initialPrompt,
       attachments: [],
       with_document: [],
-      is_browse: defaultIsBrowse,
-      is_company: defaultIsCompanyPolicy,
-      is_general: defaultIsGeneralPolicy
+      is_company: lastData?.is_company,
+      is_browse: lastData?.is_browse,
+      is_general: lastData?.is_general
     },
     mode: 'onChange'
   });
 
-  const is_company_policy2 = watch('is_company');
-  const is_browse2 = watch('is_browse');
-  const is_general_policy2 = watch('is_general');
-
   useEffect(() => {
-    const is_company_policy = Cookies.get('is_company');
-    const is_browse = Cookies.get('is_browse');
-    const is_general_policy = Cookies.get('is_general');
-
-    if (!is_company_policy && !is_browse && !is_general_policy) {
-      setValue('is_company', true);
-      Cookies.set('is_company', 'true');
-    } else if (!is_company_policy2 && !is_browse2 && !is_general_policy2) {
-      setValue('is_company', true);
-      Cookies.set('is_company', 'true');
+    if (lastData) {
+      setValue('is_company', lastData.is_company || false);
+      setValue('is_browse', lastData.is_browse || false);
+      setValue('is_general', lastData.is_general || false);
     }
-  }, [setValue, is_company_policy2, is_browse2, is_general_policy2, isHistory]);
+  }, [lastData]);
 
   useEffect(() => {
     if (!isHistory) {
-      Cookies.set('is_company', 'true');
-      Cookies.set('is_general', 'false');
-      Cookies.set('is_browse', 'false');
+      setValue('is_company', true);
     }
   }, [isHistory]);
+
+  const is_company_policy2 = watch('is_company');
+  const is_browse2 = watch('is_browse');
+  const is_general_policy2 = watch('is_general');
+  useEffect(() => {
+    if (!is_company_policy2 && !is_browse2 && !is_general_policy2) {
+      setValue('is_company', true);
+    }
+  }, [setValue, is_company_policy2, is_browse2, is_general_policy2, isHistory]);
 
   const watchedAttachments = watch('attachments');
   const watchedPrompt = watch('prompt');
@@ -431,10 +429,6 @@ const InputDataWithForm = ({
                             if (!isLoading) {
                               const newValue = !value;
                               onChange(newValue);
-                              Cookies.set(
-                                'is_company',
-                                newValue ? 'true' : 'false'
-                              );
                             }
                           }}
                         >
@@ -476,11 +470,6 @@ const InputDataWithForm = ({
                               if (!isLoading) {
                                 const newValue = !value;
                                 onChange(newValue);
-                                console.log('general', newValue);
-                                Cookies.set(
-                                  'is_general',
-                                  newValue ? 'true' : 'false'
-                                );
                               }
                             }}
                           >
@@ -523,10 +512,6 @@ const InputDataWithForm = ({
                               if (!isLoading) {
                                 const newValue = !value;
                                 onChange(newValue);
-                                Cookies.set(
-                                  'is_browse',
-                                  newValue ? 'true' : 'false'
-                                );
                               }
                             }}
                           >
