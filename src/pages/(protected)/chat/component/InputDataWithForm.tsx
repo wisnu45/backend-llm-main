@@ -23,6 +23,7 @@ interface InputDataWithFormProps {
   setPrompRef?: React.MutableRefObject<TSetPromptType | null | undefined>;
   scrollContainerRef?: React.RefObject<HTMLElement>;
   isFloating?: boolean;
+  isHistory?: boolean;
 }
 
 const InputDataWithForm = ({
@@ -31,7 +32,8 @@ const InputDataWithForm = ({
   isLoading = false,
   initialPrompt = '',
   setPrompRef,
-  scrollContainerRef
+  scrollContainerRef,
+  isHistory = true
 }: InputDataWithFormProps) => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [popupFile, setPopupFile] = useState<File | null>(null);
@@ -93,7 +95,15 @@ const InputDataWithForm = ({
       setValue('is_company', true);
       Cookies.set('is_company', 'true');
     }
-  }, [setValue, is_company_policy2, is_browse2, is_general_policy2]);
+  }, [setValue, is_company_policy2, is_browse2, is_general_policy2, isHistory]);
+
+  useEffect(() => {
+    if (!isHistory) {
+      Cookies.set('is_company', 'true');
+      Cookies.set('is_general', 'false');
+      Cookies.set('is_browse', 'false');
+    }
+  }, [isHistory]);
 
   const watchedAttachments = watch('attachments');
   const watchedPrompt = watch('prompt');

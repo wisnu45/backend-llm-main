@@ -243,6 +243,7 @@ const ChatPage = () => {
             onSubmit={handleFormSubmit}
             isLoading={loading || isLimitExceeded}
             setPrompRef={setPromptRef}
+            isHistory={false}
           />
         </div>
       </div>
