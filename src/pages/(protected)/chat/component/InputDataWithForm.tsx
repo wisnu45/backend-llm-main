@@ -15,6 +15,7 @@ import { ChatFormSchema, TChatFormData } from '../schema';
 import { toast } from '@/components/ui/use-toast';
 import { useFetchSettingFeature } from '../../setting/_hook/use-fetch-setting-feature';
 import { ChatItemData } from './types';
+import { TogglePreferences } from '@/lib/local-storage';
 
 interface InputDataWithFormProps {
   onSubmit: (data: TChatFormData) => void;
@@ -39,6 +40,7 @@ const InputDataWithForm = ({
 }: InputDataWithFormProps) => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [popupFile, setPopupFile] = useState<File | null>(null);
+  const [hasInitialized, setHasInitialized] = useState(false);
   const { shouldHideOnScroll } = useMobileScroll(50, scrollContainerRef);
   const shouldHide = shouldHideOnScroll && isFloating;
 
@@ -58,6 +60,29 @@ const InputDataWithForm = ({
   const fileTypeAllow: string[] =
     typeof rawFileTypes === 'string' ? JSON.parse(rawFileTypes) : [];
 
+  // Get smart defaults based on context
+  const getSmartDefaults = () => {
+    if (isHistory) {
+      // For chat detail page, ALWAYS prioritize chat context (lastData)
+      if (lastData) {
+        return {
+          is_company: lastData.is_company || false,
+          is_browse: lastData.is_browse || false,
+          is_general: lastData.is_general || false
+        };
+      }
+      // Fallback if no lastData yet (loading state)
+      return {
+        is_company: false,
+        is_browse: false,
+        is_general: false
+      };
+    } else {
+      // For new chat page, use stored user preferences
+      return TogglePreferences.getWithDefaults();
+    }
+  };
+
   const {
     control,
     handleSubmit,
@@ -73,35 +98,70 @@ const InputDataWithForm = ({
       prompt: initialPrompt,
       attachments: [],
       with_document: [],
-      is_company: lastData?.is_company,
-      is_browse: lastData?.is_browse,
-      is_general: lastData?.is_general
+      ...getSmartDefaults()
     },
     mode: 'onChange'
   });
 
+  // Save toggle preferences only for new chat, not for chat detail
+  const saveTogglePreferences = (
+    newToggles?: Partial<{
+      is_company: boolean;
+      is_browse: boolean;
+      is_general: boolean;
+    }>
+  ) => {
+    // Only save as global preference for new chat page
+    if (!isHistory) {
+      const currentToggles = newToggles || {
+        is_company: watch('is_company'),
+        is_browse: watch('is_browse'),
+        is_general: watch('is_general')
+      };
+      TogglePreferences.set(
+        currentToggles as {
+          is_company: boolean;
+          is_browse: boolean;
+          is_general: boolean;
+        }
+      );
+    }
+  };
+
+  // Reset initialization when chat changes (for proper chat switching)
   useEffect(() => {
-    if (lastData) {
+    setHasInitialized(false);
+  }, [lastData?.id]);
+
+  useEffect(() => {
+    if (lastData && isHistory && !hasInitialized) {
+      // Update toggles with chat-specific context
       setValue('is_company', lastData.is_company || false);
       setValue('is_browse', lastData.is_browse || false);
       setValue('is_general', lastData.is_general || false);
+      setHasInitialized(true);
     }
-  }, [lastData]);
+  }, [lastData, isHistory, hasInitialized, setValue]);
+
+  // Intelligent fallback - ensure at least one toggle is active (only when truly needed)
+  const is_company_current = watch('is_company');
+  const is_browse_current = watch('is_browse');
+  const is_general_current = watch('is_general');
 
   useEffect(() => {
-    if (!isHistory) {
-      setValue('is_company', true);
-    }
-  }, [isHistory]);
+    // Only apply fallback if all are false AND we're not in the middle of user interaction
+    if (!is_company_current && !is_browse_current && !is_general_current) {
+      // Small delay to ensure we're not interrupting user actions
+      const fallbackTimer = setTimeout(() => {
+        const preferences = TogglePreferences.getWithDefaults();
+        setValue('is_company', preferences.is_company);
+        setValue('is_browse', preferences.is_browse);
+        setValue('is_general', preferences.is_general);
+      }, 100);
 
-  const is_company_policy2 = watch('is_company');
-  const is_browse2 = watch('is_browse');
-  const is_general_policy2 = watch('is_general');
-  useEffect(() => {
-    if (!is_company_policy2 && !is_browse2 && !is_general_policy2) {
-      setValue('is_company', true);
+      return () => clearTimeout(fallbackTimer);
     }
-  }, [setValue, is_company_policy2, is_browse2, is_general_policy2, isHistory]);
+  }, [setValue, is_company_current, is_browse_current, is_general_current]);
 
   const watchedAttachments = watch('attachments');
   const watchedPrompt = watch('prompt');
@@ -223,14 +283,26 @@ const InputDataWithForm = ({
   };
 
   const onFormSubmit = (data: TChatFormData) => {
+    // Capture current state immediately before any operations
+    const currentToggles = {
+      is_company: data.is_company,
+      is_browse: data.is_browse,
+      is_general: data.is_general
+    };
+
+    // Only save as global preference for new chat, not for chat detail
+    if (!isHistory) {
+      TogglePreferences.set(currentToggles);
+    }
+
     onSubmit(data);
+
+    // Reset with the captured state (not from localStorage to avoid race condition)
     reset({
       prompt: '',
       attachments: [],
-      with_document: []
-      // is_general: Cookies.get('is_general') === 'false',
-      // is_browse: Cookies.get('is_browse') === 'false',
-      // is_company: Cookies.get('is_company') === 'true'
+      with_document: [],
+      ...currentToggles
     });
   };
 
@@ -429,6 +501,13 @@ const InputDataWithForm = ({
                             if (!isLoading) {
                               const newValue = !value;
                               onChange(newValue);
+                              // Save preferences immediately
+                              const newToggles = {
+                                is_company: newValue,
+                                is_browse: watch('is_browse'),
+                                is_general: watch('is_general')
+                              };
+                              saveTogglePreferences(newToggles);
                             }
                           }}
                         >
@@ -470,6 +549,13 @@ const InputDataWithForm = ({
                               if (!isLoading) {
                                 const newValue = !value;
                                 onChange(newValue);
+                                // Save preferences immediately for is_general
+                                const newToggles = {
+                                  is_company: watch('is_company'),
+                                  is_browse: watch('is_browse'),
+                                  is_general: newValue
+                                };
+                                saveTogglePreferences(newToggles);
                               }
                             }}
                           >
@@ -512,6 +598,13 @@ const InputDataWithForm = ({
                               if (!isLoading) {
                                 const newValue = !value;
                                 onChange(newValue);
+                                // Save preferences immediately for is_browse
+                                const newToggles = {
+                                  is_company: watch('is_company'),
+                                  is_browse: newValue,
+                                  is_general: watch('is_general')
+                                };
+                                saveTogglePreferences(newToggles);
                               }
                             }}
                           >
