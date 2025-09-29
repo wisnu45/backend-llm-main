@@ -128,6 +128,53 @@ const InputDataWithForm = ({
     }
   };
 
+  // Helper function to handle toggle changes with validation
+  const handleToggleChange = (
+    toggleType: 'is_company' | 'is_browse' | 'is_general',
+    currentValue: boolean,
+    onChange: (value: boolean) => void
+  ) => {
+    if (!isLoading) {
+      const newValue = !currentValue;
+
+      // If we're turning off this toggle, check if it's the only active one
+      if (!newValue) {
+        const activeToggles = [
+          toggleType !== 'is_company' && watch('is_company'),
+          toggleType !== 'is_browse' && watch('is_browse'),
+          toggleType !== 'is_general' && watch('is_general')
+        ].filter(Boolean);
+
+        // If this is the last active toggle, activate company insight instead
+        if (activeToggles.length === 0) {
+          setValue('is_company', true);
+          if (toggleType !== 'is_company') {
+            onChange(newValue);
+          }
+          const newToggles = {
+            is_company: true,
+            is_browse:
+              toggleType === 'is_browse' ? newValue : watch('is_browse'),
+            is_general:
+              toggleType === 'is_general' ? newValue : watch('is_general')
+          };
+          saveTogglePreferences(newToggles);
+          return;
+        }
+      }
+
+      // Normal toggle behavior
+      onChange(newValue);
+      const newToggles = {
+        is_company:
+          toggleType === 'is_company' ? newValue : watch('is_company'),
+        is_browse: toggleType === 'is_browse' ? newValue : watch('is_browse'),
+        is_general: toggleType === 'is_general' ? newValue : watch('is_general')
+      };
+      saveTogglePreferences(newToggles);
+    }
+  };
+
   // Reset initialization when chat changes (for proper chat switching)
   useEffect(() => {
     setHasInitialized(false);
@@ -143,23 +190,16 @@ const InputDataWithForm = ({
     }
   }, [lastData, isHistory, hasInitialized, setValue]);
 
-  // Intelligent fallback - ensure at least one toggle is active (only when truly needed)
+  // Toggle validation - ensure at least one toggle is always active
   const is_company_current = watch('is_company');
   const is_browse_current = watch('is_browse');
   const is_general_current = watch('is_general');
 
   useEffect(() => {
-    // Only apply fallback if all are false AND we're not in the middle of user interaction
+    // Ensure at least one toggle is always active
     if (!is_company_current && !is_browse_current && !is_general_current) {
-      // Small delay to ensure we're not interrupting user actions
-      const fallbackTimer = setTimeout(() => {
-        const preferences = TogglePreferences.getWithDefaults();
-        setValue('is_company', preferences.is_company);
-        setValue('is_browse', preferences.is_browse);
-        setValue('is_general', preferences.is_general);
-      }, 100);
-
-      return () => clearTimeout(fallbackTimer);
+      // Activate company insight as fallback
+      setValue('is_company', true);
     }
   }, [setValue, is_company_current, is_browse_current, is_general_current]);
 
@@ -498,17 +538,7 @@ const InputDataWithForm = ({
                           onClick={(e) => {
                             e.preventDefault();
                             e.stopPropagation();
-                            if (!isLoading) {
-                              const newValue = !value;
-                              onChange(newValue);
-                              // Save preferences immediately
-                              const newToggles = {
-                                is_company: newValue,
-                                is_browse: watch('is_browse'),
-                                is_general: watch('is_general')
-                              };
-                              saveTogglePreferences(newToggles);
-                            }
+                            handleToggleChange('is_company', value, onChange);
                           }}
                         >
                           <div
@@ -546,17 +576,7 @@ const InputDataWithForm = ({
                             onClick={(e) => {
                               e.preventDefault();
                               e.stopPropagation();
-                              if (!isLoading) {
-                                const newValue = !value;
-                                onChange(newValue);
-                                // Save preferences immediately for is_general
-                                const newToggles = {
-                                  is_company: watch('is_company'),
-                                  is_browse: watch('is_browse'),
-                                  is_general: newValue
-                                };
-                                saveTogglePreferences(newToggles);
-                              }
+                              handleToggleChange('is_general', value, onChange);
                             }}
                           >
                             <div
@@ -595,17 +615,7 @@ const InputDataWithForm = ({
                             onClick={(e) => {
                               e.preventDefault();
                               e.stopPropagation();
-                              if (!isLoading) {
-                                const newValue = !value;
-                                onChange(newValue);
-                                // Save preferences immediately for is_browse
-                                const newToggles = {
-                                  is_company: watch('is_company'),
-                                  is_browse: newValue,
-                                  is_general: watch('is_general')
-                                };
-                                saveTogglePreferences(newToggles);
-                              }
+                              handleToggleChange('is_browse', value, onChange);
                             }}
                           >
                             <div
