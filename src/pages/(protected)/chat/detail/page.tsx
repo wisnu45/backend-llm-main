@@ -3,13 +3,17 @@ import { useEffect, useRef } from 'react';
 import { useGetDetailHistory } from '../_hook/use-get-history-chat';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ChatItem } from '../component/ChatItem';
-import useCreateChat from '../_hook/use-create-chat';
+import useCreateChat, {
+  type NetworkAwareError
+} from '../_hook/use-create-chat';
 import { Loader } from '../component/Loader';
 import InputDataWithForm from '../component/InputDataWithForm';
+import NetworkErrorCard from '../component/NetworkErrorCard';
 import { PromptPreview } from '../component/prompt-preview';
 import { ModernLoadingIndicator } from '../component/loading-indicator';
 import { TChatFormData } from '../schema';
 import { useChatForm } from '../_hook/use-chat-form';
+import { useFetchSettingFeature } from '../../setting/_hook/use-fetch-setting-feature';
 
 const DetailPage = () => {
   const { chatId } = useParams();
@@ -19,21 +23,37 @@ const DetailPage = () => {
   const query = useGetDetailHistory({ chat_id: chatId || '' });
   const mutation = useCreateChat();
   const navigate = useNavigate();
+  const queryFeature = useFetchSettingFeature();
+
+  const settingFeature = queryFeature?.data?.data;
+  const getMenuValue = (name: string) =>
+    settingFeature?.find((menu) => menu.name.toLocaleLowerCase() === name)
+      ?.value;
+  const errorConnectionMessage =
+    (getMenuValue('error connection') as string) ||
+    'Koneksi internet terputus. Coba lagi nanti';
 
   const {
     loading,
     previewPrompt,
     previewFiles,
     showPreview,
+    networkError,
     handleSubmit,
-    resetForm
+    handleError,
+    handleRetry,
+    handleSuccess
   } = useChatForm({
     chatId: chatId || '',
     onSuccess: () => {
       query.refetch();
     },
-    onError: () => {
-      // Handle error if needed
+    onError: (isNetworkError) => {
+      // Additional error handling if needed
+      console.log(
+        'Chat error occurred:',
+        isNetworkError ? 'Network error' : 'Server error'
+      );
     }
   });
 
@@ -78,11 +98,52 @@ const DetailPage = () => {
         },
         {
           onSuccess: () => {
-            resetForm();
+            handleSuccess();
             query.refetch();
           },
-          onError: () => {
-            resetForm();
+          onError: (err: Error) => {
+            // Check if this is a network error
+            const networkError = err as NetworkAwareError;
+            if (networkError.isNetworkError) {
+              handleError(true, formData);
+            } else {
+              handleError(false);
+            }
+          }
+        }
+      );
+    }
+  };
+
+  const handleNetworkRetry = () => {
+    const payload = handleRetry();
+    if (payload) {
+      mutation.mutate(
+        {
+          ...payload,
+          chat_id: chatId || ''
+        },
+        {
+          onSuccess: () => {
+            handleSuccess();
+            query.refetch();
+          },
+          onError: (err: Error) => {
+            const networkError = err as NetworkAwareError;
+            if (networkError.isNetworkError) {
+              // Convert payload back to TChatFormData format for handleError
+              const formData: TChatFormData = {
+                prompt: payload?.question || '',
+                attachments: payload?.attachments || [],
+                with_document: [], // We don't have this in payload, but handleError doesn't actually use it
+                is_browse: payload?.is_browse || false,
+                is_company: payload?.is_company || false,
+                is_general: payload?.is_general || false
+              };
+              handleError(true, formData);
+            } else {
+              handleError(false);
+            }
           }
         }
       );
@@ -119,6 +180,15 @@ const DetailPage = () => {
           {loading && (
             <div ref={scrollAreaRef}>
               <ModernLoadingIndicator />
+            </div>
+          )}
+
+          {networkError && (
+            <div ref={scrollAreaRef}>
+              <NetworkErrorCard
+                onRetry={handleNetworkRetry}
+                message={errorConnectionMessage}
+              />
             </div>
           )}
         </div>

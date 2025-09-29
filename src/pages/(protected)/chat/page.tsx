@@ -15,9 +15,10 @@ import { useGetFiles } from '@/components/ui/sidebar/_hook/use-get-history-chat'
 import Cookies from 'js-cookie';
 import { useFetchSetting } from '../setting/_hook/use-fetch-setting';
 import { useFetchSettingFeature } from '../setting/_hook/use-fetch-setting-feature';
-import useCreateChat from './_hook/use-create-chat';
+import useCreateChat, { type NetworkAwareError } from './_hook/use-create-chat';
 import InputDataWithForm from './component/InputDataWithForm';
 import { ModernLoadingIndicator } from './component/loading-indicator';
+import NetworkErrorCard from './component/NetworkErrorCard';
 import { FileType, PromptPreview } from './component/prompt-preview';
 import { TChatFormData } from './schema';
 
@@ -50,6 +51,9 @@ const ChatPage = () => {
   const [previewPrompt, setPreviewPrompt] = useState<string>('');
   const [previewFiles, setPreviewFiles] = useState<FileType[]>([]);
   const [showPreview, setShowPreview] = useState<boolean>(false);
+  const [networkError, setNetworkError] = useState<boolean>(false);
+  const [lastFailedRequest, setLastFailedRequest] =
+    useState<TChatFormData | null>(null);
   const mutation = useCreateChat();
   const queryHistorySideBar = useGetFiles();
 
@@ -78,12 +82,22 @@ const ChatPage = () => {
   const maxChatTopic = Number(getMenuValue('max chat topic')) || 0;
   const currentChatCount = queryHistorySideBar.data?.data.length || 0;
   const isLimitExceeded = maxChatTopic > 0 && currentChatCount >= maxChatTopic;
+  const errorConnectionMessage =
+    getMenuValue('error connection') ||
+    'Koneksi internet terputus. Coba lagi nanti';
 
   const navigate = useNavigate();
   const currentPath = useLocation().pathname;
 
   const handleClickItem = (prompt: string) => {
     setPromptRef.current?.onSetPrompt(prompt);
+  };
+
+  const handleRetry = () => {
+    if (lastFailedRequest) {
+      // Pass isRetry=true to preserve network error state during retry
+      handleFormSubmit(lastFailedRequest, true);
+    }
   };
 
   useEffect(() => {
@@ -93,12 +107,21 @@ const ChatPage = () => {
     }
   }, []);
 
-  const handleFormSubmit = async (formData: TChatFormData) => {
+  const handleFormSubmit = async (
+    formData: TChatFormData,
+    isRetry: boolean = false
+  ) => {
     if (isLimitExceeded) {
       return;
     }
 
     const trimmedQuestion = formData.prompt.trim();
+
+    // Only clear network error for new submissions, not retries
+    if (!isRetry) {
+      setNetworkError(false);
+      setLastFailedRequest(null);
+    }
 
     setPreviewPrompt(trimmedQuestion);
     setPreviewFiles(formData.attachments || []);
@@ -119,20 +142,36 @@ const ChatPage = () => {
           onSuccess: (data) => {
             const chatId = data?.data?.chat_id || '';
             queryHistorySideBar.refetch();
+
+            // Clear all states including network error on success
             setLoading(false);
             setShowPreview(false);
             setPreviewPrompt('');
             setPreviewFiles([]);
+            setNetworkError(false);
+            setLastFailedRequest(null);
+
             if (chatId) {
               navigate(`${currentPath}/${chatId || ''}`);
             }
           },
-          onError: (err) => {
+          onError: (err: Error) => {
             console.error('Chat mutation failed', err);
             setLoading(false);
             setShowPreview(false);
             setPreviewPrompt('');
             setPreviewFiles([]);
+
+            // Check if this is a network error
+            const networkError = err as NetworkAwareError;
+            if (networkError.isNetworkError) {
+              setNetworkError(true);
+              setLastFailedRequest(formData);
+            } else {
+              // Clear network error for non-network errors
+              setNetworkError(false);
+              setLastFailedRequest(null);
+            }
           }
         }
       );
@@ -205,6 +244,14 @@ const ChatPage = () => {
         {loading && (
           <div className="mb-4">
             <ModernLoadingIndicator />
+          </div>
+        )}
+        {networkError && (
+          <div className="mb-4">
+            <NetworkErrorCard
+              onRetry={handleRetry}
+              message={errorConnectionMessage}
+            />
           </div>
         )}
         {isLimitExceeded && (

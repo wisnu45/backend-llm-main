@@ -69,6 +69,20 @@ api.interceptors.response.use(
       _retry?: boolean;
     };
 
+    // Check for network errors
+    if (
+      error.code === 'ERR_NETWORK' ||
+      error.code === 'ENOTFOUND' ||
+      error.code === 'ECONNABORTED' ||
+      error.message === 'Network Error' ||
+      !navigator.onLine
+    ) {
+      // Add network error flag to the error object
+      const networkError = error as AxiosError & { isNetworkError?: boolean };
+      networkError.isNetworkError = true;
+      return Promise.reject(networkError);
+    }
+
     if (error.response?.status === 401 && !originalRequest?._retry) {
       originalRequest._retry = true;
 
