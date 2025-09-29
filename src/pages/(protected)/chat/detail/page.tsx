@@ -29,9 +29,10 @@ const DetailPage = () => {
   const getMenuValue = (name: string) =>
     settingFeature?.find((menu) => menu.name.toLocaleLowerCase() === name)
       ?.value;
-  const errorConnectionMessage =
-    (getMenuValue('error connection') as string) ||
-    'Koneksi internet terputus. Coba lagi nanti';
+  const errorConnectionMessage = String(
+    getMenuValue('error connection') ||
+      'Koneksi internet terputus. Coba lagi nanti'
+  );
 
   const {
     loading,

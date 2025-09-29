@@ -82,9 +82,10 @@ const ChatPage = () => {
   const maxChatTopic = Number(getMenuValue('max chat topic')) || 0;
   const currentChatCount = queryHistorySideBar.data?.data.length || 0;
   const isLimitExceeded = maxChatTopic > 0 && currentChatCount >= maxChatTopic;
-  const errorConnectionMessage =
+  const errorConnectionMessage = String(
     getMenuValue('error connection') ||
-    'Koneksi internet terputus. Coba lagi nanti';
+      'Koneksi internet terputus. Coba lagi nanti'
+  );
 
   const navigate = useNavigate();
   const currentPath = useLocation().pathname;
