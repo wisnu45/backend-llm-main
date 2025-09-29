@@ -322,6 +322,87 @@ const InputDataWithForm = ({
     setValue('with_document', updatedDocuments);
   };
 
+  // Helper function to generate descriptive names for clipboard images
+  const generateClipboardFileName = (file: File, index: number = 0): string => {
+    const timestamp = new Date().toISOString().slice(0, 10);
+    const extension = file.type.split('/')[1] || 'png';
+
+    if (file.name === 'image.png' || file.name === 'image') {
+      return `Pasted Image ${index + 1} (${timestamp}).${extension}`;
+    }
+
+    return file.name;
+  };
+
+  // Handle paste events for file upload
+  const handlePaste = async (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
+    const items = e.clipboardData?.items;
+    if (!items) return;
+
+    const files: File[] = [];
+
+    // Process clipboard items
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i];
+
+      // Handle files
+      if (item.kind === 'file') {
+        const file = item.getAsFile();
+        if (file) {
+          // Generate descriptive name for clipboard images
+          const renamedFile = new File(
+            [file],
+            generateClipboardFileName(file, files.length),
+            { type: file.type }
+          );
+          files.push(renamedFile);
+        }
+      }
+    }
+
+    // If files were found, process them
+    if (files.length > 0) {
+      e.preventDefault(); // Prevent default paste behavior
+
+      // Validate files
+      const validFiles = files.filter(validateFile);
+      if (validFiles.length === 0) return;
+
+      // Show loading toast
+      toast({
+        title: 'Uploading files...',
+        description: `Processing ${validFiles.length} file(s) from clipboard`
+      });
+
+      try {
+        const currentAttachments = watchedAttachments || [];
+        setValue('attachments', [...currentAttachments, ...validFiles]);
+
+        const base64Files = await Promise.all(
+          validFiles.map((file) => convertFileToBase64(file))
+        );
+
+        setValue('with_document', [
+          ...(watch('with_document') || []),
+          ...base64Files
+        ]);
+
+        // Success toast
+        toast({
+          title: 'Files uploaded successfully',
+          description: `${validFiles.length} file(s) added from clipboard`
+        });
+      } catch (error) {
+        console.error('Error processing pasted files:', error);
+        toast({
+          variant: 'destructive',
+          title: 'Upload failed',
+          description: 'Failed to process files from clipboard'
+        });
+      }
+    }
+  };
+
   const onFormSubmit = (data: TChatFormData) => {
     // Capture current state immediately before any operations
     const currentToggles = {
@@ -494,6 +575,7 @@ const InputDataWithForm = ({
                   placeholder="Ask Vita"
                   maxLength={maxText ? Number(maxText) : 1000}
                   onKeyDown={handleKeyDown}
+                  onPaste={handlePaste}
                   disabled={isLoading}
                 />
               </div>
