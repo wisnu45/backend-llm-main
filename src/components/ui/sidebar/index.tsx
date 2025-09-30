@@ -28,6 +28,7 @@ import { useRenameChat } from './_hook/use-rename-chat';
 import DocumentMenu from './document-menu';
 import UserManagementMenu from './user-management-menu';
 import SeeFullHistory from './see-full-menu';
+import SettingMenu from './setting-menu';
 
 const Sidebar = ({ setShowModal }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -176,10 +177,10 @@ const Sidebar = ({ setShowModal }) => {
         </div>
         {isSidebarOpen && (
           <div
-            className="mb-[120px]  w-full overflow-auto px-4"
+            className="mb-[120px]  w-full overflow-auto px-4 "
             style={{
               marginTop: topHeight,
-              maxHeight: `calc(100vh - ${topHeight}px - 120px)`
+              maxHeight: `calc(100vh - ${topHeight}px - 230px)`
             }}
           >
             <nav>
@@ -314,8 +315,9 @@ const Sidebar = ({ setShowModal }) => {
           {userSideBarMenu && (
             <UserManagementMenu isSidebarOpen={isSidebarOpen} />
           )}
+          {settingSideBarMenu && <SettingMenu isSidebarOpen={isSidebarOpen} />}
 
-          {settingSideBarMenu && (
+          {/* {settingSideBarMenu && (
             <Link
               to="/setting"
               className="flex items-center gap-3 rounded-lg p-2 text-sm text-gray-600 transition-colors duration-200 hover:bg-neutral-300/60"
@@ -327,7 +329,7 @@ const Sidebar = ({ setShowModal }) => {
               />
               {isSidebarOpen && <span className="truncate">Setting</span>}
             </Link>
-          )}
+          )} */}
           <button
             onClick={() => setShowModal(true)}
             className={`mt-4 flex w-full items-center gap-3 rounded-lg bg-slate-400 p-2 text-sm text-[#5C47DB] transition-colors duration-200 hover:bg-[#E0E0E0]`}

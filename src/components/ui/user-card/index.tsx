@@ -4,16 +4,16 @@ interface Props {
   avatarSrc?: string;
 }
 
-function UserCard({ name, id, avatarSrc }: Props) {
+function UserCard({ name, id }: Props) {
   return (
-    <div className="relative flex h-36 w-full flex-col justify-between overflow-hidden rounded-xl bg-[#772f8e] p-4">
-      <div className="flex items-center space-x-4">
+    <div className="relative flex h-20 w-full flex-col justify-between overflow-hidden rounded-xl bg-[#772f8e] p-2">
+      {/* <div className="flex items-center space-x-4">
         <img
           src={avatarSrc || `https://ui-avatars.com/api/?name=${name}`}
           alt="User Avatar"
           className="mt-2 h-10 w-10 rounded-lg object-cover"
         />
-      </div>
+      </div> */}
 
       <div className="text-white">
         <h2 className="mb-1 text-lg font-semibold">{name}</h2>
