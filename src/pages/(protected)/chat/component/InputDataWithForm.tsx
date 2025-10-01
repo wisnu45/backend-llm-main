@@ -44,8 +44,6 @@ const InputDataWithForm = ({
   const { shouldHideOnScroll } = useMobileScroll(50, scrollContainerRef);
   const shouldHide = shouldHideOnScroll && isFloating;
 
-  console.log('CEK DISINI', shouldHideOnScroll);
-
   const queryFeature = useFetchSettingFeature();
   const settingFeature = queryFeature?.data?.data;
   const getMenuValue = (name) =>
@@ -57,6 +55,7 @@ const InputDataWithForm = ({
   const settingVoice = getMenuValue('Voice typing');
   const settingSearchInternet = getMenuValue('Search internet');
   const settingGeneralInsight = getMenuValue('General insight');
+  const settingCompanyInsight = getMenuValue('Company insight');
   const fileTypeAllow: string[] =
     typeof rawFileTypes === 'string' ? JSON.parse(rawFileTypes) : [];
 
@@ -393,7 +392,6 @@ const InputDataWithForm = ({
           description: `${validFiles.length} file(s) added from clipboard`
         });
       } catch (error) {
-        console.error('Error processing pasted files:', error);
         toast({
           variant: 'destructive',
           title: 'Upload failed',
@@ -607,43 +605,45 @@ const InputDataWithForm = ({
                   />
                 </>
               )}
-              <Controller
-                name="is_company"
-                control={control}
-                render={({ field }) => {
-                  const { value, onChange } = field;
-                  return (
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <div
-                          className="group relative w-max cursor-pointer"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            handleToggleChange('is_company', value, onChange);
-                          }}
-                        >
+              {settingCompanyInsight && (
+                <Controller
+                  name="is_company"
+                  control={control}
+                  render={({ field }) => {
+                    const { value, onChange } = field;
+                    return (
+                      <Tooltip>
+                        <TooltipTrigger>
                           <div
-                            className={`flex items-center gap-2 rounded-xl px-4 py-2 shadow-md transition-all duration-300 ${
-                              value
-                                ? 'bg-[#772f8e] text-white hover:text-purple-200 hover:shadow-lg'
-                                : 'shadow-lg'
-                            }`}
+                            className="group relative w-max cursor-pointer"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              handleToggleChange('is_company', value, onChange);
+                            }}
                           >
-                            <Building className="h-5 w-5" />
-                            <span className="text-sm font-medium md:inline">
-                              Company Insights
-                            </span>
+                            <div
+                              className={`flex items-center gap-2 rounded-xl px-4 py-2 shadow-md transition-all duration-300 ${
+                                value
+                                  ? 'bg-[#772f8e] text-white hover:text-purple-200 hover:shadow-lg'
+                                  : 'shadow-lg'
+                              }`}
+                            >
+                              <Building className="h-5 w-5" />
+                              <span className="text-sm font-medium md:inline">
+                                Company Insights
+                              </span>
+                            </div>
                           </div>
-                        </div>
-                      </TooltipTrigger>
-                      <TooltipContent className="hidden sm:block">
-                        Search Company Insights
-                      </TooltipContent>
-                    </Tooltip>
-                  );
-                }}
-              />
+                        </TooltipTrigger>
+                        <TooltipContent className="hidden sm:block">
+                          Search Company Insights
+                        </TooltipContent>
+                      </Tooltip>
+                    );
+                  }}
+                />
+              )}
               {settingGeneralInsight && (
                 <Controller
                   name="is_general"
