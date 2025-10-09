@@ -1,9 +1,15 @@
 import { useMutation } from '@tanstack/react-query';
-import { getDocsFromPortal } from '@/api/document/api';
+import { postDocsFromPortal } from '@/api/document/api';
 
 const useGetDocumentFromPortal = () => {
   return useMutation({
-    mutationFn: getDocsFromPortal
+    mutationFn: postDocsFromPortal,
+    onSuccess: (data) => {
+      console.log('Data berhasil dikirim', data);
+    },
+    onError: (error) => {
+      console.error('Terjadi error saat mengirim data', error);
+    }
   });
 };
 

@@ -21,12 +21,13 @@ const FilesPageHeader = ({ setModal, setInput, tab }: IFilesPageHeader) => {
       if (res) {
         toast({
           title: 'Success',
-          description: 'Documents synced successfully from portal.'
+          description: res.message
+            ? res.message
+            : 'Documents synced successfully from portal.'
         });
       }
     } catch (error) {
       const err = error as TErrorResponse;
-      console.log('CEK CEK123 ');
       toast({
         title: 'Error',
         description: `Failed to sync documents. ${err.response?.data.message}`,

@@ -57,7 +57,7 @@ export const editDoc = async (
   return res.data;
 };
 
-export const getDocsFromPortal = async (): Promise<TResponseListDocument> => {
-  const res = await api.get<TResponseListDocument>('/documents/sync');
+export const postDocsFromPortal = async (): Promise<TResponseListDocument> => {
+  const res = await api.post<TResponseListDocument>('/documents/sync');
   return res.data;
 };
