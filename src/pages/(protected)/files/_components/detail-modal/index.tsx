@@ -58,11 +58,11 @@ const DetailModal = ({ onEdit, onDelete, data, open, onOpenChange }: Props) => {
               to="#"
               onClick={(e) => {
                 e.preventDefault();
-                downloadFile.mutate(data?.document_url || '#');
+                downloadFile.mutate(data?.url || '#');
               }}
             >
-              <p className="text-gray-800 text-primary underline">
-                {data?.metadata?.Title ?? '-'}
+              <p className="w-fit text-gray-800 text-primary underline">
+                {data?.metadata?.Title || data?.original_filename || '-'}
               </p>
             </Link>
           </div>

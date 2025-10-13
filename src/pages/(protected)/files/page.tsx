@@ -129,8 +129,12 @@ const FilesPage = () => {
       id: 'document-info',
       header: 'document name',
       cell: ({ row }) => (
-        <div className="flex min-w-40 flex-col">
-          <span>{row.original.metadata?.Title}</span>
+        <div className="flex min-w-40 flex-col items-start">
+          <span>
+            {row.original.metadata?.Title ||
+              row.original.original_filename ||
+              '-'}
+          </span>
           <Link
             to="#"
             onClick={(e) => {
@@ -146,6 +150,7 @@ const FilesPage = () => {
                     ?.toUpperCase() ?? 'FILE')
                 : 'FILE'}
             </span>
+            <span className="w-fit font-semibold text-gray-400">PDF</span>
           </Link>
         </div>
       )
