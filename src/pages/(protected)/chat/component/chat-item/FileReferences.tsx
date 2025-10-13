@@ -21,7 +21,7 @@ export const FileReferences = ({ fileLinks }: { fileLinks: FileLink[] }) => {
               e.preventDefault();
               openPdf.mutate(item.url);
             }}
-            className="overflow-wrap-anywhere inline-block max-w-full cursor-pointer break-words rounded-md px-2 py-1 text-blue-400 hover:underline"
+            className="overflow-wrap-anywhere inline-block max-w-fit cursor-pointer break-words rounded-md px-2 py-1 text-blue-400 hover:underline"
           >
             {index + 1}. {item.title}
           </a>
