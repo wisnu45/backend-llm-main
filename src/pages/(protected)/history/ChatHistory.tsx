@@ -40,7 +40,7 @@ export default function ChatHistory() {
   const handleClear = () => setSelected([]);
   const handleDelete = () => {
     deleteBulkChat.mutate(
-      { chat_id: selected },
+      { chat_ids: selected },
       {
         onSuccess: () => {
           setSelected([]);

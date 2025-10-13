@@ -35,7 +35,7 @@ export interface TClearChatRequest {
 }
 
 export interface TDeleteBulkChatRequest {
-  chat_id: string[];
+  chat_ids: string[];
 }
 
 export interface TRenameChatRequest {
