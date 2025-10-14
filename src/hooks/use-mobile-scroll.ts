@@ -55,13 +55,13 @@ export const useMobileScroll = (
         };
       });
 
-      // Set timeout to detect when scrolling stops
+      // Set timeout to detect when scrolling stops (2 second delay)
       scrollTimeoutRef.current = setTimeout(() => {
         setState((prev) => ({
           ...prev,
           isScrolling: false
         }));
-      }, 150);
+      }, 2000);
     },
     [threshold]
   );
@@ -200,8 +200,7 @@ export const useMobileScroll = (
     isMobile: state.isHydrated ? state.isMobile : false,
     isScrolling: state.isScrolling,
     isAtTop: state.isAtTop,
-    shouldHideOnScroll:
-      state.isHydrated && state.isMobile && state.isScrolling && !state.isAtTop,
+    shouldHideOnScroll: state.isHydrated && state.isScrolling && !state.isAtTop,
     scrollY: state.scrollY
   };
 };
