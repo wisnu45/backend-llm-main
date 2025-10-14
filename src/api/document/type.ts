@@ -18,8 +18,8 @@ export type TDocParams = {
   search: string;
   page: number;
   page_size: number;
-  source_type: 'all' | 'portal' | 'admin' | 'user';
-  doc_type: 'all' | 'portal' | 'admin' | 'user';
+  source_type: 'all' | 'portal' | 'admin' | 'user' | 'website';
+  doc_type: 'all' | 'portal' | 'admin' | 'user' | 'website';
   // enabled?: boolean;
 };
 
