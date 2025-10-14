@@ -77,8 +77,12 @@ const InputDataWithForm = ({
         is_general: false
       };
     } else {
-      // For new chat page, use stored user preferences
-      return TogglePreferences.getWithDefaults();
+      // For new chat page, ALWAYS default to company insight
+      return {
+        is_company: true,
+        is_browse: false,
+        is_general: false
+      };
     }
   };
 
