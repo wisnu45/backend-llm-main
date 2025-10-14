@@ -5,9 +5,6 @@ export const useOpenPdf = () => {
   return useMutation({
     mutationKey: ['download-file'],
     mutationFn: async (url: string) => {
-      // const secureUrl = url.startsWith('http://')
-      //   ? url.replace('http://', 'https://')
-      //   : url;
       const secureUrl = url;
       const response = await fetch(secureUrl, {
         method: 'GET',
@@ -21,10 +18,22 @@ export const useOpenPdf = () => {
       const blob = await response.blob();
       return blob;
     },
-    onSuccess: (res) => {
-      const objectUrl = URL.createObjectURL(res);
-      console.log({ objectUrl });
-      window.open(objectUrl, '_blank');
+    onSuccess: (blob, url) => {
+      const fileExtension = url.split('.').pop()?.toLowerCase();
+      const isPdf = blob?.type?.includes('pdf');
+      const isImage = ['jpg', 'jpeg', 'png', 'gif'].includes(
+        fileExtension || ''
+      );
+
+      if (isPdf || isImage) {
+        const objectUrl = URL.createObjectURL(blob);
+        window.open(objectUrl, '_blank');
+      } else {
+        const downloadLink = document.createElement('a');
+        downloadLink.href = URL.createObjectURL(blob);
+        downloadLink.download = url.split('/').pop() || 'file';
+        downloadLink.click();
+      }
     },
     onError: (error, variables) => {
       console.error('Error fetching the PDF to open in a new tab:', error);

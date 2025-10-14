@@ -138,7 +138,14 @@ const FilesPage = () => {
               downloadFile.mutate(row.original.url || '#');
             }}
           >
-            <span className="font-semibold text-gray-400">PDF</span>
+            <span className="font-semibold text-gray-400">
+              {row.original.stored_filename
+                ? (row.original.stored_filename
+                    .split('.')
+                    .pop()
+                    ?.toUpperCase() ?? 'FILE')
+                : 'FILE'}
+            </span>
           </Link>
         </div>
       )

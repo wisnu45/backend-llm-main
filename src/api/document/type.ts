@@ -8,6 +8,7 @@ export type TDocItem = {
   document_url: string | null;
   id: string;
   source_type: string;
+  stored_filename: string;
   url: string;
   metadata: Record<string, string>;
   portal_id: string | null;
