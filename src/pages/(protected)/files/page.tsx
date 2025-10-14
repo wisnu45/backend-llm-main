@@ -135,7 +135,7 @@ const FilesPage = () => {
             to="#"
             onClick={(e) => {
               e.preventDefault();
-              downloadFile.mutate(row.original.document_url || '#');
+              downloadFile.mutate(row.original.url || '#');
             }}
           >
             <span className="font-semibold text-gray-400">PDF</span>
