@@ -2,6 +2,11 @@ export interface FileLink {
   title: string;
   url: string;
 }
+export interface DetailData {
+  ext: string;
+  url: string;
+  mimetype: string;
+}
 
 export interface ChatItemData {
   id: string;
@@ -16,4 +21,5 @@ export interface ChatItemData {
   is_browse?: boolean;
   is_company?: boolean;
   is_general?: boolean;
+  attachments?: DetailData[];
 }

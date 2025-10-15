@@ -24,8 +24,10 @@ export const ChatItem = ({ data }: ChatItemProps) => {
     id,
     chat_id,
     feedback,
-    source_documents
+    source_documents,
+    attachments
   } = data;
+
   const cleanedAnswer = (answer ?? '')
     .replace(/([.])\n(?=•)/g, '$1\n\n')
     .replace(/\n{1,}(?=\s*-\s)/g, '\n');
@@ -40,6 +42,18 @@ export const ChatItem = ({ data }: ChatItemProps) => {
       <div className="flex justify-end">
         <div className="rounded-xl bg-gray-200 px-4 py-2 text-sm text-gray-900">
           {question}
+          {attachments && attachments.length > 0 && (
+            <div className="mt-2 flex space-x-2 overflow-x-auto pb-2">
+              {attachments.map((file, index) => (
+                <img
+                  key={index}
+                  src={file.url}
+                  alt={`attachment-${index}`}
+                  className="h-60 w-auto flex-shrink-0 rounded"
+                />
+              ))}
+            </div>
+          )}
           <IconBar
             text={question}
             id={id}
