@@ -87,6 +87,7 @@ export default function SettingTable() {
   const filteredDataSetting = dataSetting.filter(
     (row) =>
       row.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      row.type.toLowerCase().includes(searchQuery.toLowerCase()) ||
       row.description.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
