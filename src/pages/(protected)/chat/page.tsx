@@ -136,8 +136,8 @@ const ChatPage = () => {
           is_browse: formData.is_browse,
           is_company: formData.is_company,
           is_general: formData.is_general,
-          attachments: formData.attachments,
-          with_document: formData.with_document
+          // attachments: formData.attachments,
+          with_documents: formData.attachments
         },
         {
           onSuccess: (data) => {

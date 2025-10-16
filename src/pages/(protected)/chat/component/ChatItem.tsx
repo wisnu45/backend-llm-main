@@ -45,12 +45,26 @@ export const ChatItem = ({ data }: ChatItemProps) => {
           {attachments && attachments.length > 0 && (
             <div className="mt-2 flex space-x-2 overflow-x-auto pb-2">
               {attachments.map((file, index) => (
-                <img
+                <div
                   key={index}
-                  src={file.url}
-                  alt={`attachment-${index}`}
-                  className="h-60 w-auto flex-shrink-0 rounded"
-                />
+                  className="relative flex items-center justify-center rounded-lg bg-gray-700 p-2"
+                >
+                  <div className="flex flex-col items-center hover:cursor-pointer">
+                    {file?.mimetype?.startsWith('image') ? (
+                      <img
+                        src={file.url}
+                        alt={file?.url}
+                        className="h-24 w-24 rounded-lg object-cover"
+                      />
+                    ) : (
+                      <iframe
+                        src={file.url}
+                        title={file?.ext}
+                        className="h-24 w-24 rounded-lg object-cover"
+                      />
+                    )}
+                  </div>
+                </div>
               ))}
             </div>
           )}

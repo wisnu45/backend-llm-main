@@ -150,7 +150,6 @@ const FilesPage = () => {
                     ?.toUpperCase() ?? 'FILE')
                 : 'FILE'}
             </span>
-            <span className="w-fit font-semibold text-gray-400">PDF</span>
           </Link>
         </div>
       )

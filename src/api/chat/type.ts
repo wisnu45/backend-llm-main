@@ -22,7 +22,7 @@ export interface TChatRequest {
   is_company: boolean;
   is_general: boolean;
   attachments?: File[];
-  with_document?: string[];
+  with_documents?: File[];
 }
 
 export interface TChatResponseRequest {
