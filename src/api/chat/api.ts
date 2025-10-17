@@ -19,13 +19,42 @@ import { TDefaultResponse } from '@/commons/types/response';
 //   return res.data;
 // };
 
+// export const chat = async (
+//   req: TChatRequest
+// ): Promise<TDefaultResponse<TChatResponse>> => {
+
+//   console.log('CEK REQ DI API CHAT', req)
+//   const res = await api.post<TDefaultResponse<TChatResponse>>(
+//     '/chats/ask',
+//     req
+//   );
+//   return res.data;
+// };
+
 export const chat = async (
   req: TChatRequest
 ): Promise<TDefaultResponse<TChatResponse>> => {
+  const formData = new FormData();
+  formData.append('question', req.question || '');
+  formData.append('is_browse', String(req.is_browse || false));
+  formData.append('is_company', String(req.is_company || false));
+  formData.append('chat_id', String(req.chat_id || null));
+
+  if (Array.isArray(req.with_document)) {
+    req.with_document.forEach((file) => {
+      if (file) {
+        formData.append('with_document[]', file); // ← pakai [] di key
+      }
+    });
+  } else if (req.with_document) {
+    formData.append('with_document[]', req.with_document);
+  }
+
   const res = await api.post<TDefaultResponse<TChatResponse>>(
     '/chats/ask',
-    req
+    formData
   );
+
   return res.data;
 };
 

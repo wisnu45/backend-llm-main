@@ -125,7 +125,7 @@ const ChatPage = () => {
     }
 
     setPreviewPrompt(trimmedQuestion);
-    setPreviewFiles(formData.attachments || []);
+    setPreviewFiles(formData.with_document || []);
     setShowPreview(true);
     setLoading(true);
 
@@ -137,7 +137,7 @@ const ChatPage = () => {
           is_company: formData.is_company,
           is_general: formData.is_general,
           // attachments: formData.attachments,
-          with_documents: formData.attachments
+          with_document: formData.with_document
         },
         {
           onSuccess: (data) => {

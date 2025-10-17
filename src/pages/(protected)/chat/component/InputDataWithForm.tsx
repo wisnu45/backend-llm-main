@@ -99,7 +99,7 @@ const InputDataWithForm = ({
 
     defaultValues: {
       prompt: initialPrompt,
-      attachments: [],
+      // attachments: [],
       with_document: [],
       ...getSmartDefaults()
     },
@@ -206,7 +206,7 @@ const InputDataWithForm = ({
     }
   }, [setValue, is_company_current, is_browse_current, is_general_current]);
 
-  const watchedAttachments = watch('attachments');
+  const watchedAttachments = watch('with_document');
   const watchedPrompt = watch('prompt');
 
   const openPopup = (file: File) => {
@@ -275,17 +275,7 @@ const InputDataWithForm = ({
         return;
       }
       const currentAttachments = watchedAttachments || [];
-      setValue('attachments', [...currentAttachments, ...droppedFiles]);
-      Promise.all(droppedFiles.map((file) => convertFileToBase64(file)))
-        .then((base64Files) => {
-          setValue('with_document', [
-            ...(watch('with_document') || []),
-            ...base64Files
-          ]);
-        })
-        .catch((error) => {
-          console.error('Error converting files to Base64:', error);
-        });
+      setValue('with_document', [...currentAttachments, ...droppedFiles]);
     }
   };
 
@@ -298,17 +288,7 @@ const InputDataWithForm = ({
       const validFiles = newFiles.filter(validateFile);
       if (validFiles.length === 0) return;
 
-      setValue('attachments', [...currentAttachments, ...newFiles]);
-      Promise.all(newFiles.map((file) => convertFileToBase64(file)))
-        .then((base64Files) => {
-          setValue('with_document', [
-            ...(watch('with_document') || []),
-            ...base64Files
-          ]);
-        })
-        .catch((error) => {
-          console.error('Error converting files to Base64:', error);
-        });
+      setValue('with_document', [...currentAttachments, ...newFiles]);
     }
   };
 
@@ -319,10 +299,10 @@ const InputDataWithForm = ({
   const removeFile = (index: number) => {
     const currentAttachments = watchedAttachments || [];
     const updatedAttachments = currentAttachments.filter((_, i) => i !== index);
-    setValue('attachments', updatedAttachments);
-    const currentDocuments = watch('with_document') || [];
-    const updatedDocuments = currentDocuments.filter((_, i) => i !== index);
-    setValue('with_document', updatedDocuments);
+    setValue('with_document', updatedAttachments);
+    // const currentDocuments = watch('with_document') || [];
+    // const updatedDocuments = currentDocuments.filter((_, i) => i !== index);
+    // setValue('with_document', updatedDocuments);
   };
 
   // Helper function to generate descriptive names for clipboard images
@@ -379,18 +359,7 @@ const InputDataWithForm = ({
 
       try {
         const currentAttachments = watchedAttachments || [];
-        setValue('attachments', [...currentAttachments, ...validFiles]);
-
-        const base64Files = await Promise.all(
-          validFiles.map((file) => convertFileToBase64(file))
-        );
-
-        setValue('with_document', [
-          ...(watch('with_document') || []),
-          ...base64Files
-        ]);
-
-        // Success toast
+        setValue('with_document', [...currentAttachments, ...validFiles]);
         toast({
           title: 'Files uploaded successfully',
           description: `${validFiles.length} file(s) added from clipboard`
@@ -418,12 +387,16 @@ const InputDataWithForm = ({
       TogglePreferences.set(currentToggles);
     }
 
-    onSubmit(data);
+    console.log('CEK DATANYA', data);
+    onSubmit({
+      ...data,
+      prompt: data.prompt.trim(),
+      with_document: data.with_document
+    });
 
     // Reset with the captured state (not from localStorage to avoid race condition)
     reset({
       prompt: '',
-      attachments: [],
       with_document: [],
       ...currentToggles
     });

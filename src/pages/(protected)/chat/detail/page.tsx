@@ -95,6 +95,7 @@ const DetailPage = () => {
       mutation.mutate(
         {
           ...payload,
+          with_document: payload.with_document,
           chat_id: chatId || ''
         },
         {
@@ -122,6 +123,7 @@ const DetailPage = () => {
       mutation.mutate(
         {
           ...payload,
+          with_document: payload?.with_document || [],
           chat_id: chatId || ''
         },
         {
@@ -135,8 +137,8 @@ const DetailPage = () => {
               // Convert payload back to TChatFormData format for handleError
               const formData: TChatFormData = {
                 prompt: payload?.question || '',
-                attachments: payload?.attachments || [],
-                with_document: [], // We don't have this in payload, but handleError doesn't actually use it
+                // attachments: payload?.attachments || [],
+                with_document: payload?.with_document || [], // We don't have this in payload, but handleError doesn't actually use it
                 is_browse: payload?.is_browse || false,
                 is_company: payload?.is_company || false,
                 is_general: payload?.is_general || false

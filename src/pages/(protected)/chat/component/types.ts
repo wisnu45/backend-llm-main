@@ -22,4 +22,5 @@ export interface ChatItemData {
   is_company?: boolean;
   is_general?: boolean;
   attachments?: DetailData[];
+  with_document?: File[];
 }

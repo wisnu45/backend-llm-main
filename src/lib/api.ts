@@ -4,17 +4,17 @@ import { SessionToken } from './cookies'; // penyimpanan access_token
 // import { toast } from '@/components/ui/use-toast';
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_ENDPOINT,
-  headers: {
-    'Content-Type': 'application/json'
-  }
+  baseURL: import.meta.env.VITE_API_ENDPOINT
+  // headers: {
+  //   'Content-Type': 'application/json'
+  // }
 });
 
 export const baseAxios = axios.create({
-  baseURL: import.meta.env.VITE_API_ENDPOINT,
-  headers: {
-    'Content-Type': 'application/json'
-  }
+  baseURL: import.meta.env.VITE_API_ENDPOINT
+  // headers: {
+  //   'Content-Type': 'application/json'
+  // }
 });
 
 api.interceptors.request.use((config) => {

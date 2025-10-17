@@ -21,8 +21,8 @@ export interface TChatRequest {
   is_browse: boolean;
   is_company: boolean;
   is_general: boolean;
-  attachments?: File[];
-  with_documents?: File[];
+  // attachments?: File[];
+  with_document?: File[];
 }
 
 export interface TChatResponseRequest {

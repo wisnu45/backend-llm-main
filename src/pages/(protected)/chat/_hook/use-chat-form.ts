@@ -31,7 +31,7 @@ export const useChatForm = ({
     }
 
     setPreviewPrompt(formData.prompt);
-    setPreviewFiles(formData.attachments || []);
+    setPreviewFiles(formData.with_document || []);
     setShowPreview(true);
     setLoading(true);
 
@@ -41,7 +41,7 @@ export const useChatForm = ({
       is_browse: formData.is_browse,
       is_company: formData.is_company,
       is_general: formData.is_general,
-      attachments: formData.attachments
+      with_document: formData.with_document
     };
   };
 
