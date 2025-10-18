@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useFetchSetting } from './_hook/use-fetch-setting';
 import { TSettingDocument, TSettingInput } from '@/api/settings/type';
 import useEditSetting from './_hook/use-mutate-edit-setting';
+import MarkdownViewer from './component/MarkdownViewer';
 
 export default function SettingTable() {
   const [selectedSetting, setSelectedSetting] =
@@ -25,7 +26,11 @@ export default function SettingTable() {
 
     if (row.data_type === 'integer') {
       setModalType('number');
-    } else if (row.data_type === 'string' || row.data_type === 'array') {
+    } else if (
+      row.data_type === 'string' ||
+      row.data_type === 'array' ||
+      row.data_type === 'text'
+    ) {
       setModalType('text');
     } else if (row.data_type === 'boolean') {
       setModalType('toggle');
@@ -165,7 +170,8 @@ export default function SettingTable() {
                           </button>
                         ) : (
                           <>
-                            {row.value} {row.unit || ''}
+                            <MarkdownViewer text={row.value} />
+                            {/* {row.value} {row.unit || ''} */}
                           </>
                         )}
                       </span>
