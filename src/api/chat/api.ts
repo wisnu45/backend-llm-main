@@ -38,7 +38,9 @@ export const chat = async (
   formData.append('question', req.question || '');
   formData.append('is_browse', String(req.is_browse || false));
   formData.append('is_company', String(req.is_company || false));
-  formData.append('chat_id', String(req.chat_id || null));
+  if (req.chat_id) {
+    formData.append('chat_id', String(req.chat_id || null));
+  }
 
   if (Array.isArray(req.with_document)) {
     req.with_document.forEach((file) => {
