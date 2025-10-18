@@ -25,6 +25,8 @@ export type TUserParams = {
   search?: string;
   page?: number;
   page_size?: number;
+  user_type?: 'all' | 'portal' | 'local';
+  role_id?: string;
 };
 
 export type TRoleParams = {
