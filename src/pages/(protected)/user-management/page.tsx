@@ -41,13 +41,12 @@ const useUserManagementPage = () => {
   const [roleData, setRoleData] = useState<TRole | null>(null);
   const [tab, setTab] = useState<'users' | 'roles'>('users');
 
-  console.log('CEK CEK', tab);
   const [textSearch, setTextSearch] = useState<string>('');
   const [pageIndex, setPageIndex] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const [userType, setUserType] = useState<string>('all');
+  const [roleId, setRoleId] = useState<string>('all');
   const [debouncedValue] = useDebounce(textSearch, 1000);
-
-  console.log('RENDER PAGE 123', { modal, userData, roleData });
 
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -76,13 +75,21 @@ const useUserManagementPage = () => {
   const usersQuery = useGetUsers({
     search: debouncedValue,
     page: pageIndex,
-    page_size: pageSize
+    page_size: pageSize,
+    user_type: userType as 'all' | 'portal' | 'local',
+    role_id: roleId !== 'all' ? roleId : undefined
   });
 
   const rolesQuery = useGetRoles({
     search: debouncedValue,
     page: pageIndex,
     page_size: pageSize
+  });
+
+  // Fetch all roles for filter dropdown
+  const allRolesQuery = useGetRoles({
+    page: 1,
+    page_size: 1000
   });
 
   const updateURLParams = (newPageIndex: number, newPageSize: number) => {
@@ -95,7 +102,7 @@ const useUserManagementPage = () => {
 
   useEffect(() => {
     setPageIndex(1);
-  }, [textSearch, tab]);
+  }, [textSearch, tab, userType, roleId]);
 
   return {
     userData,
@@ -110,8 +117,13 @@ const useUserManagementPage = () => {
     setPageIndex,
     pageSize,
     setPageSize,
+    userType,
+    setUserType,
+    roleId,
+    setRoleId,
     usersQuery,
     rolesQuery,
+    allRolesQuery,
     updateURLParams
   };
 };
@@ -129,8 +141,13 @@ const UserManagementPage = () => {
     setPageIndex,
     pageSize,
     setPageSize,
+    userType,
+    setUserType,
+    roleId,
+    setRoleId,
     usersQuery,
     rolesQuery,
+    allRolesQuery,
     updateURLParams
   } = useUserManagementPage();
 
@@ -396,12 +413,27 @@ const UserManagementPage = () => {
     updateURLParams(pageIndex, newPageSize);
   };
 
+  const handleUserTypeChange = (value: string) => {
+    setUserType(value);
+    setPageIndex(1);
+  };
+
+  const handleRoleChange = (value: string) => {
+    setRoleId(value);
+    setPageIndex(1);
+  };
+
   return (
     <div>
       <UserManagementHeader
         activeTab={tab}
         setModal={setModal}
         setInput={setInput}
+        userType={userType}
+        roleId={roleId}
+        onUserTypeChange={handleUserTypeChange}
+        onRoleChange={handleRoleChange}
+        roles={allRolesQuery.data?.data || []}
       />
 
       <Tabs
@@ -410,6 +442,8 @@ const UserManagementPage = () => {
         onValueChange={(val) => {
           setTab(val as 'users' | 'roles');
           setPageIndex(1);
+          setUserType('all');
+          setRoleId('all');
           updateURLParams(1, pageSize);
         }}
       >
