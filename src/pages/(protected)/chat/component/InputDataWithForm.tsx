@@ -47,9 +47,11 @@ const InputDataWithForm = ({
   const queryFeature = useFetchSettingFeature();
   const settingFeature = queryFeature?.data?.data;
   const getMenuValue = (name) =>
-    settingFeature?.find((menu) => menu.name === name)?.value;
+    settingFeature?.find(
+      (menu) => menu.name.toLowerCase() === name.toLowerCase()
+    )?.value;
   const settingAttachment = getMenuValue('Attachment');
-  const maxText = getMenuValue('Max chats') || 1000;
+  const maxText = getMenuValue('chat max text') || 1000;
   const fileSize = getMenuValue('Attachment file size') || 10;
   const rawFileTypes = getMenuValue('Attachment file types');
   const settingVoice = getMenuValue('Voice typing');
