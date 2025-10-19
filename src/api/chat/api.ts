@@ -37,6 +37,7 @@ export const chat = async (
   const formData = new FormData();
   formData.append('question', req.question || '');
   formData.append('is_browse', String(req.is_browse || false));
+  formData.append('is_general', String(req.is_general || false));
   formData.append('is_company', String(req.is_company || false));
   if (req.chat_id) {
     formData.append('chat_id', String(req.chat_id || null));
