@@ -59,6 +59,10 @@ export default function SettingTable() {
     }
     const updatedSetting: TSettingInput = {
       ...selectedSetting,
+      data_type:
+        selectedSetting.data_type === 'text'
+          ? 'string'
+          : selectedSetting.data_type,
       value: data
     };
     mutate.mutate(updatedSetting, {
