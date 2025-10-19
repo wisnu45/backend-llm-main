@@ -168,10 +168,13 @@ export default function SettingTable() {
                               }`}
                             />
                           </button>
-                        ) : (
+                        ) : row.data_type === 'string' ? (
                           <>
                             <MarkdownViewer text={row.value} />
-                            {/* {row.value} {row.unit || ''} */}
+                          </>
+                        ) : (
+                          <>
+                            {row.value} {row.unit || ''}
                           </>
                         )}
                       </span>
