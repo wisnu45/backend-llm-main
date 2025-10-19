@@ -447,13 +447,6 @@ const InputDataWithForm = ({
     }
   }, [setValue, trigger]);
 
-  // useEffect(() => {
-  //   const cookieValue = Cookies.get('search_internet') === 'true';
-  //   const is_company_policy = Cookies.get('is_company') === 'true';
-  //   setValue('is_browse', cookieValue);
-  //   setValue('is_company', is_company_policy);
-  // }, []);
-
   const toggleRecording = () => {
     if (!recognitionRef.current) {
       alert('Browser tidak mendukung Speech Recognition');

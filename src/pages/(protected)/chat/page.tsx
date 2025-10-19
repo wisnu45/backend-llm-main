@@ -157,7 +157,6 @@ const ChatPage = () => {
             }
           },
           onError: (err: Error) => {
-            console.error('Chat mutation failed', err);
             setLoading(false);
             setShowPreview(false);
             setPreviewPrompt('');
@@ -177,7 +176,6 @@ const ChatPage = () => {
         }
       );
     } catch (error) {
-      console.error('Session creation failed', error);
       setLoading(false);
       setShowPreview(false);
       setPreviewPrompt('');
