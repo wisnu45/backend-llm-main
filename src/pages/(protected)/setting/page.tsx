@@ -1,9 +1,16 @@
 import { PencilIcon } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useFetchSetting } from './_hook/use-fetch-setting';
 import { TSettingDocument, TSettingInput } from '@/api/settings/type';
 import useEditSetting from './_hook/use-mutate-edit-setting';
 import MarkdownViewer from './component/MarkdownViewer';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger
+} from '@/components/ui/select';
+import { SelectValue } from '@radix-ui/react-select';
 
 export default function SettingTable() {
   const [selectedSetting, setSelectedSetting] =
@@ -12,11 +19,20 @@ export default function SettingTable() {
   const [inputValue, setInputValue] = useState<string>('');
   const [inputValueBoolean, setInputValueBoolean] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [userType, setUserType] = useState<string>('all');
+
+  const onUserTypeChange = (value: string) => {
+    setUserType(value);
+  };
 
   const query = useFetchSetting();
   const mutate = useEditSetting(selectedSetting?.id || '');
 
-  const dataSetting = query?.data?.data || [];
+  const dataSetting = useMemo(
+    () => query?.data?.data || [],
+    [query?.data?.data]
+  );
+  const [filteredDataSetting, setFilteredDataSetting] = useState(dataSetting);
 
   const isLoading = query.isLoading || query.isFetching;
 
@@ -51,7 +67,7 @@ export default function SettingTable() {
       } else if (selectedSetting.data_type === 'array') {
         data = JSON.parse(inputValue);
       } else {
-        data = inputValue; // default untuk tipe lain
+        data = inputValue;
       }
     } catch (err) {
       console.error('Invalid JSON input:', err);
@@ -93,23 +109,66 @@ export default function SettingTable() {
     { value: 'png', label: 'png' },
     { value: 'txt', label: 'txt' }
   ];
-  const filteredDataSetting = dataSetting.filter(
-    (row) =>
-      row.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      row.type.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      row.description.toLowerCase().includes(searchQuery.toLowerCase())
+  // const filteredDataSetting = dataSetting.filter(
+  //   (row) =>
+  //     row.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+  //     row.description.toLowerCase().includes(searchQuery.toLowerCase())
+  // );
+
+  useEffect(() => {
+    const filtered = dataSetting.filter((row) => {
+      const matchesSearchQuery =
+        row.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        row.description.toLowerCase().includes(searchQuery.toLowerCase());
+
+      const matchesUserType = userType === 'all' || row.type === userType; // Sesuaikan sesuai dengan logika userType
+
+      return matchesSearchQuery && matchesUserType;
+    });
+
+    setFilteredDataSetting(filtered);
+  }, [dataSetting, searchQuery, userType]);
+
+  const uniqueRows = dataSetting.reduce(
+    (acc: TSettingDocument[], row: TSettingDocument) => {
+      if (!acc.some((item) => item.type === row.type)) {
+        acc.push(row);
+      }
+      return acc;
+    },
+    [] as TSettingDocument[]
   );
 
   return (
     <div className="mx-auto w-full rounded-lg bg-white p-6 shadow">
       <h1 className="mb-4 text-2xl font-semibold">Pengaturan Aplikasi</h1>
-      <input
-        type="text"
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
-        placeholder="Cari pengaturan..."
-        className="mb-6 mt-4 w-full rounded-lg border-2 border-gray-300 p-2"
-      />
+      <div className="mb-3 flex flex-col sm:flex-row sm:space-x-4">
+        <div className="mb-6 flex-1 sm:mb-0">
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Cari pengaturan..."
+            className="w-full rounded-lg border-2 border-gray-300 p-2"
+          />
+        </div>
+        <div className="mb-6 flex-1 sm:mb-0">
+          <Select value={userType} onValueChange={onUserTypeChange}>
+            <SelectTrigger className="w-full bg-white sm:w-[180px]">
+              <SelectValue placeholder="Type" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All</SelectItem>
+              {uniqueRows.map((row) => (
+                <SelectItem key={row.type} value={row.type}>
+                  {row.type.charAt(0).toUpperCase() + row.type.slice(1)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
       <div className="overflow-x-auto">
         <table className="w-full min-w-[600px] table-auto border-collapse overflow-hidden rounded-lg">
           <thead>
@@ -204,7 +263,7 @@ export default function SettingTable() {
         </table>
         {isLoading && (
           <div className="flex items-center justify-center py-4">
-            <span>Loading...</span> {/* You can use a spinner here */}
+            <span>Loading...</span>
           </div>
         )}
       </div>
