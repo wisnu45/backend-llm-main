@@ -89,9 +89,12 @@ const ChatPage = () => {
 
   const navigate = useNavigate();
   const currentPath = useLocation().pathname;
+  const maxText = Number(getMenuValue('chat max text')) || 1000;
 
   const handleClickItem = (prompt: string) => {
-    setPromptRef.current?.onSetPrompt(prompt);
+    const limitedPrompt =
+      prompt.length > maxText ? prompt.slice(0, maxText) : prompt;
+    setPromptRef.current?.onSetPrompt(limitedPrompt);
   };
 
   const handleRetry = () => {
