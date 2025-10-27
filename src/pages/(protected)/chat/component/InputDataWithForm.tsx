@@ -552,19 +552,19 @@ const InputDataWithForm = ({
             )}
           />
 
-          <div className="mt-4 flex flex-col items-start justify-between text-sm text-gray-800 sm:flex-row sm:items-center">
-            <div className="flex flex-col items-start gap-2 sm:flex-row sm:gap-2">
+          <div className="mt-4 flex flex-col items-start justify-between gap-3 text-sm text-gray-800 sm:flex-row sm:items-center">
+            <div className="order-2 flex w-full flex-wrap items-center gap-2.5 sm:order-1 sm:w-auto sm:flex-row sm:gap-2">
               {settingAttachment && (
                 <>
                   <label
                     htmlFor="file-upload"
-                    className={`flex cursor-pointer items-center gap-1 rounded-xl bg-gradient-to-r px-4 py-2 shadow-md transition duration-300 ${
+                    className={`flex min-h-[44px] cursor-pointer items-center justify-center gap-1 rounded-xl bg-gradient-to-r px-3 py-2 shadow-md transition duration-300 sm:px-4 sm:py-2.5 ${
                       !settingAttachment
                         ? 'cursor-not-allowed opacity-50 shadow-none'
-                        : 'hover:text-purple-600 hover:shadow-lg'
+                        : 'hover:text-purple-600 hover:shadow-lg active:scale-95'
                     }`}
                   >
-                    <Paperclip size={18} />
+                    <Paperclip className="h-4 w-4 sm:h-5 sm:w-5" />
                   </label>
 
                   <input
@@ -595,14 +595,14 @@ const InputDataWithForm = ({
                             }}
                           >
                             <div
-                              className={`flex items-center gap-2 rounded-xl px-4 py-2 shadow-md transition-all duration-300 ${
+                              className={`flex min-h-[44px] items-center gap-2 rounded-xl px-3 py-2 shadow-md transition-all duration-300 active:scale-95 sm:px-4 sm:py-2.5 ${
                                 value
                                   ? 'bg-[#772f8e] text-white hover:text-purple-200 hover:shadow-lg'
-                                  : 'shadow-lg'
+                                  : 'bg-white shadow-lg hover:shadow-xl'
                               }`}
                             >
-                              <Building className="h-5 w-5" />
-                              <span className="hidden text-sm font-medium sm:block md:inline">
+                              <Building className="h-4 w-4 flex-shrink-0 sm:h-5 sm:w-5" />
+                              <span className="hidden text-sm font-medium sm:inline">
                                 Company Insights
                               </span>
                             </div>
@@ -634,14 +634,14 @@ const InputDataWithForm = ({
                             }}
                           >
                             <div
-                              className={`flex items-center gap-2 rounded-xl px-4 py-2 shadow-md transition-all duration-300 ${
+                              className={`flex min-h-[44px] items-center gap-2 rounded-xl px-3 py-2 shadow-md transition-all duration-300 active:scale-95 sm:px-4 sm:py-2.5 ${
                                 value
                                   ? 'bg-[#772f8e] text-white hover:text-purple-200 hover:shadow-lg'
-                                  : 'shadow-lg'
+                                  : 'bg-white shadow-lg hover:shadow-xl'
                               }`}
                             >
-                              <Lightbulb className="h-5 w-5" />
-                              <span className="hidden text-sm font-medium sm:block md:inline">
+                              <Lightbulb className="h-4 w-4 flex-shrink-0 sm:h-5 sm:w-5" />
+                              <span className="hidden text-sm font-medium sm:inline">
                                 General Insights
                               </span>
                             </div>
@@ -673,14 +673,14 @@ const InputDataWithForm = ({
                             }}
                           >
                             <div
-                              className={`flex items-center gap-2 rounded-xl px-4 py-2 shadow-md transition-all duration-300 ${
+                              className={`flex min-h-[44px] items-center gap-2 rounded-xl px-3 py-2 shadow-md transition-all duration-300 active:scale-95 sm:px-4 sm:py-2.5 ${
                                 value
                                   ? 'bg-[#772f8e] text-white hover:text-purple-200 hover:shadow-lg'
-                                  : 'shadow-lg'
+                                  : 'bg-white shadow-lg hover:shadow-xl'
                               }`}
                             >
-                              <Globe className="h-5 w-5" />
-                              <span className="hidden text-sm font-medium sm:block">
+                              <Globe className="h-4 w-4 flex-shrink-0 sm:h-5 sm:w-5" />
+                              <span className="hidden text-sm font-medium sm:inline">
                                 Search
                               </span>
                             </div>
@@ -695,7 +695,7 @@ const InputDataWithForm = ({
                 />
               )}
             </div>
-            <div className="mt-3 flex w-full items-center gap-3 sm:mt-0 sm:w-auto sm:flex-row">
+            <div className="order-1 flex w-full items-center justify-between gap-3 sm:order-2 sm:mt-0 sm:w-auto sm:justify-end">
               {settingVoice && (
                 <Tooltip>
                   <TooltipTrigger>
@@ -707,14 +707,16 @@ const InputDataWithForm = ({
                         toggleRecording();
                       }}
                       disabled={isLoading}
-                      className={`flex items-center gap-2 rounded-xl px-4 py-2 shadow-md transition-all duration-300 ${
+                      className={`flex min-h-[44px] items-center gap-2 rounded-xl px-3 py-2 shadow-md transition-all duration-300 active:scale-95 sm:px-4 sm:py-2.5 ${
                         isRecording
                           ? 'animate-pulse bg-red-500 text-white'
                           : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
                       }`}
                     >
-                      <Mic className="h-5 w-5" />
-                      {isRecording && <span>{'Merekam...'}</span>}
+                      <Mic className="h-4 w-4 flex-shrink-0 sm:h-5 sm:w-5" />
+                      {isRecording && (
+                        <span className="text-sm">{'Merekam...'}</span>
+                      )}
                     </button>
                   </TooltipTrigger>
                   <TooltipContent className="hidden sm:block">
@@ -722,16 +724,16 @@ const InputDataWithForm = ({
                   </TooltipContent>
                 </Tooltip>
               )}
-              <div className="mt-3 flex w-full items-center justify-end gap-2 sm:mt-0 sm:w-auto sm:justify-end">
-                <span className="text-sm text-gray-900">
+              <div className="flex items-center gap-2.5">
+                <span className="text-sm font-medium text-gray-900">
                   {watchedPrompt?.length || 0}/{maxText || 1000}
                 </span>
                 <button
                   type="submit"
                   disabled={!isValid || isLoading}
-                  className="flex h-8 w-8 items-center justify-center rounded-md bg-[#7051f8] text-white transition hover:bg-[#5b3de4] disabled:cursor-not-allowed disabled:bg-gray-400"
+                  className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#7051f8] text-white shadow-md transition-all hover:bg-[#5b3de4] hover:shadow-lg active:scale-95 disabled:cursor-not-allowed disabled:bg-gray-400 sm:h-11 sm:w-11"
                 >
-                  <ArrowRightIcon />
+                  <ArrowRightIcon className="h-4 w-4 sm:h-5 sm:w-5" />
                 </button>
               </div>
             </div>
