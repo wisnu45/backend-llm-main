@@ -602,7 +602,7 @@ const InputDataWithForm = ({
                               }`}
                             >
                               <Building className="h-5 w-5" />
-                              <span className="text-sm font-medium md:inline">
+                              <span className="hidden text-sm font-medium sm:block md:inline">
                                 Company Insights
                               </span>
                             </div>
@@ -641,7 +641,7 @@ const InputDataWithForm = ({
                               }`}
                             >
                               <Lightbulb className="h-5 w-5" />
-                              <span className="text-sm font-medium md:inline">
+                              <span className="hidden text-sm font-medium sm:block md:inline">
                                 General Insights
                               </span>
                             </div>
@@ -680,8 +680,8 @@ const InputDataWithForm = ({
                               }`}
                             >
                               <Globe className="h-5 w-5" />
-                              <span className="text-sm font-medium">
-                                Cari di internet
+                              <span className="hidden text-sm font-medium sm:block">
+                                Search
                               </span>
                             </div>
                           </div>
@@ -695,7 +695,7 @@ const InputDataWithForm = ({
                 />
               )}
             </div>
-            <div className="mt-3 flex w-full flex-col items-center gap-3 sm:mt-0 sm:w-auto sm:flex-row">
+            <div className="mt-3 flex w-full items-center gap-3 sm:mt-0 sm:w-auto sm:flex-row">
               {settingVoice && (
                 <Tooltip>
                   <TooltipTrigger>
@@ -707,7 +707,7 @@ const InputDataWithForm = ({
                         toggleRecording();
                       }}
                       disabled={isLoading}
-                      className={`hidden items-center gap-2 rounded-xl px-4 py-2 shadow-md transition-all duration-300 md:flex ${
+                      className={`flex items-center gap-2 rounded-xl px-4 py-2 shadow-md transition-all duration-300 ${
                         isRecording
                           ? 'animate-pulse bg-red-500 text-white'
                           : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
