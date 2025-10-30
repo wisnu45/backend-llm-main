@@ -7,6 +7,8 @@ import {
   TypingEffect
 } from './chat-item';
 import { ChatItemData } from './types';
+import { Dialog, DialogContent, DialogHeader } from '@/components/ui/dialog';
+import { DialogTitle } from '@radix-ui/react-dialog';
 
 interface ChatItemProps {
   data: ChatItemData;
@@ -33,6 +35,9 @@ export const ChatItem = ({ data }: ChatItemProps) => {
     .replace(/\n{1,}(?=\s*-\s)/g, '\n');
   const [isTypingComplete, setIsTypingComplete] = useState(false);
 
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [previewType, setPreviewType] = useState<string | null>(null);
+
   const handleTypingComplete = () => {
     setIsTypingComplete(true);
   };
@@ -47,20 +52,24 @@ export const ChatItem = ({ data }: ChatItemProps) => {
               {attachments.map((file, index) => (
                 <div
                   key={index}
-                  className="relative flex items-center justify-center rounded-lg bg-gray-700 p-2"
+                  className="relative flex items-center justify-center rounded-lg bg-gray-700 p-3 hover:cursor-pointer"
+                  onClick={() => {
+                    setPreviewUrl(file.url);
+                    setPreviewType(file?.mimetype);
+                  }}
                 >
                   <div className="flex flex-col items-center hover:cursor-pointer">
                     {file?.mimetype?.startsWith('image') ? (
                       <img
                         src={file.url}
                         alt={file?.url}
-                        className="h-24 w-24 rounded-lg object-cover"
+                        className="h-24 w-24 rounded-lg object-cover hover:cursor-pointer"
                       />
                     ) : (
                       <iframe
                         src={file.url}
                         title={file?.ext}
-                        className="h-24 w-24 rounded-lg object-cover"
+                        className="h-24 w-24 rounded-lg object-cover hover:cursor-pointer"
                       />
                     )}
                   </div>
@@ -68,6 +77,7 @@ export const ChatItem = ({ data }: ChatItemProps) => {
               ))}
             </div>
           )}
+
           <IconBar
             text={question}
             id={id}
@@ -100,6 +110,22 @@ export const ChatItem = ({ data }: ChatItemProps) => {
           </>
         )}
       </div>
+
+      {previewUrl && (
+        <Dialog open={!!previewUrl} onOpenChange={() => setPreviewUrl(null)}>
+          <DialogContent className="max-w-4xl">
+            <DialogHeader>
+              <DialogTitle>Preview File</DialogTitle>
+            </DialogHeader>
+
+            {previewType?.startsWith('image') ? (
+              <img src={previewUrl} className="w-full rounded-lg" />
+            ) : (
+              <iframe src={previewUrl} className="h-[80vh] w-full rounded-lg" />
+            )}
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 };
