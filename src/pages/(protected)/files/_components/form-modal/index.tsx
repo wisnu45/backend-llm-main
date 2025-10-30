@@ -25,6 +25,7 @@ import { TRequestCreateDocument } from '@/api/document/type';
 import { Loader2 } from 'lucide-react';
 import { truncateFileName } from '@/lib/utils';
 import { useFiles } from '@/hooks/use-files';
+import { useFetchSetting } from '@/pages/(protected)/setting/_hook/use-fetch-setting';
 
 interface Props {
   loading?: boolean;
@@ -95,6 +96,42 @@ const FormModal = ({
     form.setValue('document_name', file?.file?.name?.split('.')[0]);
   }, [files, form]);
 
+  const mimeMap: Record<string, string> = {
+    pdf: 'application/pdf',
+    docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    pptx: 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+    xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    jpg: 'image/jpeg',
+    jpeg: 'image/jpeg',
+    png: 'image/png',
+    txt: 'text/plain'
+  };
+
+  function parseAcceptedExtensions(extensions: string[]) {
+    const result: Record<string, string[]> = {};
+
+    extensions.forEach((ext) => {
+      const mime = mimeMap[ext.toLowerCase()];
+      if (mime) {
+        if (!result[mime]) result[mime] = [];
+        result[mime].push(`.${ext}`);
+      }
+    });
+
+    return result;
+  }
+
+  const query = useFetchSetting();
+  const dataSetting = query?.data?.data || [];
+  const accepted = dataSetting?.find(
+    (menu) => menu.name === 'Attachment file types'
+  )?.value;
+  const maxFile = dataSetting?.find(
+    (menu) => menu.name === 'Attachment file size'
+  )?.value;
+  const accpetedFile = accepted ? JSON.parse(String(accepted)) : ['pdf'];
+  const acceptedTypes = parseAcceptedExtensions(accpetedFile);
+
   return (
     <Dialog
       open={open}
@@ -156,11 +193,9 @@ const FormModal = ({
                         <FormLabel>Document *</FormLabel>
                         <FormControl>
                           <FileUpload
-                            accept={{
-                              'application/pdf': ['.pdf']
-                            }}
+                            accept={acceptedTypes}
                             maxFiles={1}
-                            maxSize={10}
+                            maxSize={maxFile ? Number(maxFile) : 10}
                           />
                         </FormControl>
                         <FormMessage />
