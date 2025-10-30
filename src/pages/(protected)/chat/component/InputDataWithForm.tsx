@@ -602,7 +602,11 @@ const InputDataWithForm = ({
                               }`}
                             >
                               <Building className="h-4 w-4 flex-shrink-0 sm:h-5 sm:w-5" />
-                              <span className="hidden text-sm font-medium sm:inline">
+                              <span
+                                className={`text-sm font-medium sm:inline ${
+                                  value ? '' : 'hidden'
+                                }`}
+                              >
                                 Company Insights
                               </span>
                             </div>
@@ -641,7 +645,11 @@ const InputDataWithForm = ({
                               }`}
                             >
                               <Lightbulb className="h-4 w-4 flex-shrink-0 sm:h-5 sm:w-5" />
-                              <span className="hidden text-sm font-medium sm:inline">
+                              <span
+                                className={`text-sm font-medium sm:inline ${
+                                  value ? '' : 'hidden'
+                                }`}
+                              >
                                 General Insights
                               </span>
                             </div>
@@ -680,7 +688,11 @@ const InputDataWithForm = ({
                               }`}
                             >
                               <Globe className="h-4 w-4 flex-shrink-0 sm:h-5 sm:w-5" />
-                              <span className="hidden text-sm font-medium sm:inline">
+                              <span
+                                className={`text-sm font-medium sm:inline ${
+                                  value ? '' : 'hidden'
+                                }`}
+                              >
                                 Search
                               </span>
                             </div>
