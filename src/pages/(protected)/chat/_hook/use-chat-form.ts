@@ -17,16 +17,19 @@ export const useChatForm = ({
   const [previewPrompt, setPreviewPrompt] = useState<string>('');
   const [previewFiles, setPreviewFiles] = useState<FileType[]>([]);
   const [showPreview, setShowPreview] = useState<boolean>(false);
-  const [networkError, setNetworkError] = useState<boolean>(false);
+  const [error, setError] = useState<{ isNetwork: boolean; show: boolean }>({
+    isNetwork: false,
+    show: false
+  });
   const [lastFailedRequest, setLastFailedRequest] =
     useState<TChatFormData | null>(null);
 
   const handleSubmit = (formData: TChatFormData, isRetry: boolean = false) => {
     if (!formData.prompt.trim()) return;
 
-    // Only clear network error for new submissions, not retries
+    // Only clear error for new submissions, not retries
     if (!isRetry) {
-      setNetworkError(false);
+      setError({ isNetwork: false, show: false });
       setLastFailedRequest(null);
     }
 
@@ -61,12 +64,12 @@ export const useChatForm = ({
     setPreviewPrompt('');
     setPreviewFiles([]);
 
-    if (isNetworkError && failedFormData) {
-      setNetworkError(true);
+    if (failedFormData) {
+      setError({ isNetwork: isNetworkError, show: true });
       setLastFailedRequest(failedFormData);
     } else {
-      // Clear network error for non-network errors
-      setNetworkError(false);
+      // Clear error if no failed form data
+      setError({ isNetwork: false, show: false });
       setLastFailedRequest(null);
     }
 
@@ -83,9 +86,10 @@ export const useChatForm = ({
 
   const handleSuccess = () => {
     // Clear all error states on successful submission
-    setNetworkError(false);
+    setError({ isNetwork: false, show: false });
     setLastFailedRequest(null);
     resetForm();
+    onSuccess?.();
   };
 
   return {
@@ -93,7 +97,7 @@ export const useChatForm = ({
     previewPrompt,
     previewFiles,
     showPreview,
-    networkError,
+    error,
     handleSubmit,
     handleError,
     handleRetry,
