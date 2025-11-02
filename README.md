@@ -1,540 +1,310 @@
-# Dashboard-LLM — React Admin Dashboard Starter Template With Shadcn-ui
+# Combiphar Chatbot Frontend — VITA
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://user-images.githubusercontent.com/9113740/201498864-2a900c64-d88f-4ed4-b5cf-770bcb57e1f5.png">
-  <source media="(prefers-color-scheme: light)" srcset="https://user-images.githubusercontent.com/9113740/201498152-b171abb8-9225-487a-821c-6ff49ee48579.png">
-</picture>
-
-<div align="center"><strong>React Admin Dashboard Starter Template With Shadcn-ui</strong></div>
-<div align="center">Built with Vite + React + TypeScript</div>
-<br />
-<div align="center">
-<a href="https://react-shadcn-dashboard-starter.vercel.app/">View Demo</a>
-</div>
+Selamat datang di **Combiphar Chatbot Frontend (VITA)**, solusi antarmuka modern untuk chatbot berbasis AI yang mendukung proses interaksi, sinkronisasi dokumen, serta integrasi dengan API backend canggih. Proyek ini dibangun dengan teknologi web terkini untuk memenuhi kebutuhan enterprise, skalabilitas, dan kemudahan pengembangan.
+[View Dashboard Chatbot AI VITA](https://combiphar-chatbot.oemahsolution.com/)
 
 ---
 
-Versi README ini diperbarui dan diperkaya untuk mencerminkan isi repository dashboard-llm, menambahkan panduan menjalankan di lokal dan di server (contoh deploy ke server Combiphar berbasis Linux/Docker), dokumentasi API, arsitektur sistem, dan daftar teknologi yang digunakan beserta rekomendasi best practice untuk production.
+## 1. Architecture Overview
+
+Arsitektur VITA Chatbot mengadopsi pola **microservices** berbasis frontend-backend terpisah, dengan komunikasi melalui REST API dan WebSocket (opsional untuk streaming). Diagram arsitektur tinggi:
+
+```
+┌───────────────┐        ┌────────────────────────┐       ┌───────────────┐
+│   User        │◄──────►│ Combiphar Frontend VITA│◄─────►│ Chatbot API   │
+└───────────────┘        │ (React, TS, Tailwind) │       │ (OpenAI,      │
+                         └────────────────────────┘       │ Custom Logic) │
+                               ▲         │                └───────────────┘
+                               │         │
+                 ┌─────────────┴───┐   ┌─┴─────────────┐
+                 │ Document Sync   │   │ Auth Service  │
+                 │ (API, polling) │   │ (JWT, OAuth2) │
+                 └────────────────┘   └───────────────┘
+```
+
+- **Frontend (VITA)**: React (TypeScript), Tailwind, shadcn/ui, TanStack Query.
+- **Backend (API Chatbot)**: Node.js/Express, OpenAI API, Sinkronisasi dokumen dan user.
+- **Document Sync**: Sinkronisasi metadata dan konten dokumen dari sumber eksternal ke backend.
+- **Auth Service**: Token-based authentication (JWT/OAuth2).
 
 ---
 
-## Ringkasan Proyek
+## 2. Document Synchronization Flow
 
-Dashboard-LLM adalah starter template admin dashboard berbasis React + TypeScript. Template ini menggabungkan:
-- Komponen UI dari shadcn/ui (Radix + Tailwind)
-- Manajemen data remote dengan TanStack Query (React Query)
-- Table interaktif dengan TanStack Table
-- Form handling dengan React Hook Form + Zod
-- Contoh integrasi LLM melalui backend proxy (OpenAI atau penyedia LLM lain)
+Proses sinkronisasi dokumen melibatkan beberapa tahap:
 
-Tujuan: memberikan basis cepat untuk membangun aplikasi admin yang membutuhkan panel LLM (chat/summarize), tabel server-side, autentikasi sederhana, dan pattern produksi modern (linting, hooks, docker).
+1. **Inisiasi Sinkronisasi**  
+   Pengguna/admin memicu sinkronisasi via frontend (tombol/command).
+2. **Entri Sinkronisasi**  
+   Frontend mengirim request ke endpoint `/api/documents/sync` pada backend.
+3. **Proses Backend**  
+   Backend melakukan fetch dokumen dari sumber eksternal (database/API/file storage), memvalidasi, dan menyimpan ke database internal.
+4. **Update Status**  
+   Backend mengirim respon status sinkronisasi (`pending`, `success`, `failed`) ke frontend.
+5. **Feedback UI**  
+   Frontend menampilkan progres, hasil, dan log sinkronisasi pada dashboard admin.
+6. **Notifikasi**  
+   Notifikasi (real-time/async) untuk status sukses/gagal menggunakan WebSocket atau polling.
 
----
-
-## Daftar Teknologi (Lengkap)
-
-- Bahasa & Bundler
-  - React 18 (Functional Components + Hooks)
-  - TypeScript
-  - Vite (dev server & build)
-- UI / Styling
-  - Tailwind CSS
-  - shadcn/ui (components built on Radix)
-  - Radix UI (base primitives)
-- State & Data
-  - TanStack Query (React Query) — async data fetching & caching
-  - TanStack Table — tables, sorting, pagination
-  - React Context — UI-level state (theme, auth)
-- Form & Validation
-  - React Hook Form
-  - Zod (schema validation)
-- Network / HTTP
-  - Axios (HTTP client) — di client & server contoh
-- Backend (opsional / template)
-  - Node.js + Express (minimal proxy server example)
-- Dev tooling & Quality
-  - ESLint
-  - Prettier
-  - Husky (pre-commit hooks)
-  - lint-staged
-- CI / CD & Deployment
-  - Docker, Nginx (example Dockerfile + nginx.conf)
-  - Vercel / Netlify (frontend static)
-  - Render / Heroku / Fly (backend)
-- Ops & Infra (recommendasi)
-  - PostgreSQL / MongoDB
-  - Redis (cache / rate limit)
-  - Prometheus / Grafana (metrics)
-- LLM Providers (opsi)
-  - OpenAI (Chat Completions / Responses API)
-  - Anthropic, Llama2 via hosted API, atau self-hosted endpoints
+Contoh alur request:
+```
+POST /api/documents/sync
+Body: { source: "knowledge_base", userId: "..." }
+Response: { status: "success", synced: 12, errors: [] }
+```
 
 ---
 
-## Struktur Project (apa yang ada di repo)
+## 3. Quick Start
 
-- src/
-  - components/ — UI components, wrapper shadcn
-  - pages/ — Dashboard, Students, Login, 404, LLM panel
-  - hooks/ — useAuth, useLLM, useFetchStudents
-  - services/ — auth.ts, students.ts, llm.ts
-  - libs/ — react-query setup, theme provider
-  - routes.tsx, main.tsx
-- server/ (opsional)
-  - routes/ — auth.js, students.js, llm.js
-  - index.js
-- public/ / static assets
-- .env.example
-- Dockerfile, nginx.conf
-- README.md, package.json, tsconfig.json, vite.config.ts
+### Prasyarat
 
-Jika Anda tidak menemukan file tertentu di repo fork Anda, sesuaikan struktur atau buat file contoh berdasarkan template di README.
+- Node.js >= 18
+- npm atau yarn
+- Docker (opsional)
+- Git
 
----
+### Instalasi
 
-## Fitur Utama
-
-- Autentikasi (login/signup) — token-based
-- Dashboard utama dengan grafik (Recharts atau library lain)
-- Halaman Students — TanStack Table dengan server-side pagination, searching, sorting
-- Halaman LLM: chat/summarize, preview prompt & logs
-- Mode Dark / Light
-- 404 Not Found
-- Contoh backend proxy LLM (Express) untuk menjaga secret API key di server
-
----
-
-## Setup Lokal — Langkah demi langkah
-
-Panduan ini mengasumsikan Anda memiliki Node.js (>=18 recommended), npm/yarn, dan git.
-
-1. Clone repo
-   ```
-   git clone https://github.com/oemahsolution/dashboard-llm.git
-   cd dashboard-llm
+1. **Clone Repository**
+   ```sh
+   git clone https://github.com/oemahsolution/combiphar-chatbot-frontend.git
+   cd combiphar-chatbot-frontend
    ```
 
-2. Install dependency (frontend)
-   ```
+2. **Install Dependencies**
+   ```sh
    npm install
-   ```
-   atau
-   ```
+   # atau
    yarn
    ```
 
-3. Salin file env contoh
-   ```
+3. **Konfigurasi Environment**
+   Salin dan isi file `.env.example`:
+   ```sh
    cp .env.example .env
    ```
-   Contoh isi minimal .env (frontend):
+   Contoh minimal `.env`:
    ```
-   VITE_API_BASE_URL=http://localhost:4000/api
-   VITE_OPENAI_API_KEY=
+   VITE_API_BASE_URL=https://api-chatbot.oemahsolution.com/api
    VITE_APP_ENV=development
    ```
 
-   NOTE: Jangan taruh kunci LLM di file .env client. Gunakan backend proxy.
-
-4. Menjalankan dev frontend
-   ```
+4. **Jalankan Dev Server**
+   ```sh
    npm run dev
    ```
-   Buka: http://localhost:5173
+   Akses di: [http://localhost:5173](http://localhost:5173)
 
-5. (Opsional) Jika menggunakan backend lokal (server/)
-   - Masuk ke folder server:
-     ```
-     cd server
-     npm install
-     cp .env.example .env
-     ```
-   - Isi server .env:
-     ```
-     OPENAI_API_KEY=sk-...
-     PORT=4000
-     ```
-   - Jalankan server:
-     ```
-     npm run dev
-     ```
-   - Server akan berjalan di: http://localhost:4000
-   - Frontend akan memanggil: http://localhost:4000/api/llm/...
+5. **Integrasi dengan API Backend**
+   Pastikan API backend berjalan di `https://api-chatbot.oemahsolution.com` dan endpoint sesuai dokumentasi.
 
-6. Proxy Vite (opsional)
-   Jika ingin proxy route API tanpa menggunakan absolute URL, tambahkan pada vite.config.ts:
-   ```ts
-   server: {
-     proxy: {
-       '/api': 'http://localhost:4000'
+---
+
+## 4. Docker Configuration
+
+### Build & Deploy Frontend dengan Docker
+
+1. **Build Docker Image**
+   ```sh
+   docker build -t combiphar/vita-frontend:latest .
+   ```
+
+2. **Jalankan Container**
+   ```sh
+   docker run -d --name vita-frontend -p 80:80 \
+     -e VITE_API_BASE_URL=https://api-chatbot.oemahsolution.com/api \
+     combiphar/vita-frontend:latest
+   ```
+
+3. **Contoh docker-compose.yml**
+   ```yaml
+   version: '3.8'
+   services:
+     frontend:
+       image: combiphar/vita-frontend:latest
+       ports:
+         - "80:80"
+       environment:
+         - VITE_API_BASE_URL=https://api-chatbot.oemahsolution.com/api
+   ```
+
+4. **Reverse Proxy (Nginx)**
+   ```
+   server {
+     listen 443 ssl;
+     server_name combiphar-chatbot.oemahsolution.com;
+
+     ssl_certificate /etc/ssl/certs/combiphar.pem;
+     ssl_certificate_key /etc/ssl/private/combiphar.key;
+
+     location / {
+       proxy_pass http://127.0.0.1:80;
+       proxy_set_header Host $host;
+       proxy_set_header X-Real-IP $remote_addr;
+       proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
      }
    }
    ```
 
 ---
 
-## Menjalankan di Server Combiphar (Contoh Deploy Produksi)
+## 5. API Documentation
 
-Petunjuk di bawah bersifat generik dan ditulis supaya bisa diterapkan pada server Combiphar berbasis Linux (Ubuntu) yang mendukung Docker. Jika tim infra Combiphar memiliki detail lain (user, firewall, reverse-proxy centralized, registries privat), sesuaikan langkahnya.
+Dokumentasi API lengkap tersedia di:  
+[https://api-chatbot.oemahsolution.com/apidocs/#/](https://api-chatbot.oemahsolution.com/apidocs/#/)
 
-Pilihan A — Deploy dengan Docker (direkomendasikan)
-1. Buat Docker image frontend:
-   - Pastikan file Dockerfile ada (contoh ada di repo).
-   - Build image (di mesin CI atau di server):
-     ```
-     docker build -t combiphar/dashboard-llm:latest .
-     ```
-2. Siapkan nginx.conf (disertakan di repo contoh) atau gunakan container nginx default. Jika ingin men-serve static:
-   - Jalankan:
-     ```
-     docker run -d --name dashboard-llm -p 80:80 \
-       -e VITE_API_BASE_URL=https://api.mycombiphar.internal/api \
-       combiphar/dashboard-llm:latest
-     ```
-   - Atau gunakan docker-compose:
-     ```yaml
-     version: '3.8'
-     services:
-       frontend:
-         image: combiphar/dashboard-llm:latest
-         ports:
-           - "80:80"
-         environment:
-           - VITE_API_BASE_URL=https://api.mycombiphar.internal/api
-     ```
-3. Backend (proxy) deploy:
-   - Buat image backend (server/):
-     ```
-     cd server
-     docker build -t combiphar/dashboard-llm-server:latest .
-     ```
-   - Jalankan backend container:
-     ```
-     docker run -d --name dashboard-llm-server -p 4000:4000 \
-       -e OPENAI_API_KEY=sk-... \
-       -e DATABASE_URL=postgres://user:pass@db:5432/dbname \
-       combiphar/dashboard-llm-server:latest
-     ```
-4. Reverse proxy / TLS:
-   - Jika Combiphar menggunakan Traefik / Nginx proxy, daftarkan route dan sertifikat TLS (Let's Encrypt internal or company CA).
-   - Contoh Nginx config (reverse proxy):
-     ```
-     server {
-       listen 443 ssl;
-       server_name dashboard.mycombiphar.internal;
+### Contoh Endpoint Utama
 
-       ssl_certificate /etc/ssl/certs/...
-       ssl_certificate_key /etc/ssl/private/...
+- **POST /api/chat**  
+  Kirim prompt/chat untuk AI.
+- **GET /api/documents**  
+  Ambil daftar dokumen sinkronisasi.
+- **POST /api/documents/sync**  
+  Trigger sinkronisasi dokumen.
+- **POST /api/auth/login**  
+  Autentikasi user.
 
-       location / {
-         proxy_pass http://127.0.0.1:80;
-         proxy_set_header Host $host;
-         proxy_set_header X-Real-IP $remote_addr;
-         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-       }
-     }
-     ```
+#### Autentikasi
 
-Pilihan B — Deploy tanpa Docker (instal Node + serve)
-- Build frontend:
-  ```
-  npm run build
-  ```
-- Copy folder dist ke server (rsync / scp)
-- Serve dengan nginx (letakkan dist di /var/www/dashboard-llm) dan konfigurasi nginx untuk static.
-- Jalankan backend (server/) sebagai service systemd atau dengan process manager (pm2):
-  ```
-  pm2 start server/dist/index.js --name dashboard-llm-server --env production
-  ```
-
-Keamanan & Operasional di Combiphar:
-- Pastikan API keys disimpan di Secrets Manager atau vault internal (Jenkins, HashiCorp Vault, AWS Secrets Manager)
-- Gunakan network ACL / firewall untuk membatasi akses ke server backend
-- Aktifkan monitoring & log forwarding (ELK, Datadog)
-- Terapkan rate-limiting pada endpoint LLM
+Semua endpoint protected wajib menyertakan header:
+```
+Authorization: Bearer <token>
+```
 
 ---
 
-## Dokumentasi API (Detail / OpenAPI-like)
+## 6. Project Structure
 
-Base URL: {VITE_API_BASE_URL} (contoh: https://api.example.com/api)
-
-Format umum error:
 ```
-{
-  "message": "Error description",
-  "code": "ERR_CODE",
-  "details": {...}
-}
+combiphar-chatbot-frontend/
+├── src/
+│   ├── components/     # UI Components (chat, document, admin dashboard)
+│   ├── pages/          # Page-level views (Chat, Documents, Login, 404)
+│   ├── hooks/          # Custom hooks (useChat, useSync, useAuth)
+│   ├── services/       # API calls (auth, chat, documents)
+│   ├── libs/           # Utility libraries (query setup, theme provider)
+│   ├── routes.tsx      # Routing config
+│   ├── main.tsx        # Entry point
+├── public/             # Static files
+├── .env.example        # Contoh env vars
+├── Dockerfile          # Docker config
+├── nginx.conf          # Reverse proxy config (optional)
+├── README.md           # Dokumentasi ini
+├── package.json        # Dependency manifest
+├── tsconfig.json       # TypeScript config
+├── vite.config.ts      # Vite bundler config
 ```
 
-1) Auth
-- POST /api/auth/signup
-  - Body:
-    ```
-    { "name": string, "email": string, "password": string }
-    ```
-  - Response 201:
-    ```
-    { "user": { id, name, email }, "token": "<jwt>", "refreshToken": "<refresh>" }
-    ```
+---
 
-- POST /api/auth/login
-  - Body:
-    ```
-    { "email": string, "password": string }
-    ```
-  - Response 200:
-    ```
-    { "user": {...}, "token": "<jwt>", "refreshToken": "<refresh>" }
-    ```
+## 7. Development
 
-- POST /api/auth/refresh
-  - Body:
-    ```
-    { "refreshToken": string }
-    ```
-  - Response 200:
-    ```
-    { "token": "<new_jwt>" }
-    ```
-
-2) Students
-- GET /api/students
-  - Query params: page (number), limit (number), q (search string), sort (e.g., name:asc)
-  - Response 200:
-    ```
-    {
-      "data": [ { "id", "name", "email", ... } ],
-      "meta": { "total": number, "page": number, "limit": number }
-    }
-    ```
-
-- GET /api/students/:id
-  - Response 200:
-    ```
-    { "data": { ...student } }
-    ```
-
-- POST /api/students
-  - Body: { name, email, ... }
-  - Response 201: { "data": createdStudent }
-
-- PUT /api/students/:id
-  - Body: partial fields
-  - Response 200: { "data": updatedStudent }
-
-- DELETE /api/students/:id
-  - Response 200: { "message": "deleted" }
-
-3) LLM (Proxy)
-- POST /api/llm/chat
-  - Body:
-    ```
-    {
-      "prompt": string,
-      "options": {
-        "model"?: string,
-        "max_tokens"?: number,
-        "temperature"?: number
-      }
-    }
-    ```
-  - Response 200:
-    ```
-    {
-      "text": string,
-      "meta": { "model": "...", "tokens_used"?: number }
-    }
-    ```
-
-- POST /api/llm/summarize
-  - Body:
-    ```
-    { "text": string }
-    ```
-  - Response 200:
-    ```
-    { "summary": string }
-    ```
-
-4) Logs (optional)
-- GET /api/llm/logs
-  - Query params: page, limit
-  - Response 200:
-    ```
-    { "data": [ { "prompt", "response", "tokens", "userId", "createdAt" } ], "meta": {...} }
-    ```
-
-Auth:
-- Protected endpoints harus mengharuskan header:
+- **Linting & Formatting:**  
   ```
-  Authorization: Bearer <token>
+  npm run lint
+  npm run format
   ```
+- **Testing:**  
+  (Tambahkan test sesuai kebutuhan, rekomendasi: Jest/Testing Library)
+- **Pre-commit Hooks:**  
+  Husky & lint-staged untuk menjaga kualitas kode.
+- **Hot Reload:**  
+  Vite mendukung hot reload out-of-the-box.
 
-Rate limiting & Quota:
-- Direkomendasikan untuk menambahkan header respons yang menjelaskan sisa quota/kebijakan rate-limit:
-  - X-RateLimit-Limit
-  - X-RateLimit-Remaining
-  - X-RateLimit-Reset
+### Workflow Pengembangan
 
----
-
-## Contoh Implementasi: Client useLLM Hook & Server Proxy (Ringkasan)
-
-Client hook (src/hooks/useLLM.ts):
-```ts
-import { useState } from "react";
-import axios from "axios";
-
-export function useLLM() {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  async function queryLLM(prompt: string, options = {}) {
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/llm/chat`, {
-        prompt, options
-      });
-      setLoading(false);
-      return res.data; // { text: "..." }
-    } catch (e: any) {
-      setLoading(false);
-      setError(e?.response?.data?.message || e.message);
-      throw e;
-    }
-  }
-
-  return { queryLLM, loading, error };
-}
-```
-
-Server (server/routes/llm.js — contoh ringkas)
-```js
-const express = require("express");
-const router = express.Router();
-const axios = require("axios");
-const rateLimit = require("express-rate-limit");
-
-const limiter = rateLimit({ windowMs: 60 * 1000, max: 20 }); // contoh
-
-router.post("/chat", limiter, async (req, res) => {
-  const { prompt, options } = req.body;
-  if (!prompt) return res.status(400).json({ message: "Prompt required" });
-
-  try {
-    const apiKey = process.env.OPENAI_API_KEY;
-    const payload = {
-      model: options?.model || "gpt-4o-mini",
-      messages: [{ role: "user", content: prompt }],
-      max_tokens: options?.max_tokens || 800,
-    };
-
-    const openAIRes = await axios.post(
-      "https://api.openai.com/v1/chat/completions",
-      payload,
-      { headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" } }
-    );
-
-    const text = openAIRes.data?.choices?.[0]?.message?.content || "";
-    res.json({ text, meta: { model: payload.model } });
-  } catch (err) {
-    console.error(err?.response?.data || err.message);
-    res.status(500).json({ message: "LLM provider error", detail: err.message });
-  }
-});
-
-module.exports = router;
-```
-
-Keamanan:
-- Jangan expose OPENAI_API_KEY ke client.
-- Terapkan rate-limiting, input validation (Zod), logging, sanitasi.
+1. Buat branch feature/bugfix
+2. Commit dengan deskripsi yang jelas
+3. Push branch, buat Pull Request
+4. Pastikan linting dan format lulus sebelum merge
 
 ---
 
-## Best Practices & Production Checklist
+## 8. Troubleshooting
 
-- [ ] Pastikan tidak ada API keys atau secret di repo.
-- [ ] Gunakan Vault / Secret Manager untuk menyimpan secrets.
-- [ ] Terapkan TLS dan HTTP security headers.
-- [ ] Rate limiting pada endpoint LLM untuk kontrol biaya.
-- [ ] Batasi max_tokens dan pilih model yang sesuai budget.
-- [ ] Mask sensitive data di logs.
-- [ ] Monitoring & alerts di tempat (uptime, error rates, token usage).
-- [ ] Backup database & recovery plan.
-- [ ] Pen-test & input sanitization untuk mencegah injection / abuse.
-- [ ] Lakukan audit biaya LLM secara berkala.
-
----
-
-## Troubleshooting (Ringkasan)
-
-1. Dev server tidak jalan:
-   - Cek versi Node (>=16/18 direkomendasikan).
-   - Hapus node_modules & reinstall:
+1. **Dev server gagal berjalan**  
+   - Cek versi Node (>=18)
+   - Hapus node_modules & reinstall:  
      ```
      rm -rf node_modules package-lock.json
      npm install
      ```
-
-2. Env variabel tidak terbaca:
-   - Vite memerlukan prefix VITE_ untuk variabel client.
+2. **Env variable tidak terbaca**  
+   - Pastikan prefix `VITE_` untuk frontend.
    - Restart dev server setelah ubah .env.
-
-3. CORS error:
-   - Pastikan backend mengizinkan origin dev (http://localhost:5173) atau gunakan proxy vite.
-
-4. 401 Unauthorized:
-   - Pastikan token di simpan & dikirim di header Authorization.
-   - Cek mekanisme refresh token.
-
-5. LLM provider error:
-   - Cek keys, rate limits, model name, payload size.
-
-6. Build CI/CD gagal:
-   - Pastikan env vars di CI diset.
-   - Pastikan Node versi di runner sesuai.
-   - Cek scripts lint/format.
+3. **CORS error**  
+   - Pastikan backend mengizinkan origin frontend, atau gunakan proxy di vite.config.ts.
+4. **401 Unauthorized**  
+   - Pastikan token dikirim di header Authorization.
+   - Cek refresh token.
+5. **Docker build fails**  
+   - Pastikan context build benar, dependency terinstall, port expose sesuai.
 
 ---
 
-## Contoh .env.example
+## 9. Monitoring & Logs
 
-Buat file .env.example di root (contoh):
-```
-# Frontend
-VITE_API_BASE_URL=http://localhost:4000/api
-VITE_APP_ENV=development
+### Frontend
 
-# Do NOT store production OPENAI key here if the file is committed
-# Only for local dev/testing with backend proxy
-VITE_OPENAI_API_KEY=
-```
+- Gunakan service monitoring:  
+  - Vercel/Netlify: built-in analytics & logs
+  - Nginx: akses log dan error log di server
 
-Contoh server/.env.example:
-```
-PORT=4000
-OPENAI_API_KEY=sk-...
-DATABASE_URL=postgres://user:pass@localhost:5432/db
-JWT_SECRET=changeme
-```
+### Backend
+
+- Pantau API logs (lihat dokumentasi backend)
+- Integrasi monitoring: ELK, Grafana, Datadog, Sentry
+
+### Healthcheck
+
+- Endpoint `/api/health` untuk pengecekan status
+- Aktifkan alert pada error rate tinggi, rate limit terlampaui
+
+---
+
+## 10. Deployment
+
+### Production (Linux Server/Docker)
+
+1. **Build frontend**
+   ```
+   npm run build
+   ```
+2. **Deploy ke server:**
+   - Salin folder `dist/` ke server
+   - Serve dengan Nginx atau Docker
+3. **Jalankan backend sesuai petunjuk API**
+4. **Konfigurasi domain dan SSL/TLS**
+5. **Pantau logs & monitoring**
+
+### Tips Operasional
+
+- Simpan secrets di Vault/Secrets Manager (jangan di git)
+- Aktifkan firewall & network ACL
+- Gunakan rate-limiting pada endpoint AI
+- Backup database secara berkala
+- Audit penggunaan API & biaya LLM
+
+---
+
+## Resources
+
+- [Frontend Live Demo](https://combiphar-chatbot.oemahsolution.com/)
+- [API Docs](https://api-chatbot.oemahsolution.com/apidocs/#/)
 
 ---
 
 ## Contribution
 
-- Buat issue untuk fitur/bug.
-- Fork repo, buat branch feature/<nama>, buat PR.
-- Gunakan Husky & lint-staged: pastikan linting/format lulus sebelum push.
-- Sertakan deskripsi runbook / testing steps pada PR.
+- Fork repo, buat branch, ajukan PR.
+- Sertakan deskripsi runbook/testing.
+- Buat issue untuk bug/fitur baru.
 
 ---
 
-## Lisensi
+## License
 
-Project ini mengikuti lisensi sesuai file LICENSE pada repository. Periksa sebelum penggunaan komersial.
+Periksa file LICENSE di repository untuk detail lisensi penggunaan.
 
 ---
