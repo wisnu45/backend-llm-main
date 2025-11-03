@@ -36,13 +36,17 @@ const DetailPage = () => {
     getMenuValue('error connection') ||
       'Koneksi internet terputus. Coba lagi nanti'
   );
+  const serverErrorMessage = String(
+    getMenuValue('message error') ||
+      'Terjadi kesalahan pada server. Silakan coba lagi nanti'
+  );
 
   const {
     loading,
     previewPrompt,
     previewFiles,
     showPreview,
-    networkError,
+    error,
     handleSubmit,
     handleError,
     handleRetry,
@@ -194,11 +198,14 @@ const DetailPage = () => {
             </div>
           )}
 
-          {networkError && (
+          {error.show && (
             <div ref={scrollAreaRef}>
               <NetworkErrorCard
                 onRetry={handleNetworkRetry}
-                message={errorConnectionMessage}
+                message={
+                  error.isNetwork ? errorConnectionMessage : serverErrorMessage
+                }
+                isNetworkError={error.isNetwork}
               />
             </div>
           )}

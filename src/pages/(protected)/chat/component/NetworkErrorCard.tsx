@@ -1,24 +1,30 @@
 import { AlertTriangleIcon, RotateCcwIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-interface NetworkErrorCardProps {
+interface ErrorCardProps {
   onRetry?: () => void;
   message?: string;
+  isNetworkError?: boolean;
+  title?: string;
 }
 
-const NetworkErrorCard = ({
+const ErrorCard = ({
   onRetry,
-  message = 'Koneksi internet terputus. Coba lagi nanti'
-}: NetworkErrorCardProps) => {
+  message = 'Terjadi kesalahan. Coba lagi nanti',
+  isNetworkError = false,
+  title
+}: ErrorCardProps) => {
+  // Determine the title based on error type
+  const errorTitle =
+    title || (isNetworkError ? 'Koneksi Bermasalah' : 'Terjadi Kesalahan');
+
   return (
     <div className="mx-auto mb-4 w-full max-w-2xl">
       <div className="rounded-lg border border-red-200 bg-red-50 p-4">
         <div className="flex items-start gap-3">
           <AlertTriangleIcon className="mt-0.5 h-5 w-5 flex-shrink-0 text-red-600" />
           <div className="flex-1">
-            <div className="text-sm font-medium text-red-800">
-              Koneksi Bermasalah
-            </div>
+            <div className="text-sm font-medium text-red-800">{errorTitle}</div>
             <div className="mt-1 text-sm text-red-700">{message}</div>
             {onRetry && (
               <div className="mt-3">
@@ -40,4 +46,6 @@ const NetworkErrorCard = ({
   );
 };
 
-export default NetworkErrorCard;
+// Keep backward compatibility
+export default ErrorCard;
+export { ErrorCard as NetworkErrorCard };

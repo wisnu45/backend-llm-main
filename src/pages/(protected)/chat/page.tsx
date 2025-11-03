@@ -52,7 +52,10 @@ const ChatPage = () => {
   const [previewPrompt, setPreviewPrompt] = useState<string>('');
   const [previewFiles, setPreviewFiles] = useState<FileType[]>([]);
   const [showPreview, setShowPreview] = useState<boolean>(false);
-  const [networkError, setNetworkError] = useState<boolean>(false);
+  const [error, setError] = useState<{ isNetwork: boolean; show: boolean }>({
+    isNetwork: false,
+    show: false
+  });
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [popupFile, setPopupFile] = useState<File | null>(null);
 
@@ -100,6 +103,10 @@ const ChatPage = () => {
     getMenuValue('error connection') ||
       'Koneksi internet terputus. Coba lagi nanti'
   );
+  const serverErrorMessage = String(
+    getMenuValue('message error') ||
+      'Terjadi kesalahan pada server. Silakan coba lagi nanti'
+  );
 
   const navigate = useNavigate();
   const currentPath = useLocation().pathname;
@@ -135,9 +142,9 @@ const ChatPage = () => {
 
     const trimmedQuestion = formData.prompt.trim();
 
-    // Only clear network error for new submissions, not retries
+    // Only clear error for new submissions, not retries
     if (!isRetry) {
-      setNetworkError(false);
+      setError({ isNetwork: false, show: false });
       setLastFailedRequest(null);
     }
 
@@ -161,12 +168,12 @@ const ChatPage = () => {
             const chatId = data?.data?.chat_id || '';
             queryHistorySideBar.refetch();
 
-            // Clear all states including network error on success
+            // Clear all states including error on success
             setLoading(false);
             setShowPreview(false);
             setPreviewPrompt('');
             setPreviewFiles([]);
-            setNetworkError(false);
+            setError({ isNetwork: false, show: false });
             setLastFailedRequest(null);
 
             if (chatId) {
@@ -182,12 +189,12 @@ const ChatPage = () => {
             // Check if this is a network error
             const networkError = err as NetworkAwareError;
             if (networkError.isNetworkError) {
-              setNetworkError(true);
+              setError({ isNetwork: true, show: true });
               setLastFailedRequest(formData);
             } else {
-              // Clear network error for non-network errors
-              setNetworkError(false);
-              setLastFailedRequest(null);
+              // Show server error
+              setError({ isNetwork: false, show: true });
+              setLastFailedRequest(formData);
             }
           }
         }
@@ -264,11 +271,14 @@ const ChatPage = () => {
             <ModernLoadingIndicator />
           </div>
         )}
-        {networkError && (
+        {error.show && (
           <div className="mb-4">
             <NetworkErrorCard
               onRetry={handleRetry}
-              message={errorConnectionMessage}
+              message={
+                error.isNetwork ? errorConnectionMessage : serverErrorMessage
+              }
+              isNetworkError={error.isNetwork}
             />
           </div>
         )}
