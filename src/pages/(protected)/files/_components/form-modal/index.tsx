@@ -77,8 +77,8 @@ const FormModal = ({
       formData.append('portal_id', data.portal_id);
     }
 
-    if (data.document_name) {
-      formData.append('document_name', data.document_name);
+    if (data.original_filename) {
+      formData.append('original_filename', data.original_filename);
     }
 
     onSubmit(formData);
@@ -93,7 +93,7 @@ const FormModal = ({
     if (!file.file) return;
 
     form.setValue('document_path', file?.file?.name);
-    form.setValue('document_name', file?.file?.name?.split('.')[0]);
+    form.setValue('original_filename', file?.file?.name?.split('.')[0]);
   }, [files, form]);
 
   const mimeMap: Record<string, string> = {
@@ -174,7 +174,7 @@ const FormModal = ({
                         <div className="flex flex-col">
                           <span className="inline-block max-w-[300px] text-sm font-semibold">
                             {truncateFileName(
-                              defaultValues?.document_name ?? '-',
+                              defaultValues?.original_filename ?? '-',
                               30
                             )}
                           </span>
@@ -208,7 +208,7 @@ const FormModal = ({
             <div>
               <FormField
                 control={form.control}
-                name="document_name"
+                name="original_filename"
                 render={({ field }) => {
                   return (
                     <FormItem>
@@ -226,7 +226,7 @@ const FormModal = ({
                 }}
               />
             </div>
-            {mode === 'edit' ? (
+            {/* {mode === 'edit' ? (
               <div>
                 <FormField
                   control={form.control}
@@ -244,7 +244,8 @@ const FormModal = ({
                   }}
                 />
               </div>
-            ) : null}
+            ) 
+            : null} */}
 
             <DialogFooter className="mt-2 sm:justify-start">
               <Button type="submit" className="w-full" disabled={loading}>

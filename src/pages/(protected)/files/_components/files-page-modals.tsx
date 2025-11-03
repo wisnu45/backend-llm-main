@@ -64,8 +64,8 @@ const FilesPageModals = ({ modal, setModal, data }: IFilesPageModals) => {
           });
         }}
         defaultValues={{
-          document_name: detailQuery.data?.data.metadata?.Title,
-          document_path: detailQuery.data?.data.metadata?.Title,
+          original_filename: detailQuery.data?.data.original_filename || '',
+          document_path: detailQuery.data?.data.storage_path || '',
           portal_id: detailQuery.data?.data.portal_id ?? ''
         }}
       />

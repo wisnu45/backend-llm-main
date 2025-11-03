@@ -1,5 +1,5 @@
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useGetDetailHistory } from '../_hook/use-get-history-chat';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ChatItem } from '../component/ChatItem';
@@ -14,6 +14,7 @@ import { ModernLoadingIndicator } from '../component/loading-indicator';
 import { TChatFormData } from '../schema';
 import { useChatForm } from '../_hook/use-chat-form';
 import { useFetchSettingFeature } from '../../setting/_hook/use-fetch-setting-feature';
+import { Cross2Icon } from '@radix-ui/react-icons';
 
 const DetailPage = () => {
   const { chatId } = useParams();
@@ -24,6 +25,8 @@ const DetailPage = () => {
   const mutation = useCreateChat();
   const navigate = useNavigate();
   const queryFeature = useFetchSettingFeature();
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [popupFile, setPopupFile] = useState<File | null>(null);
 
   const settingFeature = queryFeature?.data?.data;
   const getMenuValue = (name: string) =>
@@ -117,6 +120,11 @@ const DetailPage = () => {
     }
   };
 
+  const closePopup = () => {
+    setIsPopupOpen(false);
+    setPopupFile(null);
+  };
+
   const handleNetworkRetry = () => {
     const payload = handleRetry();
     if (payload) {
@@ -203,7 +211,64 @@ const DetailPage = () => {
           scrollContainerRef={scrollContainerRef}
           isFloating={true}
           lastData={lastData || undefined}
+          setPopupFile={setPopupFile}
+          setIsPopupOpen={setIsPopupOpen}
         />
+
+        {isPopupOpen && popupFile && (
+          <div
+            className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 backdrop-blur-sm"
+            onClick={closePopup}
+          >
+            <div
+              className="max-w-screen relative h-full max-h-screen w-full p-2 md:p-6"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="relative h-full w-full overflow-hidden rounded-lg bg-white shadow-xl">
+                {popupFile?.type?.startsWith('image') ? (
+                  <div className="flex h-full w-full flex-col items-center justify-center gap-3 p-4">
+                    <img
+                      src={URL.createObjectURL(popupFile)}
+                      alt={popupFile?.name}
+                      className="h-full w-full object-contain"
+                    />
+                  </div>
+                ) : popupFile?.type === 'application/pdf' ? (
+                  <div className="flex h-full w-full flex-col items-center justify-center gap-3 p-4">
+                    <iframe
+                      src={URL.createObjectURL(popupFile) || ''}
+                      title={popupFile?.name}
+                      className="h-full w-full"
+                    />
+                  </div>
+                ) : (
+                  <div className="flex h-full w-full flex-col items-center justify-center gap-3 p-4">
+                    <span className="text-6xl">📄</span>
+                    <p className="text-lg font-semibold">{popupFile?.name}</p>
+                    <p className="text-sm text-gray-500">
+                      Preview tidak tersedia untuk file ini
+                    </p>
+                    <a
+                      href={URL.createObjectURL(popupFile)}
+                      download={popupFile?.name}
+                      className="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
+                    >
+                      Download file
+                    </a>
+                  </div>
+                )}
+
+                <button
+                  type="button"
+                  onClick={closePopup}
+                  className="absolute right-3 top-3 z-50 rounded-full bg-red-600 p-2 text-white shadow-lg hover:bg-red-700"
+                >
+                  <Cross2Icon className="h-6 w-6" />
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </ScrollArea>
     </>
   );

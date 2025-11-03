@@ -7,7 +7,14 @@ import { useMobileScroll } from '@/hooks/use-mobile-scroll';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ArrowRightIcon, Cross2Icon } from '@radix-ui/react-icons';
 import clsx from 'clsx';
-import { Globe, Mic, Paperclip, Lightbulb, Building } from 'lucide-react';
+import {
+  Globe,
+  Mic,
+  Paperclip,
+  Lightbulb,
+  Building,
+  SlidersHorizontal
+} from 'lucide-react';
 import { useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { TSetPromptType } from '../page';
@@ -26,6 +33,9 @@ interface InputDataWithFormProps {
   isFloating?: boolean;
   isHistory?: boolean;
   lastData?: ChatItemData;
+  // isPopupOpen: boolean;
+  setIsPopupOpen: (isOpen: boolean) => void;
+  setPopupFile: (popupFile: File | null) => void;
 }
 
 const InputDataWithForm = ({
@@ -36,11 +46,16 @@ const InputDataWithForm = ({
   setPrompRef,
   scrollContainerRef,
   isHistory = true,
-  lastData
+  lastData,
+  // isPopupOpen,
+  setIsPopupOpen,
+  setPopupFile
 }: InputDataWithFormProps) => {
-  const [isPopupOpen, setIsPopupOpen] = useState(false);
-  const [popupFile, setPopupFile] = useState<File | null>(null);
+  // const [isPopupOpen, setIsPopupOpen] = useState(false);
+  // const [popupFile, setPopupFile] = useState<File | null>(null);
   const [hasInitialized, setHasInitialized] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
   const { shouldHideOnScroll } = useMobileScroll(50, scrollContainerRef);
   const shouldHide = shouldHideOnScroll && isFloating;
 
@@ -58,13 +73,12 @@ const InputDataWithForm = ({
   const settingSearchInternet = getMenuValue('Search internet');
   const settingGeneralInsight = getMenuValue('General insight');
   const settingCompanyInsight = getMenuValue('Company insight');
+
   const fileTypeAllow: string[] =
     typeof rawFileTypes === 'string' ? JSON.parse(rawFileTypes) : [];
 
-  // Get smart defaults based on context
   const getSmartDefaults = () => {
     if (isHistory) {
-      // For chat detail page, ALWAYS prioritize chat context (lastData)
       if (lastData) {
         return {
           is_company: lastData.is_company || false,
@@ -72,14 +86,12 @@ const InputDataWithForm = ({
           is_general: lastData.is_general || false
         };
       }
-      // Fallback if no lastData yet (loading state)
       return {
         is_company: false,
         is_browse: false,
         is_general: false
       };
     } else {
-      // For new chat page, ALWAYS default to company insight
       return {
         is_company: true,
         is_browse: false,
@@ -108,7 +120,6 @@ const InputDataWithForm = ({
     mode: 'onChange'
   });
 
-  // Save toggle preferences only for new chat, not for chat detail
   const saveTogglePreferences = (
     newToggles?: Partial<{
       is_company: boolean;
@@ -116,7 +127,6 @@ const InputDataWithForm = ({
       is_general: boolean;
     }>
   ) => {
-    // Only save as global preference for new chat page
     if (!isHistory) {
       const currentToggles = newToggles || {
         is_company: watch('is_company'),
@@ -133,7 +143,6 @@ const InputDataWithForm = ({
     }
   };
 
-  // Helper function to handle toggle changes with validation
   const handleToggleChange = (
     toggleType: 'is_company' | 'is_browse' | 'is_general',
     currentValue: boolean,
@@ -141,8 +150,6 @@ const InputDataWithForm = ({
   ) => {
     if (!isLoading) {
       const newValue = !currentValue;
-
-      // If we're turning off this toggle, check if it's the only active one
       if (!newValue) {
         const activeToggles = [
           toggleType !== 'is_company' && watch('is_company'),
@@ -168,7 +175,6 @@ const InputDataWithForm = ({
         }
       }
 
-      // Normal toggle behavior
       onChange(newValue);
       const newToggles = {
         is_company:
@@ -180,14 +186,12 @@ const InputDataWithForm = ({
     }
   };
 
-  // Reset initialization when chat changes (for proper chat switching)
   useEffect(() => {
     setHasInitialized(false);
   }, [lastData?.id]);
 
   useEffect(() => {
     if (lastData && isHistory && !hasInitialized) {
-      // Update toggles with chat-specific context
       setValue('is_company', lastData.is_company || false);
       setValue('is_browse', lastData.is_browse || false);
       setValue('is_general', lastData.is_general || false);
@@ -195,13 +199,11 @@ const InputDataWithForm = ({
     }
   }, [lastData, isHistory, hasInitialized, setValue]);
 
-  // Toggle validation - ensure at least one toggle is always active
   const is_company_current = watch('is_company');
   const is_browse_current = watch('is_browse');
   const is_general_current = watch('is_general');
 
   useEffect(() => {
-    // Ensure at least one toggle is always active
     if (!is_company_current && !is_browse_current && !is_general_current) {
       // Activate company insight as fallback
       setValue('is_company', true);
@@ -215,22 +217,6 @@ const InputDataWithForm = ({
     setPopupFile(file);
     setIsPopupOpen(true);
   };
-
-  const closePopup = () => {
-    setIsPopupOpen(false);
-    setPopupFile(null);
-  };
-
-  // const convertFileToBase64 = (file: File): Promise<string> => {
-  //   return new Promise((resolve, reject) => {
-  //     const reader = new FileReader();
-  //     reader.onloadend = () => {
-  //       resolve(reader.result as string);
-  //     };
-  //     reader.onerror = (error) => reject(error);
-  //     reader.readAsDataURL(file);
-  //   });
-  // };
 
   const validateFile = (file: File) => {
     const fileExtension = file.name.split('.').pop()?.toLowerCase();
@@ -302,12 +288,8 @@ const InputDataWithForm = ({
     const currentAttachments = watchedAttachments || [];
     const updatedAttachments = currentAttachments.filter((_, i) => i !== index);
     setValue('with_document', updatedAttachments);
-    // const currentDocuments = watch('with_document') || [];
-    // const updatedDocuments = currentDocuments.filter((_, i) => i !== index);
-    // setValue('with_document', updatedDocuments);
   };
 
-  // Helper function to generate descriptive names for clipboard images
   const generateClipboardFileName = (file: File, index: number = 0): string => {
     const timestamp = new Date().toISOString().slice(0, 10);
     const extension = file.type.split('/')[1] || 'png';
@@ -319,22 +301,16 @@ const InputDataWithForm = ({
     return file.name;
   };
 
-  // Handle paste events for file upload
   const handlePaste = async (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
     const items = e.clipboardData?.items;
     if (!items) return;
 
     const files: File[] = [];
-
-    // Process clipboard items
     for (let i = 0; i < items.length; i++) {
       const item = items[i];
-
-      // Handle files
       if (item.kind === 'file') {
         const file = item.getAsFile();
         if (file) {
-          // Generate descriptive name for clipboard images
           const renamedFile = new File(
             [file],
             generateClipboardFileName(file, files.length),
@@ -345,15 +321,10 @@ const InputDataWithForm = ({
       }
     }
 
-    // If files were found, process them
     if (files.length > 0) {
-      e.preventDefault(); // Prevent default paste behavior
-
-      // Validate files
+      e.preventDefault();
       const validFiles = files.filter(validateFile);
       if (validFiles.length === 0) return;
-
-      // Show loading toast
       toast({
         title: 'Uploading files...',
         description: `Processing ${validFiles.length} file(s) from clipboard`
@@ -377,14 +348,11 @@ const InputDataWithForm = ({
   };
 
   const onFormSubmit = (data: TChatFormData) => {
-    // Capture current state immediately before any operations
     const currentToggles = {
       is_company: data.is_company,
       is_browse: data.is_browse,
       is_general: data.is_general
     };
-
-    // Only save as global preference for new chat, not for chat detail
     if (!isHistory) {
       TogglePreferences.set(currentToggles);
     }
@@ -396,7 +364,6 @@ const InputDataWithForm = ({
       with_document: data.with_document
     });
 
-    // Reset with the captured state (not from localStorage to avoid race condition)
     reset({
       prompt: '',
       with_document: [],
@@ -507,14 +474,33 @@ const InputDataWithForm = ({
                             className="h-24 w-24 rounded-lg object-cover"
                             onClick={() => openPopup(file)}
                           />
-                        ) : (
+                        ) : file?.type === 'application/pdf' ? (
                           <iframe
-                            src={file ? URL.createObjectURL(file) : ''}
+                            src={URL.createObjectURL(file)}
                             title={file?.name}
                             className="h-24 w-24 rounded-lg object-cover"
                             onClick={() => openPopup(file)}
                           />
+                        ) : file?.type ===
+                            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||
+                          file?.type === 'application/vnd.ms-excel' ? (
+                          <div
+                            className="flex h-24 w-24 cursor-pointer flex-col items-center justify-center rounded-lg bg-gray-100 p-2 text-center text-xs"
+                            onClick={() => openPopup(file)}
+                          >
+                            <span className="text-xl">📊</span>
+                            <p className="w-full truncate">{file?.name}</p>
+                          </div>
+                        ) : (
+                          <div
+                            className="flex h-24 w-24 cursor-pointer flex-col items-center justify-center rounded-lg bg-gray-100 p-2 text-center text-xs"
+                            onClick={() => openPopup(file)}
+                          >
+                            <span className="text-xl">📄</span>
+                            <p className="w-full truncate">{file?.name}</p>
+                          </div>
                         )}
+
                         <span className="w-16 truncate text-center text-xs text-white">
                           {file?.name}
                         </span>
@@ -554,158 +540,330 @@ const InputDataWithForm = ({
 
           <div className="mt-4 flex flex-col items-start justify-between gap-3 text-sm text-gray-800 sm:flex-row sm:items-center">
             <div className="order-2 flex w-full flex-wrap items-center gap-2.5 sm:order-1 sm:w-auto sm:flex-row sm:gap-2">
-              {settingAttachment && (
-                <>
-                  <label
-                    htmlFor="file-upload"
-                    className={`flex min-h-[44px] cursor-pointer items-center justify-center gap-1 rounded-xl bg-gradient-to-r px-3 py-2 shadow-md transition duration-300 sm:px-4 sm:py-2.5 ${
-                      !settingAttachment
-                        ? 'cursor-not-allowed opacity-50 shadow-none'
-                        : 'hover:text-purple-600 hover:shadow-lg active:scale-95'
-                    }`}
-                  >
-                    <Paperclip className="h-4 w-4 sm:h-5 sm:w-5" />
-                  </label>
+              <div className="hidden flex-wrap items-center gap-2 sm:flex">
+                {settingAttachment && (
+                  <>
+                    <label
+                      htmlFor="file-upload"
+                      className={`flex min-h-[44px] cursor-pointer items-center justify-center gap-1 rounded-xl bg-gradient-to-r px-3 py-2 shadow-md transition duration-300 sm:px-4 sm:py-2.5 ${
+                        !settingAttachment
+                          ? 'cursor-not-allowed opacity-50 shadow-none'
+                          : 'hover:text-purple-600 hover:shadow-lg active:scale-95'
+                      }`}
+                    >
+                      <Paperclip className="h-4 w-4 sm:h-5 sm:w-5" />
+                    </label>
 
-                  <input
-                    id="file-upload"
-                    type="file"
-                    multiple
-                    className="hidden"
-                    onChange={handleFileChange}
-                    disabled={isLoading || !settingAttachment}
+                    <input
+                      id="file-upload"
+                      type="file"
+                      multiple
+                      className="hidden"
+                      onChange={handleFileChange}
+                      disabled={isLoading || !settingAttachment}
+                    />
+                  </>
+                )}
+              </div>
+
+              {/* ✅ MOBILE MENU (collapsed) */}
+              <div className="flex sm:hidden">
+                <button
+                  onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                  className="flex min-h-[50px] items-center justify-center rounded-xl bg-white p-2 shadow-lg"
+                >
+                  <SlidersHorizontal className="h-5 w-5" />
+                </button>
+
+                {mobileMenuOpen && (
+                  <div className="absolute bottom-[80px] left-2 z-[100] flex flex-col gap-2 rounded-xl border bg-white p-3 shadow-2xl">
+                    {settingCompanyInsight && (
+                      <Controller
+                        name="is_company"
+                        control={control}
+                        render={({ field }) => {
+                          const { value, onChange } = field;
+                          return (
+                            <Tooltip>
+                              <TooltipTrigger>
+                                <div
+                                  className="group relative w-max cursor-pointer"
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    handleToggleChange(
+                                      'is_company',
+                                      value,
+                                      onChange
+                                    );
+                                  }}
+                                >
+                                  <div
+                                    className={`flex min-h-[44px] items-center gap-2 rounded-xl px-3 py-2 shadow-md transition-all duration-300 active:scale-95 sm:px-4 sm:py-2.5 ${
+                                      value
+                                        ? 'bg-[#772f8e] text-white hover:text-purple-200 hover:shadow-lg'
+                                        : 'bg-white shadow-lg hover:shadow-xl'
+                                    }`}
+                                  >
+                                    <Building className="h-4 w-4 flex-shrink-0 sm:h-5 sm:w-5" />
+                                    <span
+                                      className={`text-sm font-medium sm:inline`}
+                                    >
+                                      Company Insights
+                                    </span>
+                                  </div>
+                                </div>
+                              </TooltipTrigger>
+                              <TooltipContent className="hidden sm:block">
+                                Search Company Insights
+                              </TooltipContent>
+                            </Tooltip>
+                          );
+                        }}
+                      />
+                    )}
+
+                    {/* General */}
+                    {settingGeneralInsight && (
+                      <Controller
+                        name="is_general"
+                        control={control}
+                        render={({ field }) => {
+                          const { value, onChange } = field;
+                          return (
+                            <Tooltip>
+                              <TooltipTrigger>
+                                <div
+                                  className="group relative w-max cursor-pointer"
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    handleToggleChange(
+                                      'is_general',
+                                      value,
+                                      onChange
+                                    );
+                                  }}
+                                >
+                                  <div
+                                    className={`flex min-h-[44px] items-center gap-2 rounded-xl px-3 py-2 shadow-md transition-all duration-300 active:scale-95 sm:px-4 sm:py-2.5 ${
+                                      value
+                                        ? 'bg-[#772f8e] text-white hover:text-purple-200 hover:shadow-lg'
+                                        : 'bg-white shadow-lg hover:shadow-xl'
+                                    }`}
+                                  >
+                                    <Lightbulb className="h-4 w-4 flex-shrink-0 sm:h-5 sm:w-5" />
+                                    <span
+                                      className={`text-sm font-medium sm:inline`}
+                                    >
+                                      General Insights
+                                    </span>
+                                  </div>
+                                </div>
+                              </TooltipTrigger>
+                              <TooltipContent className="hidden sm:block">
+                                Search General Insights
+                              </TooltipContent>
+                            </Tooltip>
+                          );
+                        }}
+                      />
+                    )}
+
+                    {/* Browse */}
+                    {settingSearchInternet && (
+                      <Controller
+                        name="is_browse"
+                        control={control}
+                        render={({ field }) => {
+                          const { value, onChange } = field;
+                          return (
+                            <Tooltip>
+                              <TooltipTrigger>
+                                <div
+                                  className="group relative w-max cursor-pointer"
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    handleToggleChange(
+                                      'is_browse',
+                                      value,
+                                      onChange
+                                    );
+                                  }}
+                                >
+                                  <div
+                                    className={`flex min-h-[44px] items-center gap-2 rounded-xl px-3 py-2 shadow-md transition-all duration-300 active:scale-95 sm:px-4 sm:py-2.5 ${
+                                      value
+                                        ? 'bg-[#772f8e] text-white hover:text-purple-200 hover:shadow-lg'
+                                        : 'bg-white shadow-lg hover:shadow-xl'
+                                    }`}
+                                  >
+                                    <Globe className="h-4 w-4 flex-shrink-0 sm:h-5 sm:w-5" />
+                                    <span
+                                      className={`text-sm font-medium sm:inline`}
+                                    >
+                                      Search
+                                    </span>
+                                  </div>
+                                </div>
+                              </TooltipTrigger>
+                              <TooltipContent className="hidden sm:block">
+                                Search the web when necessary
+                              </TooltipContent>
+                            </Tooltip>
+                          );
+                        }}
+                      />
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* ✅ DESKTOP MENU (original buttons) */}
+              <div className="hidden flex-wrap items-center gap-2 sm:flex">
+                {settingCompanyInsight && (
+                  <Controller
+                    name="is_company"
+                    control={control}
+                    render={({ field }) => {
+                      const { value, onChange } = field;
+                      return (
+                        <Tooltip>
+                          <TooltipTrigger>
+                            <div
+                              className="group relative w-max cursor-pointer"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                handleToggleChange(
+                                  'is_company',
+                                  value,
+                                  onChange
+                                );
+                              }}
+                            >
+                              <div
+                                className={`flex min-h-[44px] items-center gap-2 rounded-xl px-3 py-2 shadow-md transition-all duration-300 active:scale-95 sm:px-4 sm:py-2.5 ${
+                                  value
+                                    ? 'bg-[#772f8e] text-white hover:text-purple-200 hover:shadow-lg'
+                                    : 'bg-white shadow-lg hover:shadow-xl'
+                                }`}
+                              >
+                                <Building className="h-4 w-4 flex-shrink-0 sm:h-5 sm:w-5" />
+                                <span
+                                  className={`text-sm font-medium sm:inline ${
+                                    value ? '' : 'hidden'
+                                  }`}
+                                >
+                                  Company Insights
+                                </span>
+                              </div>
+                            </div>
+                          </TooltipTrigger>
+                          <TooltipContent className="hidden sm:block">
+                            Search Company Insights
+                          </TooltipContent>
+                        </Tooltip>
+                      );
+                    }}
                   />
-                </>
-              )}
-              {settingCompanyInsight && (
-                <Controller
-                  name="is_company"
-                  control={control}
-                  render={({ field }) => {
-                    const { value, onChange } = field;
-                    return (
-                      <Tooltip>
-                        <TooltipTrigger>
-                          <div
-                            className="group relative w-max cursor-pointer"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              handleToggleChange('is_company', value, onChange);
-                            }}
-                          >
+                )}
+                {settingGeneralInsight && (
+                  <Controller
+                    name="is_general"
+                    control={control}
+                    render={({ field }) => {
+                      const { value, onChange } = field;
+                      return (
+                        <Tooltip>
+                          <TooltipTrigger>
                             <div
-                              className={`flex min-h-[44px] items-center gap-2 rounded-xl px-3 py-2 shadow-md transition-all duration-300 active:scale-95 sm:px-4 sm:py-2.5 ${
-                                value
-                                  ? 'bg-[#772f8e] text-white hover:text-purple-200 hover:shadow-lg'
-                                  : 'bg-white shadow-lg hover:shadow-xl'
-                              }`}
+                              className="group relative w-max cursor-pointer"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                handleToggleChange(
+                                  'is_general',
+                                  value,
+                                  onChange
+                                );
+                              }}
                             >
-                              <Building className="h-4 w-4 flex-shrink-0 sm:h-5 sm:w-5" />
-                              <span
-                                className={`text-sm font-medium sm:inline ${
-                                  value ? '' : 'hidden'
+                              <div
+                                className={`flex min-h-[44px] items-center gap-2 rounded-xl px-3 py-2 shadow-md transition-all duration-300 active:scale-95 sm:px-4 sm:py-2.5 ${
+                                  value
+                                    ? 'bg-[#772f8e] text-white hover:text-purple-200 hover:shadow-lg'
+                                    : 'bg-white shadow-lg hover:shadow-xl'
                                 }`}
                               >
-                                Company Insights
-                              </span>
+                                <Lightbulb className="h-4 w-4 flex-shrink-0 sm:h-5 sm:w-5" />
+                                <span
+                                  className={`text-sm font-medium sm:inline ${
+                                    value ? '' : 'hidden'
+                                  }`}
+                                >
+                                  General Insights
+                                </span>
+                              </div>
                             </div>
-                          </div>
-                        </TooltipTrigger>
-                        <TooltipContent className="hidden sm:block">
-                          Search Company Insights
-                        </TooltipContent>
-                      </Tooltip>
-                    );
-                  }}
-                />
-              )}
-              {settingGeneralInsight && (
-                <Controller
-                  name="is_general"
-                  control={control}
-                  render={({ field }) => {
-                    const { value, onChange } = field;
-                    return (
-                      <Tooltip>
-                        <TooltipTrigger>
-                          <div
-                            className="group relative w-max cursor-pointer"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              handleToggleChange('is_general', value, onChange);
-                            }}
-                          >
+                          </TooltipTrigger>
+                          <TooltipContent className="hidden sm:block">
+                            Search General Insights
+                          </TooltipContent>
+                        </Tooltip>
+                      );
+                    }}
+                  />
+                )}
+                {settingSearchInternet && (
+                  <Controller
+                    name="is_browse"
+                    control={control}
+                    render={({ field }) => {
+                      const { value, onChange } = field;
+                      return (
+                        <Tooltip>
+                          <TooltipTrigger>
                             <div
-                              className={`flex min-h-[44px] items-center gap-2 rounded-xl px-3 py-2 shadow-md transition-all duration-300 active:scale-95 sm:px-4 sm:py-2.5 ${
-                                value
-                                  ? 'bg-[#772f8e] text-white hover:text-purple-200 hover:shadow-lg'
-                                  : 'bg-white shadow-lg hover:shadow-xl'
-                              }`}
+                              className="group relative w-max cursor-pointer"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                handleToggleChange(
+                                  'is_browse',
+                                  value,
+                                  onChange
+                                );
+                              }}
                             >
-                              <Lightbulb className="h-4 w-4 flex-shrink-0 sm:h-5 sm:w-5" />
-                              <span
-                                className={`text-sm font-medium sm:inline ${
-                                  value ? '' : 'hidden'
+                              <div
+                                className={`flex min-h-[44px] items-center gap-2 rounded-xl px-3 py-2 shadow-md transition-all duration-300 active:scale-95 sm:px-4 sm:py-2.5 ${
+                                  value
+                                    ? 'bg-[#772f8e] text-white hover:text-purple-200 hover:shadow-lg'
+                                    : 'bg-white shadow-lg hover:shadow-xl'
                                 }`}
                               >
-                                General Insights
-                              </span>
+                                <Globe className="h-4 w-4 flex-shrink-0 sm:h-5 sm:w-5" />
+                                <span
+                                  className={`text-sm font-medium sm:inline ${
+                                    value ? '' : 'hidden'
+                                  }`}
+                                >
+                                  Search
+                                </span>
+                              </div>
                             </div>
-                          </div>
-                        </TooltipTrigger>
-                        <TooltipContent className="hidden sm:block">
-                          Search General Insights
-                        </TooltipContent>
-                      </Tooltip>
-                    );
-                  }}
-                />
-              )}
-              {settingSearchInternet && (
-                <Controller
-                  name="is_browse"
-                  control={control}
-                  render={({ field }) => {
-                    const { value, onChange } = field;
-                    return (
-                      <Tooltip>
-                        <TooltipTrigger>
-                          <div
-                            className="group relative w-max cursor-pointer"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              handleToggleChange('is_browse', value, onChange);
-                            }}
-                          >
-                            <div
-                              className={`flex min-h-[44px] items-center gap-2 rounded-xl px-3 py-2 shadow-md transition-all duration-300 active:scale-95 sm:px-4 sm:py-2.5 ${
-                                value
-                                  ? 'bg-[#772f8e] text-white hover:text-purple-200 hover:shadow-lg'
-                                  : 'bg-white shadow-lg hover:shadow-xl'
-                              }`}
-                            >
-                              <Globe className="h-4 w-4 flex-shrink-0 sm:h-5 sm:w-5" />
-                              <span
-                                className={`text-sm font-medium sm:inline ${
-                                  value ? '' : 'hidden'
-                                }`}
-                              >
-                                Search
-                              </span>
-                            </div>
-                          </div>
-                        </TooltipTrigger>
-                        <TooltipContent className="hidden sm:block">
-                          Search the web when necessary
-                        </TooltipContent>
-                      </Tooltip>
-                    );
-                  }}
-                />
-              )}
+                          </TooltipTrigger>
+                          <TooltipContent className="hidden sm:block">
+                            Search the web when necessary
+                          </TooltipContent>
+                        </Tooltip>
+                      );
+                    }}
+                  />
+                )}
+              </div>
             </div>
             <div className="order-1 flex w-full items-center justify-between gap-3 sm:order-2 sm:mt-0 sm:w-auto sm:justify-end">
               {settingVoice && (
@@ -750,39 +908,6 @@ const InputDataWithForm = ({
               </div>
             </div>
           </div>
-
-          {isPopupOpen && popupFile && (
-            <div
-              className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
-              onClick={closePopup}
-            >
-              <div
-                className="relative h-full max-h-[90%] w-full max-w-4xl overflow-hidden rounded-lg bg-white p-4"
-                onClick={(e) => e.stopPropagation()}
-              >
-                {popupFile?.type?.startsWith('image') ? (
-                  <img
-                    src={URL.createObjectURL(popupFile)}
-                    alt={popupFile?.name}
-                    className="h-full w-full rounded-lg object-contain"
-                  />
-                ) : (
-                  <iframe
-                    src={URL.createObjectURL(popupFile) || ''}
-                    title={popupFile?.name}
-                    className="h-full w-full rounded-lg"
-                  />
-                )}
-                <button
-                  type="button"
-                  onClick={closePopup}
-                  className="absolute right-4 top-4 rounded-full bg-red-600 p-2 text-white"
-                >
-                  <Cross2Icon className="h-6 w-6" />
-                </button>
-              </div>
-            </div>
-          )}
         </div>
         <div className="flex justify-center bg-[#EEEEEE] pt-2 text-[10px] font-bold sm:text-sm">
           Vita can make mistakes, so double-check it

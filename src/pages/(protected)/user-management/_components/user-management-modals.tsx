@@ -204,13 +204,20 @@ const UserManagementModals = ({
         itemName={userDetailQuery.data?.data.name || userData?.name}
         loading={deleteUserMutation.isPending}
         onDelete={() => {
-          const id = roleData?.id;
-          console.log('Deleting user with id:', userDetailQuery.data);
+          const id = userDetailQuery.data?.data.id;
           deleteUserMutation.mutate(
             { id: id?.toString()! },
             {
-              onSuccess: () => setModal(null),
+              onSuccess: (res) => {
+                toast({
+                  title: 'Sukses delete user',
+                  description: res.message,
+                  variant: 'default'
+                });
+                setModal(null);
+              },
               onError: (error) => {
+                console.log('Error deleting user:', error);
                 setModal(null);
                 toast({
                   title: 'Failed to delete user',
@@ -218,8 +225,8 @@ const UserManagementModals = ({
                     typeof error === 'object' &&
                     error !== null &&
                     'response' in error &&
-                    typeof (error as any).response?.data?.error === 'string'
-                      ? (error as any).response.data.error
+                    typeof (error as any).response?.data?.message === 'string'
+                      ? (error as any).response.data.message
                       : 'An unexpected error occurred',
                   variant: 'destructive'
                 });

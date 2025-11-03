@@ -1,7 +1,7 @@
 import * as z from 'zod';
 
 const BaseSchema = z.object({
-  document_name: z
+  original_filename: z
     .string({ message: 'Document Name is Required' })
     .min(1, { message: 'Document Name is Required' }),
   document_path: z.string({ message: 'Document is Required' }),

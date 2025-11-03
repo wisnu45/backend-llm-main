@@ -14,6 +14,7 @@ export type TDocItem = {
   original_filename: string;
   // missing
   updated_at: string;
+  storage_path: string;
 };
 
 export type TDocParams = {
