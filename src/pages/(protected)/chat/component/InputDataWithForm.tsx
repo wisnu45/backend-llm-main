@@ -366,8 +366,6 @@ const InputDataWithForm = ({
     if (!isHistory) {
       TogglePreferences.set(currentToggles);
     }
-
-    console.log('CEK DATANYA', data);
     onSubmit({
       ...data,
       prompt: data.prompt.trim(),

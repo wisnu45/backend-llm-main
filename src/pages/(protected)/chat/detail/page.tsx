@@ -15,6 +15,7 @@ import { TChatFormData } from '../schema';
 import { useChatForm } from '../_hook/use-chat-form';
 import { useFetchSettingFeature } from '../../setting/_hook/use-fetch-setting-feature';
 import { Cross2Icon } from '@radix-ui/react-icons';
+import { toast } from '@/components/ui/use-toast';
 
 const DetailPage = () => {
   const { chatId } = useParams();
@@ -110,13 +111,19 @@ const DetailPage = () => {
             handleSuccess();
             query.refetch();
           },
-          onError: (err: Error) => {
-            // Check if this is a network error
+          onError: (err: any) => {
             const networkError = err as NetworkAwareError;
             if (networkError.isNetworkError) {
               handleError(true, formData);
             } else {
               handleError(false);
+            }
+            if (err?.response?.status === 429) {
+              toast({
+                title: 'Sudah mencapai batas penggunaan',
+                description: `${err?.response.data.message || 'Please try again later.'}`,
+                variant: 'destructive'
+              });
             }
           }
         }
