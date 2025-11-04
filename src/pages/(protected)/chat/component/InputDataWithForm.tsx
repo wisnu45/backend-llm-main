@@ -213,6 +213,16 @@ const InputDataWithForm = ({
   const watchedAttachments = watch('with_document');
   const watchedPrompt = watch('prompt');
 
+  useEffect(() => {
+    if (maxText === watchedPrompt?.length) {
+      toast({
+        variant: 'destructive',
+        title: 'Maksimum karakter tercapai',
+        description: `Anda telah mencapai batas maksimum karakter untuk pesan ini sebanyak ${maxText} karakter.`
+      });
+    }
+  }, [watchedPrompt?.length]);
+
   const openPopup = (file: File) => {
     setPopupFile(file);
     setIsPopupOpen(true);
