@@ -7,7 +7,13 @@ interface Props {
 }
 
 const DocumentMenu = ({ isSidebarOpen }: Props) => {
-  const queryDocument = useGetListDocument();
+  const queryDocument = useGetListDocument({
+    search: '',
+    page: 1,
+    page_size: 1,
+    source_type: 'all',
+    doc_type: 'all'
+  });
   const location = useLocation();
   const isActive = location.pathname === '/files';
 

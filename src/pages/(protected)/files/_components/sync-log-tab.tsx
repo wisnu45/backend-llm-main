@@ -115,7 +115,7 @@ const SyncLogTab = () => {
     }
   ];
 
-  const { page, page_size, total_pages, total } = query.data?.pagination || {};
+  const { page_size, total_pages, total } = query.data?.pagination || {};
 
   return (
     <div className="">

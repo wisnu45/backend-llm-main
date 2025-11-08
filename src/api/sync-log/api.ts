@@ -177,14 +177,22 @@ export const getSyncLogs = async (
   const endIndex = startIndex + pageSize;
   const paginatedLogs = filteredLogs.slice(startIndex, endIndex);
 
+  const totalPages = Math.ceil(filteredLogs.length / pageSize);
+
   return {
     data: paginatedLogs,
     message: 'Success',
+    pageCount: totalPages,
+    page: page,
     pagination: {
-      page,
-      page_size: pageSize,
+      currentPage: page,
       total: filteredLogs.length,
-      total_pages: Math.ceil(filteredLogs.length / pageSize)
+      totalPage: totalPages,
+      hasPreviousPage: page > 1,
+      hasNextPage: page < totalPages,
+      page_size: pageSize,
+      page: page,
+      total_pages: totalPages
     }
   };
 };
@@ -203,7 +211,9 @@ export const getSyncLogDetail = async (
 
   return {
     data: detail,
-    message: 'Success'
+    message: 'Success',
+    pageCount: 1,
+    page: 1
   };
 };
 

@@ -6,6 +6,7 @@ export interface DetailData {
   ext: string;
   url: string;
   mimetype: string;
+  original_filename?: string;
 }
 
 export interface ChatItemData {

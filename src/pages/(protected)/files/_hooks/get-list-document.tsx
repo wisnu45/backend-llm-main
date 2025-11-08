@@ -1,14 +1,14 @@
 import { getDocs } from '@/api/document/api';
-import { TDocParams } from '@/api/document/type';
-import { useQuery } from '@tanstack/react-query';
+import { TDocParams, TResponseListDocument } from '@/api/document/type';
+import { useQuery, UseQueryOptions } from '@tanstack/react-query';
 
 export const documentListQueryKey = 'get-document-list';
 
 const useGetListDocument = (
   params?: TDocParams,
-  options?: Partial<Parameters<typeof useQuery>[0]>
+  options?: Omit<UseQueryOptions<TResponseListDocument>, 'queryKey' | 'queryFn'>
 ) => {
-  return useQuery({
+  return useQuery<TResponseListDocument>({
     queryKey: [documentListQueryKey, params],
     queryFn: () => getDocs(params),
     ...options
