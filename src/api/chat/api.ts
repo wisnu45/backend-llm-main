@@ -46,11 +46,11 @@ export const chat = async (
   if (Array.isArray(req.with_document)) {
     req.with_document.forEach((file) => {
       if (file) {
-        formData.append('with_document[]', file); // ← pakai [] di key
+        formData.append('with_document', file);
       }
     });
   } else if (req.with_document) {
-    formData.append('with_document[]', req.with_document);
+    formData.append('with_document', req.with_document);
   }
 
   const res = await api.post<TDefaultResponse<TChatResponse>>(

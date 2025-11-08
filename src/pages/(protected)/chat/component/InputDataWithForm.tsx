@@ -15,7 +15,13 @@ import {
   Building,
   SlidersHorizontal
 } from 'lucide-react';
-import { useEffect, useImperativeHandle, useRef, useState } from 'react';
+import {
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+  useMemo
+} from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { TSetPromptType } from '../page';
 import { ChatFormSchema, TChatFormData } from '../schema';
@@ -213,6 +219,25 @@ const InputDataWithForm = ({
   const watchedAttachments = watch('with_document');
   const watchedPrompt = watch('prompt');
 
+  // Memoize blob URLs to prevent re-creating them on every render
+  const filePreviewUrls = useMemo(() => {
+    if (!watchedAttachments || watchedAttachments.length === 0) return [];
+
+    return watchedAttachments.map((file) => ({
+      file,
+      url: URL.createObjectURL(file)
+    }));
+  }, [watchedAttachments]);
+
+  // Cleanup blob URLs when component unmounts or files change
+  useEffect(() => {
+    return () => {
+      filePreviewUrls.forEach(({ url }) => {
+        URL.revokeObjectURL(url);
+      });
+    };
+  }, [filePreviewUrls]);
+
   useEffect(() => {
     if (maxText === watchedPrompt?.length) {
       toast({
@@ -262,7 +287,7 @@ const InputDataWithForm = ({
           toast({
             variant: 'destructive',
             title: 'Upload gagal',
-            description: `File "${file.name}" terlalu besar (max 2 MB).`
+            description: `File "${file.name}" terlalu besar (max ${fileSize} MB).`
           });
           return false;
         }
@@ -461,12 +486,12 @@ const InputDataWithForm = ({
           onDrop={handleFileDrop}
           onDragOver={handleDragOver}
         >
-          {watchedAttachments && watchedAttachments.length > 0 && (
+          {filePreviewUrls.length > 0 && (
             <>
               <h4 className="text-sm text-gray-400">Files:</h4>
               <div className="mb-4 overflow-x-auto hide-scrollbar">
                 <div className="mt-2 flex gap-4">
-                  {watchedAttachments.map((file, index) => (
+                  {filePreviewUrls.map(({ file, url }, index) => (
                     <div
                       key={index}
                       className="relative flex items-center justify-center rounded-lg bg-gray-700 p-2"
@@ -477,14 +502,14 @@ const InputDataWithForm = ({
                       >
                         {file?.type?.startsWith('image') ? (
                           <img
-                            src={URL.createObjectURL(file)}
+                            src={url}
                             alt={file?.name}
                             className="h-24 w-24 rounded-lg object-cover"
                             onClick={() => openPopup(file)}
                           />
                         ) : file?.type === 'application/pdf' ? (
                           <iframe
-                            src={URL.createObjectURL(file)}
+                            src={url}
                             title={file?.name}
                             className="h-24 w-24 rounded-lg object-cover"
                             onClick={() => openPopup(file)}
