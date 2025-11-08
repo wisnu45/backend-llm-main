@@ -12,14 +12,16 @@ import { Link, useSearchParams } from 'react-router-dom'; // Import useSearchPar
 import { useDebounce } from 'use-debounce';
 import FilesPageHeader from './_components/files-page-header';
 import FilesPageModals from './_components/files-page-modals';
+import SyncLogTab from './_components/sync-log-tab';
 import useGetListDocument from './_hooks/get-list-document';
 
 type TModal = 'delete' | 'edit' | 'create' | 'detail' | null;
+type TTab = TDocParams['source_type'] | 'synclog';
 
 const useFilesPage = () => {
   const [modal, setModal] = useState<TModal>(null);
   const [data, setData] = useState<TDocItem | null>(null);
-  const [tab, setTab] = useState<TDocParams['source_type']>('all');
+  const [tab, setTab] = useState<TTab>('all');
   const [textSearch, setTextSearch] = useState<string>('');
   const [pageIndex, setPageIndex] = useState(0);
   const [pageSize, setPageSize] = useState(10);
@@ -43,13 +45,18 @@ const useFilesPage = () => {
     setPageSize(limitFromURL);
   }, [searchParams]);
 
-  const query = useGetListDocument({
-    search: debouncedValue,
-    page: pageIndex,
-    page_size: pageSize,
-    doc_type: tab,
-    source_type: tab
-  });
+  const query = useGetListDocument(
+    {
+      search: debouncedValue,
+      page: pageIndex,
+      page_size: pageSize,
+      doc_type: tab === 'synclog' ? 'all' : tab,
+      source_type: tab === 'synclog' ? 'all' : tab
+    },
+    {
+      enabled: tab !== 'synclog'
+    }
+  );
 
   const updateURLParams = (newPageIndex: number, newPageSize: number) => {
     setSearchParams({
@@ -254,7 +261,7 @@ const FilesPage = () => {
       <Tabs
         defaultValue="all"
         onValueChange={(val) => {
-          setTab(val as TDocParams['doc_type']);
+          setTab(val as TTab);
         }}
       >
         <ScrollArea className="w-full">
@@ -268,25 +275,35 @@ const FilesPage = () => {
             <TabsTrigger value="website" className="w-full sm:w-auto">
               Upload Document
             </TabsTrigger>
+            <TabsTrigger value="synclog" className="w-full sm:w-auto">
+              Sync Log
+            </TabsTrigger>
           </TabsList>
           <ScrollBar orientation="horizontal" />
         </ScrollArea>
-        <TabsContent value={tab}>
-          <Suspense fallback={<LoaderCircle />}>
-            <DataTable
-              pageCount={total_pages || 0}
-              loading={query.isLoading}
-              data={query.data?.data || []}
-              columns={columns}
-              pageSizeOptions={[10, 20, 30, 40, 50]}
-              setPageIndex={handlePageChange}
-              pageIndex={pageIndex}
-              setPageSize={handlePageSizeChange}
-              total={total || 0}
-              pageSize={page_size || 10}
-            />
-          </Suspense>
-        </TabsContent>
+
+        {tab === 'synclog' ? (
+          <TabsContent value="synclog">
+            <SyncLogTab />
+          </TabsContent>
+        ) : (
+          <TabsContent value={tab}>
+            <Suspense fallback={<LoaderCircle />}>
+              <DataTable
+                pageCount={total_pages || 0}
+                loading={query.isLoading}
+                data={query.data?.data || []}
+                columns={columns}
+                pageSizeOptions={[10, 20, 30, 40, 50]}
+                setPageIndex={handlePageChange}
+                pageIndex={pageIndex}
+                setPageSize={handlePageSizeChange}
+                total={total || 0}
+                pageSize={page_size || 10}
+              />
+            </Suspense>
+          </TabsContent>
+        )}
       </Tabs>
 
       <FilesPageModals

@@ -4,12 +4,15 @@ import { MagnifyingGlassIcon } from '@radix-ui/react-icons';
 import useGetDocumentFromPortal from '../_hooks/get-doument-from-portal';
 import { TErrorResponse } from '@/commons/types/response';
 
+import { TDocParams } from '@/api/document/type';
+
 type TModal = 'delete' | 'edit' | 'create' | 'detail' | null;
+type TTab = TDocParams['source_type'] | 'synclog';
 
 interface IFilesPageHeader {
   setModal: (modal: TModal) => void;
   setInput: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  tab: string;
+  tab: TTab;
 }
 
 const FilesPageHeader = ({ setModal, setInput, tab }: IFilesPageHeader) => {
@@ -49,30 +52,35 @@ const FilesPageHeader = ({ setModal, setInput, tab }: IFilesPageHeader) => {
       </div>
 
       <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
-        <div className="flex w-full items-center overflow-hidden rounded-lg border border-gray-300 bg-white shadow-sm sm:w-auto">
-          <input
-            type="text"
-            placeholder="Search"
-            onChange={setInput}
-            className="w-full rounded-l-lg px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 sm:w-64"
-          />
-          <button className="rounded-r-lg border-l border-gray-300 bg-gray-50 p-2 hover:bg-gray-100">
-            <MagnifyingGlassIcon className="h-5 w-5 text-gray-500" />
-          </button>
-        </div>
-        <div className="flex gap-3">
+        {tab !== 'synclog' && (
+          <div className="flex w-full items-center overflow-hidden rounded-lg border border-gray-300 bg-white shadow-sm sm:w-auto">
+            <input
+              type="text"
+              placeholder="Search"
+              onChange={setInput}
+              className="w-full rounded-l-lg px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 sm:w-64"
+            />
+            <button className="rounded-r-lg border-l border-gray-300 bg-gray-50 p-2 hover:bg-gray-100">
+              <MagnifyingGlassIcon className="h-5 w-5 text-gray-500" />
+            </button>
+          </div>
+        )}
+        <div className={`flex gap-3 ${tab === 'synclog' ? 'ml-auto' : ''}`}>
           <Button
-            className={`w-full bg-red-400 hover:bg-red-600 sm:w-auto ${tab !== 'portal' ? 'hidden' : ''}`}
+            variant="destructive"
+            className={`sm:w-auto ${tab !== 'portal' && tab !== 'synclog' ? 'hidden' : ''}`}
             onClick={handleSyncPortal}
           >
             {isPending ? 'Syncing...' : 'Sync Portal'}
           </Button>
-          <Button
-            className="w-full bg-green-500 hover:bg-green-600 sm:w-auto"
-            onClick={() => setModal('create')}
-          >
-            Add New File
-          </Button>
+          {tab !== 'synclog' && (
+            <Button
+              className="w-full bg-green-500 hover:bg-green-600 sm:w-auto"
+              onClick={() => setModal('create')}
+            >
+              Add New File
+            </Button>
+          )}
         </div>
       </div>
     </>

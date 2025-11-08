@@ -5,13 +5,13 @@ import { useQuery } from '@tanstack/react-query';
 export const documentListQueryKey = 'get-document-list';
 
 const useGetListDocument = (
-  params?: TDocParams
-  // options?: Parameters<typeof useQuery>[0]
+  params?: TDocParams,
+  options?: Partial<Parameters<typeof useQuery>[0]>
 ) => {
   return useQuery({
     queryKey: [documentListQueryKey, params],
-    queryFn: () => getDocs(params)
-    // ...options
+    queryFn: () => getDocs(params),
+    ...options
   });
 };
 export default useGetListDocument;
