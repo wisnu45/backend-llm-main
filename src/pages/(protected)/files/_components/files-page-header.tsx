@@ -68,7 +68,7 @@ const FilesPageHeader = ({ setModal, setInput, tab }: IFilesPageHeader) => {
         <div className={`flex gap-3 ${tab === 'synclog' ? 'ml-auto' : ''}`}>
           <Button
             variant="destructive"
-            className={`sm:w-auto ${tab !== 'portal' && tab !== 'synclog' ? 'hidden' : ''}`}
+            className={`sm:w-auto ${tab !== 'synclog' ? 'hidden' : ''}`}
             onClick={handleSyncPortal}
           >
             {isPending ? 'Syncing...' : 'Sync Portal'}
