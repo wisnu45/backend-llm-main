@@ -14,6 +14,8 @@ import FilesPageHeader from './_components/files-page-header';
 import FilesPageModals from './_components/files-page-modals';
 import SyncLogTab from './_components/sync-log-tab';
 import useGetListDocument from './_hooks/get-list-document';
+import { useFetchSetting } from '../setting/_hook/use-fetch-setting';
+import Cookies from 'js-cookie';
 
 type TModal = 'delete' | 'edit' | 'create' | 'detail' | null;
 type TTab = TDocParams['source_type'] | 'synclog';
@@ -251,6 +253,34 @@ const FilesPage = () => {
     updateURLParams(pageIndex, newPageSize);
   };
 
+  const querySetting = useFetchSetting();
+  const menuSncData =
+    querySetting.data?.data.find(
+      (s) => s.name === 'Document sync allowed users'
+    ) || null;
+  let menuSncList: string[] = [];
+  if (menuSncData && typeof menuSncData.value === 'string') {
+    try {
+      const parsed = JSON.parse(menuSncData.value);
+      if (Array.isArray(parsed)) {
+        menuSncList = parsed.map((item) => String(item));
+      } else {
+        menuSncList = String(parsed)
+          .split(',')
+          .map((s) => s.trim())
+          .filter(Boolean);
+      }
+    } catch {
+      menuSncList = menuSncData.value
+        .split(',')
+        .map((u: string) => u.trim())
+        .filter(Boolean);
+    }
+  }
+  const isUserAllowed = menuSncList.includes(
+    Cookies.get('name')?.toString().toLowerCase() || ''
+  );
+
   return (
     <div>
       <FilesPageHeader
@@ -275,9 +305,11 @@ const FilesPage = () => {
             <TabsTrigger value="website" className="w-full sm:w-auto">
               Upload Document
             </TabsTrigger>
-            <TabsTrigger value="synclog" className="w-full sm:w-auto">
-              Sync Log
-            </TabsTrigger>
+            {isUserAllowed && (
+              <TabsTrigger value="synclog" className="w-full sm:w-auto">
+                Sync Log
+              </TabsTrigger>
+            )}
           </TabsList>
           <ScrollBar orientation="horizontal" />
         </ScrollArea>
