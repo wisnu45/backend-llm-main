@@ -278,7 +278,7 @@ const FilesPage = () => {
     }
   }
   const isUserAllowed = menuSncList.includes(
-    Cookies.get('name')?.toString().toLowerCase() || ''
+    Cookies.get('username')?.toString().toLowerCase() || ''
   );
 
   return (
