@@ -18,10 +18,11 @@ const useDeleteDocument = () => {
         variant: 'default'
       });
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast({
         title: 'Failed to delete document',
-        description: error?.message || 'An unexpected error occurred',
+        description:
+          error?.response?.data?.error || 'An unexpected error occurred',
         variant: 'destructive'
       });
     }

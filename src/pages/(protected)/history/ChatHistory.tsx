@@ -5,6 +5,7 @@ import { TrashIcon } from 'lucide-react';
 import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useBulkDeleteChat } from './_hook/use-delete-bulk-chat';
+import { toast } from '@/components/ui/use-toast';
 
 type TRecentChats = {
   chat_id: string;
@@ -47,8 +48,13 @@ export default function ChatHistory() {
           query.refetch();
           alert(`Berhasil menghapus sejumlah ${selected.length} obrolan`);
         },
-        onError: (error) => {
-          console.error('Error deleting chats:', error);
+        onError: (error: any) => {
+          toast({
+            title: 'Failed to delete chats',
+            description:
+              error?.response?.data?.error || 'An unexpected error occurred',
+            variant: 'destructive'
+          });
         }
       }
     );

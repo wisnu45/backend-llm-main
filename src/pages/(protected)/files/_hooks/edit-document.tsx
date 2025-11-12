@@ -19,10 +19,11 @@ const useEditDocument = (id: string) => {
         variant: 'default'
       });
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast({
-        title: 'Failed to edi document',
-        description: error?.message || 'An unexpected error occurred',
+        title: 'Failed to edit document',
+        description:
+          error?.response?.data?.error || 'An unexpected error occurred',
         variant: 'destructive'
       });
     }

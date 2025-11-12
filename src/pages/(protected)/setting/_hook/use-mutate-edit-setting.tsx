@@ -18,10 +18,11 @@ const useEditSetting = (id: string) => {
         variant: 'default'
       });
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast({
-        title: 'Failed to edi Setting',
-        description: error?.message || 'An unexpected error occurred',
+        title: 'Failed to edit Setting',
+        description:
+          error?.response?.data?.error || 'An unexpected error occurred',
         variant: 'destructive'
       });
     }
