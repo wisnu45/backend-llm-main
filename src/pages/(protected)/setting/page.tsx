@@ -269,7 +269,7 @@ export default function SettingTable() {
       </div>
       {selectedSetting && modalType && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="w-[400px] rounded-lg bg-white p-6">
+          <div className="m-3 w-full rounded-lg bg-white p-6 md:m-10">
             <h2 className="mb-4 text-xl font-semibold">
               Edit Setting: {selectedSetting.name}
             </h2>
@@ -288,7 +288,7 @@ export default function SettingTable() {
                 <textarea
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
-                  className="h-60 w-full rounded-lg border-2 border-gray-300 bg-white p-4 text-gray-700 shadow-md transition-all duration-300 ease-in-out placeholder:text-gray-400 hover:shadow-lg focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500"
+                  className="h-96 w-full rounded-lg border-2 border-gray-300 bg-white p-4 text-gray-700 shadow-md transition-all duration-300 ease-in-out placeholder:text-gray-400 hover:shadow-lg focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500"
                   placeholder="Enter your text here"
                   onInput={(e) => {
                     const textarea = e.target as HTMLTextAreaElement;
