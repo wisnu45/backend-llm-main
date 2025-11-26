@@ -74,7 +74,7 @@ const SyncLogFilters = ({
               <Input
                 id="log-search"
                 type="text"
-                placeholder="Cari error, doc ID..."
+                placeholder="Cari error, doc title, dll."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="mt-1 pr-8"

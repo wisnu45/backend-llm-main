@@ -16,6 +16,11 @@ export type TSyncLogItem = {
   success_count: number;
   failed_count: number;
   global_error?: string;
+  title?: string;
+  metadata: {
+    title?: string;
+  };
+  original_filename?: string;
 };
 
 export type TSyncLogDetail = TSyncLogItem & {

@@ -292,6 +292,9 @@ const FilesPage = () => {
         defaultValue="all"
         onValueChange={(val) => {
           setTab(val as TTab);
+          if (val == 'synclog') {
+            setTextSearch('');
+          }
         }}
       >
         <ScrollArea className="w-full">

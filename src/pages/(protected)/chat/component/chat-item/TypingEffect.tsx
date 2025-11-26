@@ -20,6 +20,9 @@ export const TypingEffect = ({
     if (isComplete && onComplete) {
       onComplete();
     }
+    if (isComplete) {
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    }
   }, [isComplete, onComplete]);
 
   return (

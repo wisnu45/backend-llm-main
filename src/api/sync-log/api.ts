@@ -14,7 +14,8 @@ const dummySyncLogs: TSyncLogItem[] = [
     status: 'partial_success',
     total_documents: 50,
     success_count: 48,
-    failed_count: 2
+    failed_count: 2,
+    metadata: { title: 'Sync Log 1' }
   },
   {
     id: '2',
@@ -22,7 +23,8 @@ const dummySyncLogs: TSyncLogItem[] = [
     status: 'success',
     total_documents: 50,
     success_count: 50,
-    failed_count: 0
+    failed_count: 0,
+    metadata: { title: 'Sync Log 2' }
   },
   {
     id: '3',
@@ -32,7 +34,8 @@ const dummySyncLogs: TSyncLogItem[] = [
     success_count: 0,
     failed_count: 50,
     global_error:
-      "API Request Gagal: 'https://portal.combiphar.com' tidak merespon (500 Internal Server Error). Token mungkin kedaluwarsa atau server down."
+      "API Request Gagal: 'https://portal.combiphar.com' tidak merespon (500 Internal Server Error). Token mungkin kedaluwarsa atau server down.",
+    metadata: { title: 'Sync Log 3' }
   },
   {
     id: '4',
@@ -40,7 +43,8 @@ const dummySyncLogs: TSyncLogItem[] = [
     status: 'success',
     total_documents: 45,
     success_count: 45,
-    failed_count: 0
+    failed_count: 0,
+    metadata: { title: 'Sync Log 4' }
   },
   {
     id: '5',
@@ -48,7 +52,8 @@ const dummySyncLogs: TSyncLogItem[] = [
     status: 'partial_success',
     total_documents: 52,
     success_count: 50,
-    failed_count: 2
+    failed_count: 2,
+    metadata: { title: 'Sync Log 5' }
   }
 ];
 
@@ -60,6 +65,7 @@ const dummySyncLogDetails: TSyncLogDetail[] = [
     total_documents: 50,
     success_count: 48,
     failed_count: 2,
+    metadata: { title: 'Sync Log 1' },
     failed_documents: [
       {
         title: 'SK Direksi - Tunjangan Mutasi',
@@ -80,6 +86,7 @@ const dummySyncLogDetails: TSyncLogDetail[] = [
     total_documents: 50,
     success_count: 50,
     failed_count: 0,
+    metadata: { title: 'Sync Log 2' },
     failed_documents: []
   },
   {
@@ -89,6 +96,7 @@ const dummySyncLogDetails: TSyncLogDetail[] = [
     total_documents: 50,
     success_count: 0,
     failed_count: 50,
+    metadata: { title: 'Sync Log 3' },
     global_error:
       "API Request Gagal: 'https://portal.combiphar.com' tidak merespon (500 Internal Server Error). Token mungkin kedaluwarsa atau server down.",
     failed_documents: [
@@ -106,6 +114,7 @@ const dummySyncLogDetails: TSyncLogDetail[] = [
     total_documents: 45,
     success_count: 45,
     failed_count: 0,
+    metadata: { title: 'Sync Log 4' },
     failed_documents: []
   },
   {
@@ -115,6 +124,7 @@ const dummySyncLogDetails: TSyncLogDetail[] = [
     total_documents: 52,
     success_count: 50,
     failed_count: 2,
+    metadata: { title: 'Sync Log 5' },
     failed_documents: [
       {
         title: 'Laporan Tahunan 2024',
@@ -136,6 +146,8 @@ export const getSyncLogs = async (
   // Simulate API delay
   await new Promise((resolve) => setTimeout(resolve, 500));
 
+  console.log('Fetching sync logs with params:', params);
+
   let filteredLogs = [...dummySyncLogs];
 
   // Filter by search
@@ -144,7 +156,10 @@ export const getSyncLogs = async (
     filteredLogs = filteredLogs.filter(
       (log) =>
         log.id.toLowerCase().includes(searchLower) ||
-        log.status.toLowerCase().includes(searchLower)
+        log.status.toLowerCase().includes(searchLower) ||
+        log?.title?.toLowerCase().includes(searchLower) ||
+        log?.metadata?.title?.toLowerCase().includes(searchLower) ||
+        log?.original_filename?.toLowerCase().includes(searchLower)
     );
   }
 

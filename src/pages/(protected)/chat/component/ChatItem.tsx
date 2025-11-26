@@ -12,13 +12,14 @@ import { DialogTitle } from '@radix-ui/react-dialog';
 
 interface ChatItemProps {
   data: ChatItemData;
+  chatEndRef?: React.RefObject<HTMLDivElement>;
 }
 
 const isRecentMessage = (createdAt: string | Date) => {
   return dayjs().diff(dayjs(createdAt), 'second') < 5;
 };
 
-export const ChatItem = ({ data }: ChatItemProps) => {
+export const ChatItem = ({ data, chatEndRef }: ChatItemProps) => {
   const {
     question,
     answer,
@@ -118,13 +119,19 @@ export const ChatItem = ({ data }: ChatItemProps) => {
       </div>
       <div className="col-auto flex flex-col items-start space-y-3 overflow-hidden">
         {isRecentMessage(created_at) ? (
-          <TypingEffect
-            text={cleanedAnswer}
-            typingSpeed={8}
-            onComplete={handleTypingComplete}
-          />
+          <>
+            <TypingEffect
+              text={cleanedAnswer}
+              typingSpeed={8}
+              onComplete={handleTypingComplete}
+            />
+            <div ref={chatEndRef}></div>
+          </>
         ) : (
-          <MarkdownRenderer content={cleanedAnswer} />
+          <>
+            <MarkdownRenderer content={cleanedAnswer} />
+            <div ref={chatEndRef}></div>
+          </>
         )}
         {(isTypingComplete || !isRecentMessage(created_at)) && (
           <>

@@ -187,7 +187,11 @@ const DetailPage = () => {
                   ref={isLast && !loading && !showPreview ? chatEndRef : null}
                   key={index}
                 >
-                  <ChatItem key={index} data={message} />
+                  <ChatItem
+                    key={index}
+                    data={message}
+                    chatEndRef={chatEndRef}
+                  />
                 </div>
               );
             })
@@ -217,7 +221,6 @@ const DetailPage = () => {
             </div>
           )}
         </div>
-        <div ref={chatEndRef} />
 
         <InputDataWithForm
           onSubmit={handleFormSubmit}
