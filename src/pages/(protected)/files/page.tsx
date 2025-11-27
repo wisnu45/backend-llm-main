@@ -305,7 +305,8 @@ const FilesPage = () => {
             <TabsTrigger value="portal" className="w-full sm:w-auto">
               Metadata Document
             </TabsTrigger>
-            <TabsTrigger value="website" className="w-full sm:w-auto">
+            {/* <TabsTrigger value="website" className="w-full sm:w-auto"> */}
+            <TabsTrigger value="admin" className="w-full sm:w-auto">
               Upload Document
             </TabsTrigger>
             {isUserAllowed && (
