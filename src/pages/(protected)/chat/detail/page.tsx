@@ -1,4 +1,3 @@
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { useEffect, useRef, useState } from 'react';
 import { useGetDetailHistory } from '../_hook/use-get-history-chat';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -19,15 +18,13 @@ import { toast } from '@/components/ui/use-toast';
 
 const DetailPage = () => {
   const { chatId } = useParams();
-  const scrollAreaRef = useRef<HTMLDivElement>(null);
-  const scrollContainerRef = useRef<HTMLElement | null>(null);
-  const chatEndRef = useRef<HTMLDivElement>(null);
   const query = useGetDetailHistory({ chat_id: chatId || '' });
   const mutation = useCreateChat();
   const navigate = useNavigate();
   const queryFeature = useFetchSettingFeature();
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [popupFile, setPopupFile] = useState<File | null>(null);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
 
   const settingFeature = queryFeature?.data?.data;
   const getMenuValue = (name: string) =>
@@ -66,12 +63,8 @@ const DetailPage = () => {
     }
   });
 
-  // Simplified scroll container setup - use ScrollArea ref directly
-  useEffect(() => {
-    if (scrollAreaRef.current) {
-      scrollContainerRef.current = scrollAreaRef.current;
-    }
-  }, []);
+  // For main layout scrolling, we'll let the hook use window scroll by not passing containerRef
+  // The floating input will respond to the main document scroll
 
   useEffect(() => {
     if (!query.data?.data.length && !query.isLoading) {
@@ -82,19 +75,26 @@ const DetailPage = () => {
   }, [chatId, query.data, query.isLoading]);
 
   useEffect(() => {
-    if (scrollAreaRef.current) {
-      scrollAreaRef.current.scrollIntoView({
-        behavior: 'smooth',
-        block: 'end'
-      });
-    }
-  }, [query.data?.data.length, loading, showPreview, query.isLoading]);
+    const container = chatContainerRef.current;
+    if (!container) return;
 
-  useEffect(() => {
-    if (chatEndRef.current) {
-      chatEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
-    }
-  }, [query?.data?.data, loading, showPreview]);
+    const scrollToBottom = () => {
+      window.scrollTo({
+        top: document.body.scrollHeight,
+        behavior: 'smooth'
+      });
+    };
+
+    const observer = new ResizeObserver(scrollToBottom);
+    observer.observe(container);
+
+    // Initial scroll
+    scrollToBottom();
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
 
   const handleFormSubmit = (formData: TChatFormData) => {
     const payload = handleSubmit(formData);
@@ -174,43 +174,38 @@ const DetailPage = () => {
   const lastData = query?.data?.data.at(-1) || null;
 
   return (
-    <>
-      <ScrollArea ref={scrollAreaRef} className="scrollbar-hide flex-1">
-        <div className={`mx-auto min-h-full w-[95%] pb-44`}>
+    <div>
+      <div
+        className="flex-1"
+        style={{ paddingBottom: 'calc(var(--chatbox-height, 128px) + 16px)' }}
+      >
+        <div ref={chatContainerRef} className={`mx-auto min-h-full w-[95%]`}>
           {query.isLoading ? (
             <Loader />
           ) : (
             query?.data?.data?.map((message, index) => {
-              const isLast = index === (query?.data?.data?.length ?? 0) - 1;
               return (
-                <div
-                  ref={isLast && !loading && !showPreview ? chatEndRef : null}
-                  key={index}
-                >
-                  <ChatItem
-                    key={index}
-                    data={message}
-                    chatEndRef={chatEndRef}
-                  />
+                <div key={index}>
+                  <ChatItem key={index} data={message} />
                 </div>
               );
             })
           )}
 
           {showPreview && (
-            <div ref={scrollAreaRef}>
+            <div>
               <PromptPreview text={previewPrompt} files={previewFiles} />
             </div>
           )}
 
           {loading && (
-            <div ref={scrollAreaRef}>
+            <div>
               <ModernLoadingIndicator />
             </div>
           )}
 
           {error.show && (
-            <div ref={scrollAreaRef}>
+            <div>
               <NetworkErrorCard
                 onRetry={handleNetworkRetry}
                 message={
@@ -221,74 +216,74 @@ const DetailPage = () => {
             </div>
           )}
         </div>
+      </div>
 
-        <InputDataWithForm
-          onSubmit={handleFormSubmit}
-          isLoading={loading}
-          scrollContainerRef={scrollContainerRef}
-          isFloating={true}
-          lastData={lastData || undefined}
-          setPopupFile={setPopupFile}
-          setIsPopupOpen={setIsPopupOpen}
-        />
+      <InputDataWithForm
+        onSubmit={handleFormSubmit}
+        isLoading={loading}
+        isFloating={true}
+        lastData={lastData || undefined}
+        setPopupFile={setPopupFile}
+        setIsPopupOpen={setIsPopupOpen}
+      />
 
-        {isPopupOpen && popupFile && (
+      {isPopupOpen && popupFile && (
+        <div
+          className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 backdrop-blur-sm"
+          onClick={closePopup}
+        >
           <div
-            className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 backdrop-blur-sm"
-            onClick={closePopup}
+            className="max-w-screen relative h-full max-h-screen w-full p-2 md:p-6"
+            onClick={(e) => e.stopPropagation()}
           >
-            <div
-              className="max-w-screen relative h-full max-h-screen w-full p-2 md:p-6"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="relative h-full w-full overflow-hidden rounded-lg bg-white shadow-xl">
-                {popupFile?.type?.startsWith('image') ? (
-                  <div className="flex h-full w-full flex-col items-center justify-center gap-3 p-4">
-                    <img
-                      src={URL.createObjectURL(popupFile)}
-                      alt={popupFile?.name}
-                      className="h-full w-full object-contain"
-                    />
-                  </div>
-                ) : popupFile?.type === 'application/pdf' ? (
-                  <div className="flex h-full w-full flex-col items-center justify-center gap-3 p-4">
-                    <iframe
-                      src={URL.createObjectURL(popupFile) || ''}
-                      title={popupFile?.name}
-                      className="h-full w-full"
-                    />
-                  </div>
-                ) : (
-                  <div className="flex h-full w-full flex-col items-center justify-center gap-3 p-4">
-                    <span className="text-6xl">📄</span>
-                    <p className="text-lg font-semibold">{popupFile?.name}</p>
-                    <p className="text-sm text-gray-500">
-                      Preview tidak tersedia untuk file ini
-                    </p>
-                    <a
-                      href={URL.createObjectURL(popupFile)}
-                      download={popupFile?.name}
-                      className="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
-                    >
-                      Download file
-                    </a>
-                  </div>
-                )}
+            <div className="relative h-full w-full overflow-hidden rounded-lg bg-white shadow-xl">
+              {popupFile?.type?.startsWith('image') ? (
+                <div className="flex h-full w-full flex-col items-center justify-center gap-3 p-4">
+                  <img
+                    src={URL.createObjectURL(popupFile)}
+                    alt={popupFile?.name}
+                    className="h-full w-full object-contain"
+                  />
+                </div>
+              ) : popupFile?.type === 'application/pdf' ? (
+                <div className="flex h-full w-full flex-col items-center justify-center gap-3 p-4">
+                  <iframe
+                    src={URL.createObjectURL(popupFile) || ''}
+                    title={popupFile?.name}
+                    className="h-full w-full"
+                  />
+                </div>
+              ) : (
+                <div className="flex h-full w-full flex-col items-center justify-center gap-3 p-4">
+                  <span className="text-6xl">📄</span>
+                  <p className="text-lg font-semibold">{popupFile?.name}</p>
+                  <p className="text-sm text-gray-500">
+                    Preview tidak tersedia untuk file ini
+                  </p>
+                  <a
+                    href={URL.createObjectURL(popupFile)}
+                    download={popupFile?.name}
+                    className="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
+                  >
+                    Download file
+                  </a>
+                </div>
+              )}
 
-                <button
-                  type="button"
-                  onClick={closePopup}
-                  className="absolute right-3 top-3 z-50 rounded-full bg-red-600 p-2 text-white shadow-lg hover:bg-red-700"
-                >
-                  <Cross2Icon className="h-6 w-6" />
-                </button>
-              </div>
+              <button
+                type="button"
+                onClick={closePopup}
+                className="absolute right-3 top-3 z-50 rounded-full bg-red-600 p-2 text-white shadow-lg hover:bg-red-700"
+              >
+                <Cross2Icon className="h-6 w-6" />
+              </button>
             </div>
           </div>
-        )}
-      </ScrollArea>
-    </>
+        </div>
+      )}
+    </div>
   );
 };
 
 export default DetailPage;
+

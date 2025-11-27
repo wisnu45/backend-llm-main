@@ -88,6 +88,12 @@ const Sidebar = ({ setShowModal }) => {
     };
   }, []);
 
+  // Update CSS variable when sidebar state changes
+  useEffect(() => {
+    const sidebarWidth = isSidebarOpen ? '272px' : '50px';
+    document.documentElement.style.setProperty('--sidebar-width', sidebarWidth);
+  }, [isSidebarOpen]);
+
   const [textSearch, setTextSearch] = useState<string>('');
 
   const filteredData = dataResult?.filter((item) =>

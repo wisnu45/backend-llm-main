@@ -5,14 +5,22 @@ import Logout from '@/components/ui/Logout';
 const MainLayout = ({ children }: PropsWithChildren) => {
   const [showModal, setShowModal] = useState(false);
   return (
-    <div className="flex h-screen bg-[#EEEEEE] font-sans text-[#1B212D] ">
-      <Sidebar setShowModal={setShowModal} />
-      <main className="flex h-full flex-1 flex-col overflow-y-auto p-4">
-        <header className="mb-5 flex items-center justify-between">
-          <h3 className="mb-1 text-2xl">Vita</h3>
+    <div className="flex h-screen bg-[#EEEEEE] font-sans text-[#1B212D]">
+      <div className="fixed inset-y-0 left-0 z-20">
+        <Sidebar setShowModal={setShowModal} />
+      </div>
+      <div
+        className="relative flex h-full flex-1 flex-col"
+        style={{ marginLeft: 'var(--sidebar-width, 50px)' }}
+      >
+        <header
+          style={{ marginLeft: 'var(--sidebar-width, 50px)' }}
+          className="fixed inset-x-0 top-0 z-10 flex h-16 items-center justify-between bg-[#EEEEEE] px-4"
+        >
+          <h3 className="text-2xl">Vita</h3>
         </header>
-        {children}
-      </main>
+        <main className="relative top-16 bg-[#EEEEEE] p-4">{children}</main>
+      </div>
       <Logout showModal={showModal} setShowModal={setShowModal} />
     </div>
   );

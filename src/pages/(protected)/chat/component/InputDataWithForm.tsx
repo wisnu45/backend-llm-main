@@ -1,11 +1,5 @@
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger
-} from '@/components/ui/tooltip';
-import { useMobileScroll } from '@/hooks/use-mobile-scroll';
+import { useShouldHideOnScroll } from '@/hooks/use-should-hide-on-scroll';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ArrowRightIcon, Cross2Icon } from '@radix-ui/react-icons';
 import clsx from 'clsx';
 import {
   Globe,
@@ -13,7 +7,9 @@ import {
   Paperclip,
   Lightbulb,
   Building,
-  SlidersHorizontal
+  SlidersHorizontal,
+  Send,
+  X
 } from 'lucide-react';
 import {
   useEffect,
@@ -50,19 +46,37 @@ const InputDataWithForm = ({
   isLoading = false,
   initialPrompt = '',
   setPrompRef,
-  scrollContainerRef,
   isHistory = true,
   lastData,
   // isPopupOpen,
   setIsPopupOpen,
   setPopupFile
 }: InputDataWithFormProps) => {
-  // const [isPopupOpen, setIsPopupOpen] = useState(false);
-  // const [popupFile, setPopupFile] = useState<File | null>(null);
+  const chatboxRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const chatboxElem = chatboxRef.current;
+    if (!chatboxElem) return;
+
+    const observer = new ResizeObserver(() => {
+      const newHeight = chatboxElem.offsetHeight;
+      document.documentElement.style.setProperty(
+        '--chatbox-height',
+        `${newHeight}px`
+      );
+    });
+
+    observer.observe(chatboxElem);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+
   const [hasInitialized, setHasInitialized] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const { shouldHideOnScroll } = useMobileScroll(50, scrollContainerRef);
+  const shouldHideOnScroll = useShouldHideOnScroll(50);
   const shouldHide = shouldHideOnScroll && isFloating;
 
   const queryFeature = useFetchSettingFeature();
@@ -466,7 +480,17 @@ const InputDataWithForm = ({
 
   return (
     <div
-      className={clsx(' bottom-0 left-0 right-0', isFloating ? 'absolute' : '')}
+      ref={chatboxRef}
+      className={clsx('bottom-0 right-0 z-10', isFloating ? 'fixed' : '')}
+      style={
+        isFloating
+          ? {
+              left: 'calc(var(--sidebar-width, 50px) + 16px)',
+              right: '16px'
+              // bottom: '16px'
+            }
+          : {}
+      }
     >
       <form
         onSubmit={handleSubmit(onFormSubmit)}
@@ -543,7 +567,7 @@ const InputDataWithForm = ({
                         className="absolute right-0 top-0 z-50 rounded-full bg-red-600 p-1 text-white"
                         onClick={() => removeFile(index)}
                       >
-                        <Cross2Icon className="h-4 w-4" />
+                        <X className="h-4 w-4" />
                       </button>
                     </div>
                   ))}
@@ -608,42 +632,32 @@ const InputDataWithForm = ({
                     render={({ field }) => {
                       const { value, onChange } = field;
                       return (
-                        <Tooltip>
-                          <TooltipTrigger>
-                            <div
-                              className="group relative w-max cursor-pointer"
-                              onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                handleToggleChange(
-                                  'is_company',
-                                  !!value,
-                                  onChange
-                                );
-                              }}
+                        <div
+                          className="group relative w-max cursor-pointer"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleToggleChange('is_company', value, onChange);
+                          }}
+                          title="Search Company Insights"
+                        >
+                          <div
+                            className={`flex min-h-[44px] items-center gap-2 rounded-xl px-3 py-2 shadow-md transition-all duration-300 active:scale-95 sm:px-4 sm:py-2.5 ${
+                              value
+                                ? 'bg-[#772f8e] text-white hover:text-purple-200 hover:shadow-lg'
+                                : 'bg-white shadow-lg hover:shadow-xl'
+                            }`}
+                          >
+                            <Building className="h-4 w-4 flex-shrink-0 sm:h-5 sm:w-5" />
+                            <span
+                              className={`text-sm font-medium sm:inline ${
+                                value ? '' : 'hidden'
+                              }`}
                             >
-                              <div
-                                className={`flex min-h-[44px] items-center gap-2 rounded-xl px-3 py-2 shadow-md transition-all duration-300 active:scale-95 sm:px-4 sm:py-2.5 ${
-                                  value
-                                    ? 'bg-[#772f8e] text-white hover:text-purple-200 hover:shadow-lg'
-                                    : 'bg-white shadow-lg hover:shadow-xl'
-                                }`}
-                              >
-                                <Building className="h-4 w-4 flex-shrink-0 sm:h-5 sm:w-5" />
-                                <span
-                                  className={`text-sm font-medium sm:inline ${
-                                    value ? '' : 'hidden'
-                                  }`}
-                                >
-                                  Company Insights
-                                </span>
-                              </div>
-                            </div>
-                          </TooltipTrigger>
-                          <TooltipContent className="hidden sm:block">
-                            Search Company Insights
-                          </TooltipContent>
-                        </Tooltip>
+                              Company Insights
+                            </span>
+                          </div>
+                        </div>
                       );
                     }}
                   />
@@ -655,42 +669,32 @@ const InputDataWithForm = ({
                     render={({ field }) => {
                       const { value, onChange } = field;
                       return (
-                        <Tooltip>
-                          <TooltipTrigger>
-                            <div
-                              className="group relative w-max cursor-pointer"
-                              onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                handleToggleChange(
-                                  'is_general',
-                                  !!value,
-                                  onChange
-                                );
-                              }}
+                        <div
+                          className="group relative w-max cursor-pointer"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleToggleChange('is_general', value, onChange);
+                          }}
+                          title="Search General Insights"
+                        >
+                          <div
+                            className={`flex min-h-[44px] items-center gap-2 rounded-xl px-3 py-2 shadow-md transition-all duration-300 active:scale-95 sm:px-4 sm:py-2.5 ${
+                              value
+                                ? 'bg-[#772f8e] text-white hover:text-purple-200 hover:shadow-lg'
+                                : 'bg-white shadow-lg hover:shadow-xl'
+                            }`}
+                          >
+                            <Lightbulb className="h-4 w-4 flex-shrink-0 sm:h-5 sm:w-5" />
+                            <span
+                              className={`text-sm font-medium sm:inline ${
+                                value ? '' : 'hidden'
+                              }`}
                             >
-                              <div
-                                className={`flex min-h-[44px] items-center gap-2 rounded-xl px-3 py-2 shadow-md transition-all duration-300 active:scale-95 sm:px-4 sm:py-2.5 ${
-                                  value
-                                    ? 'bg-[#772f8e] text-white hover:text-purple-200 hover:shadow-lg'
-                                    : 'bg-white shadow-lg hover:shadow-xl'
-                                }`}
-                              >
-                                <Lightbulb className="h-4 w-4 flex-shrink-0 sm:h-5 sm:w-5" />
-                                <span
-                                  className={`text-sm font-medium sm:inline ${
-                                    value ? '' : 'hidden'
-                                  }`}
-                                >
-                                  General Insights
-                                </span>
-                              </div>
-                            </div>
-                          </TooltipTrigger>
-                          <TooltipContent className="hidden sm:block">
-                            Search General Insights
-                          </TooltipContent>
-                        </Tooltip>
+                              General Insights
+                            </span>
+                          </div>
+                        </div>
                       );
                     }}
                   />
@@ -702,42 +706,32 @@ const InputDataWithForm = ({
                     render={({ field }) => {
                       const { value, onChange } = field;
                       return (
-                        <Tooltip>
-                          <TooltipTrigger>
-                            <div
-                              className="group relative w-max cursor-pointer"
-                              onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                handleToggleChange(
-                                  'is_browse',
-                                  !!value,
-                                  onChange
-                                );
-                              }}
+                        <div
+                          className="group relative w-max cursor-pointer"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleToggleChange('is_browse', value, onChange);
+                          }}
+                          title="Search the web when necessary"
+                        >
+                          <div
+                            className={`flex min-h-[44px] items-center gap-2 rounded-xl px-3 py-2 shadow-md transition-all duration-300 active:scale-95 sm:px-4 sm:py-2.5 ${
+                              value
+                                ? 'bg-[#772f8e] text-white hover:text-purple-200 hover:shadow-lg'
+                                : 'bg-white shadow-lg hover:shadow-xl'
+                            }`}
+                          >
+                            <Globe className="h-4 w-4 flex-shrink-0 sm:h-5 sm:w-5" />
+                            <span
+                              className={`text-sm font-medium sm:inline ${
+                                value ? '' : 'hidden'
+                              }`}
                             >
-                              <div
-                                className={`flex min-h-[44px] items-center gap-2 rounded-xl px-3 py-2 shadow-md transition-all duration-300 active:scale-95 sm:px-4 sm:py-2.5 ${
-                                  value
-                                    ? 'bg-[#772f8e] text-white hover:text-purple-200 hover:shadow-lg'
-                                    : 'bg-white shadow-lg hover:shadow-xl'
-                                }`}
-                              >
-                                <Globe className="h-4 w-4 flex-shrink-0 sm:h-5 sm:w-5" />
-                                <span
-                                  className={`text-sm font-medium sm:inline ${
-                                    value ? '' : 'hidden'
-                                  }`}
-                                >
-                                  Search
-                                </span>
-                              </div>
-                            </div>
-                          </TooltipTrigger>
-                          <TooltipContent className="hidden sm:block">
-                            Search the web when necessary
-                          </TooltipContent>
-                        </Tooltip>
+                              Search
+                            </span>
+                          </div>
+                        </div>
                       );
                     }}
                   />
@@ -763,40 +757,34 @@ const InputDataWithForm = ({
                         render={({ field }) => {
                           const { value, onChange } = field;
                           return (
-                            <Tooltip>
-                              <TooltipTrigger>
-                                <div
-                                  className="group relative w-max cursor-pointer"
-                                  onClick={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    handleToggleChange(
-                                      'is_company',
-                                      !!value,
-                                      onChange
-                                    );
-                                  }}
+                            <div
+                              className="group relative w-max cursor-pointer"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                handleToggleChange(
+                                  'is_company',
+                                  value,
+                                  onChange
+                                );
+                              }}
+                              title="Search Company Insights"
+                            >
+                              <div
+                                className={`flex min-h-[44px] items-center gap-2 rounded-xl px-3 py-2 shadow-md transition-all duration-300 active:scale-95 sm:px-4 sm:py-2.5 ${
+                                  value
+                                    ? 'bg-[#772f8e] text-white hover:text-purple-200 hover:shadow-lg'
+                                    : 'bg-white shadow-lg hover:shadow-xl'
+                                }`}
+                              >
+                                <Building className="h-4 w-4 flex-shrink-0 sm:h-5 sm:w-5" />
+                                <span
+                                  className={`text-sm font-medium sm:inline`}
                                 >
-                                  <div
-                                    className={`flex min-h-[44px] items-center gap-2 rounded-xl px-3 py-2 shadow-md transition-all duration-300 active:scale-95 sm:px-4 sm:py-2.5 ${
-                                      value
-                                        ? 'bg-[#772f8e] text-white hover:text-purple-200 hover:shadow-lg'
-                                        : 'bg-white shadow-lg hover:shadow-xl'
-                                    }`}
-                                  >
-                                    <Building className="h-4 w-4 flex-shrink-0 sm:h-5 sm:w-5" />
-                                    <span
-                                      className={`text-sm font-medium sm:inline`}
-                                    >
-                                      Company Insights
-                                    </span>
-                                  </div>
-                                </div>
-                              </TooltipTrigger>
-                              <TooltipContent className="hidden sm:block">
-                                Search Company Insights
-                              </TooltipContent>
-                            </Tooltip>
+                                  Company Insights
+                                </span>
+                              </div>
+                            </div>
                           );
                         }}
                       />
@@ -810,40 +798,34 @@ const InputDataWithForm = ({
                         render={({ field }) => {
                           const { value, onChange } = field;
                           return (
-                            <Tooltip>
-                              <TooltipTrigger>
-                                <div
-                                  className="group relative w-max cursor-pointer"
-                                  onClick={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    handleToggleChange(
-                                      'is_general',
-                                      !!value,
-                                      onChange
-                                    );
-                                  }}
+                            <div
+                              className="group relative w-max cursor-pointer"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                handleToggleChange(
+                                  'is_general',
+                                  value,
+                                  onChange
+                                );
+                              }}
+                              title="Search General Insights"
+                            >
+                              <div
+                                className={`flex min-h-[44px] items-center gap-2 rounded-xl px-3 py-2 shadow-md transition-all duration-300 active:scale-95 sm:px-4 sm:py-2.5 ${
+                                  value
+                                    ? 'bg-[#772f8e] text-white hover:text-purple-200 hover:shadow-lg'
+                                    : 'bg-white shadow-lg hover:shadow-xl'
+                                }`}
+                              >
+                                <Lightbulb className="h-4 w-4 flex-shrink-0 sm:h-5 sm:w-5" />
+                                <span
+                                  className={`text-sm font-medium sm:inline`}
                                 >
-                                  <div
-                                    className={`flex min-h-[44px] items-center gap-2 rounded-xl px-3 py-2 shadow-md transition-all duration-300 active:scale-95 sm:px-4 sm:py-2.5 ${
-                                      value
-                                        ? 'bg-[#772f8e] text-white hover:text-purple-200 hover:shadow-lg'
-                                        : 'bg-white shadow-lg hover:shadow-xl'
-                                    }`}
-                                  >
-                                    <Lightbulb className="h-4 w-4 flex-shrink-0 sm:h-5 sm:w-5" />
-                                    <span
-                                      className={`text-sm font-medium sm:inline`}
-                                    >
-                                      General Insights
-                                    </span>
-                                  </div>
-                                </div>
-                              </TooltipTrigger>
-                              <TooltipContent className="hidden sm:block">
-                                Search General Insights
-                              </TooltipContent>
-                            </Tooltip>
+                                  General Insights
+                                </span>
+                              </div>
+                            </div>
                           );
                         }}
                       />
@@ -857,40 +839,34 @@ const InputDataWithForm = ({
                         render={({ field }) => {
                           const { value, onChange } = field;
                           return (
-                            <Tooltip>
-                              <TooltipTrigger>
-                                <div
-                                  className="group relative w-max cursor-pointer"
-                                  onClick={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    handleToggleChange(
-                                      'is_browse',
-                                      !!value,
-                                      onChange
-                                    );
-                                  }}
+                            <div
+                              className="group relative w-max cursor-pointer"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                handleToggleChange(
+                                  'is_browse',
+                                  value,
+                                  onChange
+                                );
+                              }}
+                              title="Search the web when necessary"
+                            >
+                              <div
+                                className={`flex min-h-[44px] items-center gap-2 rounded-xl px-3 py-2 shadow-md transition-all duration-300 active:scale-95 sm:px-4 sm:py-2.5 ${
+                                  value
+                                    ? 'bg-[#772f8e] text-white hover:text-purple-200 hover:shadow-lg'
+                                    : 'bg-white shadow-lg hover:shadow-xl'
+                                }`}
+                              >
+                                <Globe className="h-4 w-4 flex-shrink-0 sm:h-5 sm:w-5" />
+                                <span
+                                  className={`text-sm font-medium sm:inline`}
                                 >
-                                  <div
-                                    className={`flex min-h-[44px] items-center gap-2 rounded-xl px-3 py-2 shadow-md transition-all duration-300 active:scale-95 sm:px-4 sm:py-2.5 ${
-                                      value
-                                        ? 'bg-[#772f8e] text-white hover:text-purple-200 hover:shadow-lg'
-                                        : 'bg-white shadow-lg hover:shadow-xl'
-                                    }`}
-                                  >
-                                    <Globe className="h-4 w-4 flex-shrink-0 sm:h-5 sm:w-5" />
-                                    <span
-                                      className={`text-sm font-medium sm:inline`}
-                                    >
-                                      Search
-                                    </span>
-                                  </div>
-                                </div>
-                              </TooltipTrigger>
-                              <TooltipContent className="hidden sm:block">
-                                Search the web when necessary
-                              </TooltipContent>
-                            </Tooltip>
+                                  Search
+                                </span>
+                              </div>
+                            </div>
                           );
                         }}
                       />
@@ -900,32 +876,26 @@ const InputDataWithForm = ({
               </div>
               <div className="flex gap-2">
                 {settingVoice && (
-                  <Tooltip>
-                    <TooltipTrigger>
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          toggleRecording();
-                        }}
-                        disabled={isLoading}
-                        className={`flex min-h-[44px] items-center gap-2 rounded-xl px-3 py-2 shadow-md transition-all duration-300 active:scale-95 sm:px-4 sm:py-2.5 ${
-                          isRecording
-                            ? 'animate-pulse bg-red-500 text-white'
-                            : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-                        }`}
-                      >
-                        <Mic className="h-4 w-4 flex-shrink-0 sm:h-5 sm:w-5" />
-                        {isRecording && (
-                          <span className="text-sm">{'Merekam...'}</span>
-                        )}
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent className="hidden sm:block">
-                      Ucapkan pertanyaanmu
-                    </TooltipContent>
-                  </Tooltip>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      toggleRecording();
+                    }}
+                    disabled={isLoading}
+                    className={`flex min-h-[44px] items-center gap-2 rounded-xl px-3 py-2 shadow-md transition-all duration-300 active:scale-95 sm:px-4 sm:py-2.5 ${
+                      isRecording
+                        ? 'animate-pulse bg-red-500 text-white'
+                        : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+                    }`}
+                    title="Ucapkan pertanyaanmu"
+                  >
+                    <Mic className="h-4 w-4 flex-shrink-0 sm:h-5 sm:w-5" />
+                    {isRecording && (
+                      <span className="text-sm">{'Merekam...'}</span>
+                    )}
+                  </button>
                 )}
                 <div className="flex items-center gap-2.5">
                   <span className="text-sm font-medium text-gray-900">
@@ -936,14 +906,14 @@ const InputDataWithForm = ({
                     disabled={!isValid || isLoading}
                     className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#7051f8] text-white shadow-md transition-all hover:bg-[#5b3de4] hover:shadow-lg active:scale-95 disabled:cursor-not-allowed disabled:bg-gray-400 sm:h-11 sm:w-11"
                   >
-                    <ArrowRightIcon className="h-4 w-4 sm:h-5 sm:w-5" />
+                    <Send className="h-4 w-4 sm:h-5 sm:w-5" />
                   </button>
                 </div>
               </div>
             </div>
           </div>
         </div>
-        <div className="flex justify-center bg-[#EEEEEE] pt-2 text-[10px] font-bold sm:text-sm">
+        <div className="flex justify-center bg-[#EEEEEE] py-2 text-[10px] font-bold sm:text-sm">
           Vita can make mistakes, so double-check it
         </div>
       </form>
@@ -952,3 +922,4 @@ const InputDataWithForm = ({
 };
 
 export default InputDataWithForm;
+
