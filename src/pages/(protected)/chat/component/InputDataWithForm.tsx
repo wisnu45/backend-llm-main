@@ -617,7 +617,7 @@ const InputDataWithForm = ({
                                 e.stopPropagation();
                                 handleToggleChange(
                                   'is_company',
-                                  value,
+                                  !!value,
                                   onChange
                                 );
                               }}
@@ -664,7 +664,7 @@ const InputDataWithForm = ({
                                 e.stopPropagation();
                                 handleToggleChange(
                                   'is_general',
-                                  value,
+                                  !!value,
                                   onChange
                                 );
                               }}
@@ -711,7 +711,7 @@ const InputDataWithForm = ({
                                 e.stopPropagation();
                                 handleToggleChange(
                                   'is_browse',
-                                  value,
+                                  !!value,
                                   onChange
                                 );
                               }}
@@ -772,7 +772,7 @@ const InputDataWithForm = ({
                                     e.stopPropagation();
                                     handleToggleChange(
                                       'is_company',
-                                      value,
+                                      !!value,
                                       onChange
                                     );
                                   }}
@@ -819,7 +819,7 @@ const InputDataWithForm = ({
                                     e.stopPropagation();
                                     handleToggleChange(
                                       'is_general',
-                                      value,
+                                      !!value,
                                       onChange
                                     );
                                   }}
@@ -866,7 +866,7 @@ const InputDataWithForm = ({
                                     e.stopPropagation();
                                     handleToggleChange(
                                       'is_browse',
-                                      value,
+                                      !!value,
                                       onChange
                                     );
                                   }}
