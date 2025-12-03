@@ -165,7 +165,7 @@ const InputDataWithForm = ({
 
   const handleToggleChange = (
     toggleType: 'is_company' | 'is_browse' | 'is_general',
-    currentValue: boolean,
+    currentValue: boolean | undefined,
     onChange: (value: boolean) => void
   ) => {
     if (!isLoading) {
@@ -922,4 +922,3 @@ const InputDataWithForm = ({
 };
 
 export default InputDataWithForm;
-
