@@ -7,5 +7,5 @@ export const formatDate = (
   timestamp: string | Date,
   format: string | undefined = 'ddd, DD MMM YYYY HH:mm'
 ) => {
-  return dayjs.utc(timestamp).format(format);
+  return dayjs(timestamp).format(format);
 };
