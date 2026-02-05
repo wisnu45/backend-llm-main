@@ -177,7 +177,7 @@ const UserFormModal = ({
                       type="text"
                       placeholder="Enter username"
                       {...field}
-                      disabled={mode === 'edit' || watchPortalUser}
+                      disabled={mode === 'edit'}
                     />
                   </FormControl>
                   <FormMessage />
