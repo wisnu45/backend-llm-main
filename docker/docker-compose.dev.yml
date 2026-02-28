@@ -1,0 +1,171 @@
+x-app-build: &app-build
+  image: combiphar-app:latest
+  build:
+    context: ..
+    dockerfile: docker/Dockerfile.dev
+name: combiphar
+
+services:
+  db:
+    image: pgvector/pgvector:pg15
+    container_name: combiphar-db
+    environment:
+      - POSTGRES_USER=${DB_USERNAME:-postgres}
+      - POSTGRES_PASSWORD=${DB_PASSWORD:-combiphar*2024}
+      - POSTGRES_DB=${DB_DATABASE:-combiphar-db}
+      - TZ=UTC
+      - PGTZ=UTC
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+      - ../schema/init.sql:/docker-entrypoint-initdb.d/01-init.sql
+      - ../schema/pgvector.sql:/docker-entrypoint-initdb.d/02-pgvector.sql
+    networks:
+      - combiphar-network
+    restart: unless-stopped
+
+  db_migrate:
+    image: pgvector/pgvector:pg15
+    container_name: combiphar-db-migrate
+    env_file:
+      - ../.env
+    environment:
+      - DB_HOST=${DB_HOST:-db}
+      - DB_PORT=${DB_PORT:-5432}
+      - DB_USERNAME=${DB_USERNAME:-postgres}
+      - DB_PASSWORD=${DB_PASSWORD:-combiphar*2024}
+      - DB_DATABASE=${DB_DATABASE:-combiphar-db}
+      - MIGRATIONS_DIR=${MIGRATIONS_DIR:-/app/schema/migrations}
+      - TZ=UTC
+    volumes:
+      - ../schema:/app/schema:ro
+      - ../docker/run_migrations.sh:/app/run_migrations.sh:ro
+    depends_on:
+      - db
+    networks:
+      - combiphar-network
+    command: ["/bin/sh", "-c", "/app/run_migrations.sh"]
+    restart: "no"
+
+  app:
+    <<: *app-build
+    container_name: combiphar-app
+    env_file:
+      - ../.env
+    environment:
+      - FLASK_ENV=development
+      - FLASK_DEBUG=1
+      - TEST_MODE=True
+      - TZ=UTC
+      - DB_HOST=${DB_HOST:-db}
+      - DB_PORT=${DB_PORT:-5432}
+      - DB_USERNAME=${DB_USERNAME:-postgres}
+      - DB_PASSWORD=${DB_PASSWORD:-combiphar*2024}
+      - DB_DATABASE=${DB_DATABASE:-combiphar-db}
+    ports:
+      - '8070:8070'
+    volumes:
+      # Mount source code for live reloading
+      - ../app:/app/app
+      - ../requirements.txt:/app/requirements.txt
+      - ../logs:/app/logs
+      - ../data:/app/data
+      - ../.env:/app/.env
+      # Mount Python cache to avoid permission issues
+      - app_cache:/app/__pycache__
+    networks:
+      - combiphar-network
+    restart: unless-stopped
+    depends_on:
+      - db
+    # Use development command with auto-reload
+    command: ["python3", "-m", "flask", "--app", "app.server", "run", "--host=0.0.0.0", "--port=8070", "--reload"]
+
+  sync_docs:
+    <<: *app-build
+    container_name: combiphar-sync-docs
+    env_file:
+      - ../.env
+    environment:
+      - FLASK_ENV=development
+      - TEST_MODE=True
+      - TZ=UTC
+      - DB_HOST=${DB_HOST:-db}
+      - DB_PORT=${DB_PORT:-5432}
+      - DB_USERNAME=${DB_USERNAME:-postgres}
+      - DB_PASSWORD=${DB_PASSWORD:-combiphar*2024}
+      - DB_DATABASE=${DB_DATABASE:-combiphar-db}
+    volumes:
+      - ../app:/app/app
+      - ../logs:/app/logs
+      - ../data:/app/data
+      - ../.env:/app/.env
+    networks:
+      - combiphar-network
+    command: ["python3", "app/services/pull_portal.py"]
+    restart: "no"
+    depends_on:
+      - app
+
+  sync_sites:
+    <<: *app-build
+    container_name: combiphar-sync-sites
+    env_file:
+      - ../.env
+    environment:
+      - FLASK_ENV=development
+      - TEST_MODE=True
+      - TZ=UTC
+      - DB_HOST=${DB_HOST:-db}
+      - DB_PORT=${DB_PORT:-5432}
+      - DB_USERNAME=${DB_USERNAME:-postgres}
+      - DB_PASSWORD=${DB_PASSWORD:-combiphar*2024}
+      - DB_DATABASE=${DB_DATABASE:-combiphar-db}
+    volumes:
+      - ../app:/app/app
+      - ../logs:/app/logs
+      - ../data:/app/data
+      - ../.env:/app/.env
+    networks:
+      - combiphar-network
+    command: ["python3", "app/services/pull_websites.py"]
+    restart: "no"
+    depends_on:
+      - app
+
+  cron:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.cron
+    container_name: combiphar-cron
+    env_file:
+      - ../.env
+    environment:
+      - TZ=UTC
+      - CRON_TZ=UTC
+      - PYTHONPATH=/app
+      - DB_HOST=${DB_HOST:-db}
+      - DB_PORT=${DB_PORT:-5432}
+      - DB_USERNAME=${DB_USERNAME:-postgres}
+      - DB_PASSWORD=${DB_PASSWORD:-combiphar*2024}
+      - DB_DATABASE=${DB_DATABASE:-combiphar-db}
+    volumes:
+      - ../app:/app/app
+      - ../data:/app/data
+      - ../logs:/logs
+      - ../cron/crontab:/etc/crontabs/root
+    restart: always
+    depends_on:
+      - app
+    networks:
+      - combiphar-network
+
+volumes:
+  db_data:
+  app_cache:
+
+networks:
+  combiphar-network:
+    driver: bridge
+    name: combiphar-network

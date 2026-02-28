@@ -1,0 +1,84 @@
+FROM python:3.10.13
+
+# Install system dependencies required by Tesseract, Poppler, Playwright/Chromium, and OpenCV
+RUN apt-get update \
+  && apt-get -y install --no-install-recommends \
+     poppler-utils tesseract-ocr libtesseract-dev \
+     libgl1-mesa-glx libglib2.0-0 libnss3 libxss1 libasound2 \
+     libatk1.0-0 libatk-bridge2.0-0 libcups2 libx11-6 libxcomposite1 \
+     libxcursor1 libxdamage1 libxrandr2 libxinerama1 libgbm1 \
+     libpango-1.0-0 libpangocairo-1.0-0 libgtk-3-0 ca-certificates \
+     build-essential unzip \
+  && apt-get clean \
+  && rm -rf /var/lib/apt/lists/*
+
+# Optional proxy support for restricted networks
+ARG HTTP_PROXY
+ARG HTTPS_PROXY
+ARG NO_PROXY
+ENV HTTP_PROXY=${HTTP_PROXY} \
+    HTTPS_PROXY=${HTTPS_PROXY} \
+    NO_PROXY=${NO_PROXY}
+
+# Create and change to the app directory
+WORKDIR /app
+
+# Copy and install Python dependencies first for better build caching
+COPY requirements.txt /app/requirements.txt
+ENV PIP_NO_CACHE_DIR=1 \
+    PIP_DEFAULT_TIMEOUT=120
+RUN python -m pip install --upgrade pip setuptools wheel \
+  && pip install --no-cache-dir -r /app/requirements.txt \
+  && pip install --no-cache-dir gunicorn
+
+# Copy application files
+COPY . /app
+
+# Create .env from example if it doesn't exist
+RUN if [ ! -f .env ]; then cp env.example .env; fi
+
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONPATH=/app
+ENV FLASK_ENV=production
+
+# Install Playwright browsers with all required OS dependencies, with robust fallbacks
+# Try multiple download hosts to mitigate CDN/proxy issues and retry once per host
+#RUN set -eux; \
+#  hosts="https://playwright.azureedge.net https://playwright-akamai.azureedge.net https://playwright-verizon.azureedge.net https://registry.npmmirror.com/playwright"; \
+#  ok=0; \
+#  for host in $hosts; do \
+#    echo "Attempting Playwright install from $host"; \
+#    PLAYWRIGHT_DOWNLOAD_HOST=$host playwright install --with-deps && { ok=1; break; } || echo "Playwright install failed from $host"; \
+#    echo "Retrying once for $host"; \
+#    PLAYWRIGHT_DOWNLOAD_HOST=$host playwright install --with-deps && { ok=1; break; } || echo "Second attempt failed for $host"; \
+#  done; \
+#  if [ "$ok" != "1" ]; then echo "Playwright browsers installation failed across all hosts"; exit 1; fi
+
+# COPY file browser lokal dari folder proyek ke dalam image
+COPY chromium-linux.zip /tmp/chromium.zip
+COPY chromium-headless-shell-linux.zip /tmp/headless_shell.zip
+
+# Install dependencies OS, lalu ekstrak browser manual ke folder cache Playwright (v1148)
+RUN playwright install-deps chromium \
+    && mkdir -p /root/.cache/ms-playwright/chromium-1148 \
+    && unzip -q /tmp/chromium.zip -d /root/.cache/ms-playwright/chromium-1148/ \
+    && mkdir -p /root/.cache/ms-playwright/chromium_headless_shell-1148 \
+    && unzip -q /tmp/headless_shell.zip -d /root/.cache/ms-playwright/chromium_headless_shell-1148/ \
+    && rm /tmp/chromium.zip /tmp/headless_shell.zip
+
+# Set file permissions for production security
+RUN chmod 444 app/server.py \
+  && chmod 444 requirements.txt
+
+# Create necessary directories
+RUN mkdir -p data/documents/portal data/documents/admin data/documents/user logs \
+  && chmod 775 data \
+  && chmod 775 logs
+
+# Service must listen to $PORT environment variable.
+ENV PORT=8070
+EXPOSE 8070
+ENV GUNICORN_TIMEOUT=300
+
+# Use Gunicorn for production
+CMD ["sh", "-c", "exec gunicorn --bind 0.0.0.0:${PORT:-8070} --workers 4 --timeout ${GUNICORN_TIMEOUT:-300} --access-logfile logs/gunicorn_access.log --error-logfile logs/gunicorn_error.log app.server:app"]

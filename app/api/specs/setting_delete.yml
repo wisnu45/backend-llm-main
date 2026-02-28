@@ -1,0 +1,65 @@
+tags:
+  - Settings
+summary: Menghapus setting berdasarkan ID
+description: Endpoint ini digunakan untuk menghapus setting berdasarkan ID. Hanya dapat diakses oleh admin.
+security:
+  - bearerAuth: []
+parameters:
+  - name: setting_id
+    in: path
+    required: true
+    schema:
+      type: string
+      format: uuid
+    description: ID dari setting yang akan dihapus
+responses:
+  200:
+    description: Setting berhasil dihapus
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: Setting berhasil dihapus
+  401:
+    description: Tidak terautentikasi / token tidak valid
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: Unauthorized
+  403:
+    description: Tidak memiliki akses admin
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: Forbidden
+  404:
+    description: Setting tidak ditemukan
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: Setting tidak ditemukan
+  500:
+    description: Gagal menghapus setting
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: Gagal menghapus setting

@@ -1,0 +1,102 @@
+tags:
+  - Chats
+summary: Ganti judul (title) chat session
+description: |
+  Mengganti field `subject` untuk chat session berdasarkan `chat_id` (id session).
+  Catatan:
+  - Ini akan mengubah judul yang muncul di daftar sesi (/chats/history).
+  - Judul akan dipotong maksimal 255 karakter jika melebihi batas.
+security:
+  - bearerAuth: []
+parameters:
+  - in: path
+    name: chat_id
+    required: true
+    schema:
+      type: string
+      format: uuid
+    examples:
+      sample:
+        value: "123e4567-e89b-12d3-a456-426614174999"
+requestBody:
+  required: true
+  content:
+    application/json:
+      schema:
+        type: object
+        required:
+          - title
+        properties:
+          title:
+            type: string
+            maxLength: 255
+            example: "Penjelasan tentang benefit karyawan"
+            description: "Judul baru (akan di-trim dan dipotong maksimal 255 karakter)."
+      examples:
+        rename:
+          value:
+            title: "Penjelasan tentang benefit karyawan"
+responses:
+  200:
+    description: Berhasil mengubah title
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+            data:
+              type: object
+              properties:
+                id:
+                  type: string
+                  format: uuid
+                title:
+                  type: string
+        examples:
+          success:
+            value:
+              message: "Berhasil mengubah title"
+              data:
+                id: "123e4567-e89b-12d3-a456-426614174999"
+                title: "Penjelasan tentang benefit karyawan"
+  400:
+    description: Request tidak valid (misal title kosong)
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+        examples:
+          empty_title:
+            value:
+              message: "Title tidak boleh kosong"
+  404:
+    description: Data tidak ditemukan
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+        examples:
+          not_found:
+            value:
+              message: "Chat tidak ditemukan"
+  401:
+    description: Unauthorized
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+        examples:
+          unauthorized:
+            value:
+              message: "Unauthorized"

@@ -1,0 +1,50 @@
+tags:
+  - Documents
+summary: Generate dokumen baru
+description: Generate dokumen baru dari data tertentu.
+security:
+  - bearerAuth: []
+requestBody:
+  required: true
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          source:
+            type: string
+            description: Sumber data dokumen
+responses:
+  201:
+    description: Berhasil generate dokumen
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+            data:
+              type: object
+              properties:
+                id:
+                  type: string
+        examples:
+          success:
+            value:
+              message: "Berhasil generate dokumen"
+              data:
+                id: "1"
+  400:
+    description: Request tidak valid
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+        examples:
+          error:
+            value:
+              message: "Request tidak valid"

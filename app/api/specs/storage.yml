@@ -1,0 +1,121 @@
+tags:
+  - Storage
+summary: Document storage endpoint using document ID (preview/download modes)
+description: |
+  Endpoint untuk mengakses dokumen menggunakan document ID dengan mode preview/download.
+  Menggunakan document ID (UUID) sebagai path parameter untuk mengidentifikasi dokumen.
+   
+  **Mode Operasi:**
+  - `download=false` (default): PDF dan gambar ditampilkan di browser, file lain di-download
+  - `download=true`: Semua file dipaksa download
+parameters:
+  - in: path
+    name: docs_id
+    required: true
+    schema:
+      type: string
+      format: uuid
+    description: Document ID (UUID) yang akan diakses
+    example: "123e4567-e89b-12d3-a456-426614174000"
+  # TEMPORARILY DISABLED
+  # - in: query
+  #   name: access_token
+  #   required: true
+  #   schema:
+  #     type: string
+  #   description: JWT access token untuk autentikasi (wajib)
+  - in: query
+    name: download
+    required: false
+    schema:
+      type: boolean
+      default: false
+    description: |
+      Mode akses file:
+      - `false` (default): PDF dan gambar ditampilkan di browser, file lain di-download
+      - `true`: Semua file dipaksa download
+responses:
+  200:
+    description: File berhasil dilayani
+    content:
+      application/octet-stream:
+        schema:
+          type: string
+          format: binary
+      application/pdf:
+        schema:
+          type: string
+          format: binary
+  400:
+    description: Parameter tidak valid
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+            message:
+              type: string
+        examples:
+          missing_docs_id:
+            value:
+              error: "Document ID tidak valid"
+              message: "Harap sertakan document ID yang valid di URL."
+          invalid_docs_id:
+            value:
+              error: "Document ID tidak valid"
+              message: "Format document ID harus berupa UUID yang valid."
+  # TEMPORARILY DISABLED - Authentication responses
+  # 401:
+  #   description: Authentication diperlukan
+  #   content:
+  #     application/json:
+  #       schema:
+  #         type: object
+  #         properties:
+  #           error:
+  #             type: string
+  #           message:
+  #             type: string
+  #       examples:
+  #         missing_token:
+  #           value:
+  #             error: "Authentication required"
+  #             message: "Parameter 'access_token' diperlukan dengan token yang valid."
+  404:
+    description: Dokumen atau file tidak ditemukan
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+            message:
+              type: string
+        examples:
+          document_not_found:
+            value:
+              error: "Dokumen tidak ditemukan"
+              message: "Dokumen dengan ID '123e4567-e89b-12d3-a456-426614174000' tidak tersedia."
+          file_not_found:
+            value:
+              error: "File tidak ditemukan"
+              message: "File dokumen dengan ID '123e4567-e89b-12d3-a456-426614174000' tidak tersedia di server."
+  500:
+    description: Error internal server
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+            message:
+              type: string
+        examples:
+          server_error:
+            value:
+              error: "Internal Server Error"
+              message: "Terjadi kesalahan pada server. Silakan coba lagi nanti."

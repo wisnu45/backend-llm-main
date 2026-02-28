@@ -1,0 +1,51 @@
+FROM python:3.10.13
+
+# Install dependencies
+RUN apt-get update \
+  && apt-get -y install poppler-utils tesseract-ocr libtesseract-dev \
+  && apt-get clean \
+  && rm -rf /var/lib/apt/lists/*
+
+# Create and change to the app directory.
+WORKDIR /app
+
+# Copy requirements first for better caching
+COPY requirements.txt .
+
+# Install Python dependencies
+ENV PIP_NO_CACHE_DIR=1 PIP_DEFAULT_TIMEOUT=120
+RUN python -m pip install --upgrade pip setuptools wheel && \
+    pip config set global.require-hashes false && \
+    pip config set install.require-hashes false && \
+    pip install --no-cache-dir -r requirements.txt
+
+# Install development dependencies
+RUN pip install --no-cache-dir flask[dotenv] watchdog
+
+#  Install Playwright browser with dependencies
+RUN playwright install
+
+# Copy application files
+COPY . .
+
+# Create .env from example if it doesn't exist
+RUN if [ ! -f .env ]; then cp env.example .env; fi
+
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONPATH=/app
+ENV FLASK_ENV=development
+ENV FLASK_DEBUG=1
+
+# Create necessary directories with proper permissions
+RUN mkdir -p data/documents/portal data/documents/admin data/documents/user logs
+RUN chmod 775 data logs
+
+# Don't make files read-only in development
+# RUN chmod 444 app/server.py
+
+# Service must listen to $PORT environment variable.
+ENV PORT=8070
+EXPOSE 8070
+
+# Start the application with Flask development server
+CMD ["python3", "-m", "flask", "--app", "app.server", "run", "--host=0.0.0.0", "--port=8070", "--reload"]

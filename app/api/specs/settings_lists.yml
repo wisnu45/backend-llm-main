@@ -1,0 +1,78 @@
+tags:
+  - Settings
+summary: Mendapatkan seluruh data setting
+description: |
+  Endpoint ini digunakan untuk mengambil list seluruh settings yang tersedia. Hanya dapat diakses oleh admin.
+security:
+  - bearerAuth: []
+responses:
+  200:
+    description: Berhasil mengambil list settings
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: Berhasil mengambil list settings
+            data:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                    example: "2125d07d-d74a-4865-98ec-677ddab570fc"
+                  name:
+                    type: string
+                    example: Chat topic expired days
+                  type:
+                    type: string
+                    example: feature
+                  unit:
+                    type: string
+                    example: days
+                  data_type:
+                    type: string
+                    example: integer
+                  value:
+                    type: string
+                    example: "30"
+                  is_protected:
+                    type: boolean
+                    example: false
+                  description:
+                    type: string
+                    example: Batas max chat topic auto delete, dilihat dari last date chat per topic
+  401:
+    description: Tidak terautentikasi / token tidak valid
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: Unauthorized
+  403:
+    description: Tidak memiliki akses admin
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: Forbidden
+  500:
+    description: Gagal mengambil list settings
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: Gagal mengambil list settings

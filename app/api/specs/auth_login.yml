@@ -1,0 +1,106 @@
+tags:
+  - Authentication
+summary: Login dengan Username dan Password
+description: |
+  Login user dengan username dan password. Mengembalikan access token dan refresh token.
+  - Access token adalah JWT untuk akses API (15 menit)
+  - Refresh token dikirim sebagai HttpOnly Secure Cookie (durasi sesuai JWT_REFRESH_TOKEN_EXPIRE_DAYS)
+  - Cookie settings: HttpOnly=true, Secure=true (production), SameSite=None/Lax (tergantung environment)
+requestBody:
+  required: true
+  content:
+    application/json:
+      schema:
+        type: object
+        required:
+          - username
+          - password
+        properties:
+          username:
+            type: string
+            description: Username user
+            example: "admin"
+          password:
+            type: string
+            description: Password user
+            example: "Secret123"
+responses:
+  200:
+    description: Berhasil login
+    headers:
+      Set-Cookie:
+        description: HttpOnly Secure Cookie berisi refresh token
+        schema:
+          type: string
+          example: "refresh_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...; HttpOnly; Secure; SameSite=None; Max-Age=86400"
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: "Berhasil login"
+            data:
+              type: object
+              properties:
+                access_token:
+                  type: string
+                  description: JWT access token untuk akses API
+                  example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                userdata:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      format: uuid
+                      example: "123e4567-e89b-12d3-a456-426614174000"
+                    name:
+                      type: string
+                      example: "John Doe"
+                    username:
+                      type: string
+                      example: "admin"
+                    role:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          format: uuid
+                          example: "456e7890-e12b-34c5-d678-901234567890"
+                        name:
+                          type: string
+                          example: "admin"
+                    is_portal:
+                      type: boolean
+                      example: false
+                    created_at:
+                      type: string
+                      format: date-time
+                      nullable: true
+                      example: "2024-01-01T00:00:00Z"
+                    updated_at:
+                      type: string
+                      format: date-time
+                      nullable: true
+                      example: "2024-01-01T00:00:00Z"
+  401:
+    description: Username atau password tidak valid
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: "Username atau password tidak valid"
+  500:
+    description: Gagal membuat token atau server error
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: "Gagal melakukan login"

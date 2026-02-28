@@ -1,0 +1,75 @@
+tags:
+  - Userdata
+summary: Menghapus User
+description: |
+  Menghapus User Local Atau User Portal By User ID
+security:
+  - bearerAuth: []
+responses:
+  200:
+    description: Berhasil menghapus User Lokal / User Portal
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+            message:
+              type: string
+        examples:
+          success:
+            value:
+              message: "User berhasil dihapus"
+  401:
+    description: Empty Authorization header
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+        examples:
+          message:
+            value:
+              message: "Authorization header is required"
+  403:
+    description: User Not Admin Try to Get Data
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+        examples:
+          error:
+            value:
+              error: "Tidak diizinkan"
+  404:
+    description: Update User tidak ditemukan
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+        examples:
+          error:
+            value:
+              error: "User tidak ditemukan"
+  500:
+    description: Gagal Membuat user
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+        examples:
+          error:
+            value:
+              error: "Gagal menghapus user"

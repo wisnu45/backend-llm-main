@@ -1,0 +1,66 @@
+tags:
+  - Authentication
+summary: Logout User dari Device
+description: |
+  Endpoint untuk logout user dari device saat ini.
+  - Blacklist current access token
+  - Revoke refresh token dari HttpOnly Cookie (bukan request body)
+  - Hapus refresh token cookie
+  - Optional: Revoke semua refresh token untuk user jika parameter revoke_all = true
+security:
+  - bearerAuth: []
+parameters:
+  - in: cookie
+    name: refresh_token
+    required: false
+    schema:
+      type: string
+    description: JWT refresh token dari HttpOnly Cookie (akan di-revoke jika ada)
+requestBody:
+  required: false
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          revoke_all:
+            type: boolean
+            description: Revoke semua refresh token untuk user dari semua device (default false)
+            example: false
+responses:
+  200:
+    description: Berhasil logout
+    headers:
+      Set-Cookie:
+        description: Hapus refresh token cookie
+        schema:
+          type: string
+          example: "refresh_token=; HttpOnly; Secure; SameSite=None; expires=Thu, 01 Jan 1970 00:00:00 GMT"
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: "Berhasil logout"
+  401:
+    description: Token tidak valid atau tidak ada authorization header
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: "Authorization header is required"
+  500:
+    description: Server error
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: "Gagal logout"

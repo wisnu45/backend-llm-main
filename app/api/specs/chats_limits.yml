@@ -1,0 +1,79 @@
+tags:
+  - Chats
+summary: Get Chat Limits Information
+description: |
+  Endpoint untuk mendapatkan informasi batasan chat untuk pengguna yang sedang login.
+  Mengembalikan informasi tentang batasan max_chat_topic dan max_chats berdasarkan role dan pengaturan pengguna.
+security:
+  - Bearer: []
+parameters: []
+responses:
+  200:
+    description: Berhasil mengambil informasi batasan chat
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: "Berhasil mengambil informasi batasan chat"
+            data:
+              type: object
+              properties:
+                max_chat_topic:
+                  type: integer
+                  description: Batas maksimum jumlah topik chat yang dapat dibuat
+                  example: 10
+                max_chats:
+                  type: integer
+                  description: Batas maksimum jumlah chat per topik
+                  example: 50
+                current_chat_topics:
+                  type: integer
+                  description: Jumlah topik chat yang sudah dibuat saat ini
+                  example: 3
+                can_create_new_topic:
+                  type: boolean
+                  description: Apakah pengguna dapat membuat topik chat baru
+                  example: true
+        examples:
+          success:
+            summary: Respons sukses
+            value:
+              message: "Berhasil mengambil informasi batasan chat"
+              data:
+                max_chat_topic: 10
+                max_chats: 50
+                current_chat_topics: 3
+                can_create_new_topic: true
+  401:
+    description: Token tidak valid atau sudah expired
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: "Token tidak valid"
+  403:
+    description: Access tidak diizinkan untuk menu chat
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: "Access tidak diizinkan"
+  500:
+    description: Internal server error
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: "Terjadi kesalahan pada server"

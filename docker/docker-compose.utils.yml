@@ -1,0 +1,23 @@
+version: "3.9"
+
+services:
+  cron:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.cron
+    container_name: cron_service
+    environment:
+      - TZ=UTC
+      - CRON_TZ=UTC
+      - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+    volumes:
+      - ../app:/app
+      - ../cron/crontab:/etc/crontabs/root
+      - ../logs:/logs
+    restart: always
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

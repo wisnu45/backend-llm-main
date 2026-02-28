@@ -1,0 +1,145 @@
+summary: Embed local documents
+description: Process and embed local documents from filesystem into vector store
+tags:
+  - Documents
+security:
+  - BearerAuth: []
+requestBody:
+  required: false
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          documents_path:
+            type: string
+            default: "data/documents"
+            description: Path to documents directory relative to project root
+          source_type:
+            type: string
+            default: "local"
+            description: Source type identifier for the documents
+          skip_existing:
+            type: boolean
+            default: true
+            description: Whether to skip files that already exist in database
+          allowed_extensions:
+            type: array
+            items:
+              type: string
+            default: [".pdf", ".txt", ".doc", ".docx", ".png", ".jpg", ".jpeg"]
+            description: List of allowed file extensions
+          specific_files:
+            type: array
+            items:
+              type: string
+            description: Specific files to process (relative paths from documents_path)
+        example:
+          documents_path: "data/documents"
+          source_type: "local"
+          skip_existing: true
+          allowed_extensions: [".pdf", ".txt", ".docx"]
+          specific_files: ["manual.pdf", "guide.txt"]
+responses:
+  200:
+    description: Documents embedded successfully
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: "Local document embedding completed. Processed: 5, Skipped: 2, Errors: 0"
+            processed_files:
+              type: array
+              items:
+                type: string
+              example: ["manual.pdf", "guide.txt", "readme.md"]
+            skipped_files:
+              type: array
+              items:
+                type: string
+              example: ["existing.pdf", "already_processed.txt"]
+            errors:
+              type: array
+              items:
+                type: string
+              example: []
+            summary:
+              type: object
+              properties:
+                total_processed:
+                  type: integer
+                  example: 5
+                total_skipped:
+                  type: integer
+                  example: 2
+                total_errors:
+                  type: integer
+                  example: 0
+            success:
+              type: boolean
+              example: true
+  207:
+    description: Partial success (some files processed with errors)
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+            processed_files:
+              type: array
+              items:
+                type: string
+            errors:
+              type: array
+              items:
+                type: string
+            summary:
+              type: object
+            success:
+              type: boolean
+              example: false
+  400:
+    description: Bad request
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: "Invalid request parameters"
+            success:
+              type: boolean
+              example: false
+  401:
+    description: Unauthorized
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: "Authentication required"
+  500:
+    description: Internal server error
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: "Error embedding local documents"
+            success:
+              type: boolean
+              example: false
+            errors:
+              type: array
+              items:
+                type: string

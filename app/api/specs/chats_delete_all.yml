@@ -1,0 +1,46 @@
+tags:
+  - Chats
+summary: Hard delete semua sesi chat milik user
+description: Melakukan hard delete pada semua sesi chat milik user dengan menghapus permanen semua record chat dari tabel chat_details.
+security:
+  - bearerAuth: []
+responses:
+  200:
+    description: Berhasil menghapus semua sesi chat secara permanen
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+        examples:
+          success:
+            value:
+              message: "Berhasil menghapus semua sesi chat (3 sesi)"
+  400:
+    description: Permintaan tidak valid
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+        examples:
+          error:
+            value:
+              message: "Permintaan tidak valid"
+  401:
+    description: Tidak ada auth
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+        examples:
+          no_auth:
+            value:
+              message: "No auth provided"

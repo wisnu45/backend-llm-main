@@ -1,0 +1,146 @@
+tags:
+  - Userdata
+summary: Mendapatkan Daftar Semua User baik User Lokal dan User Portal
+description: |
+  Menampilkan List Semua User baik User Lokal dan User Portal
+security:
+  - bearerAuth: []
+parameters:
+  - in: query
+    name: page
+    schema:
+      type: integer
+      default: 1
+      minimum: 1
+    description: Halaman data yang diambil (default 1)
+  - in: query
+    name: page_size
+    schema:
+      type: integer
+      default: 10
+      minimum: 1
+    description: Jumlah data per halaman (default 10)
+  - in: query
+    name: search
+    schema:
+      type: string
+    description: Pencarian user berdasarkan nama user (opsional)
+  - in: query
+    name: role_id
+    schema:
+      type: string
+      format: uuid
+    description: Pencarian user berdasarkan role user (opsional)
+  - in: query
+    name: user_type
+    schema:
+      type: string
+      enum: [all, portal, local]
+      default: all
+    description: Tipe User (all, portal, local)  (opsional)
+responses:
+  200:
+    description: Berhasil mengambil data user
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+            message:
+              type: string
+            data:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  is_portal:
+                    type: boolean
+                  name:
+                    type: string
+                  password:
+                    type: string
+                    nullable: true
+                  role:
+                    type: string
+                  role_id:
+                    type: string
+                    format: uuid
+                  username:
+                    type: string
+                  is_protected:
+                    type: boolean
+                  pagination:
+                    type: object
+                    properties:
+                      page:
+                        type: integer
+                      page_size:
+                        type: integer
+                      total:
+                        type: integer
+                      total_pages:
+                        type: integer
+        examples:
+          local:
+            value:
+              message: "Berhasil mengambil List users"
+              data:
+                - id: "b8ef8e81-829e-4d29-af1c-ca88641fcac5"
+                  name: "John Doe"
+                  username: "admin"
+                  role: "admin"
+                  role_id: "b8ef8e81-829e-4d29-af1c-ca88641fcac5"
+                  password: "scrypt:32768:8:1$nusZhRrOd5doyN5Q$707a6abd60e15f76a01d7ad4108c9250d473b503eddeefafd54bd981c9e77e253d01ac03f71783939cd561b23b95c549d92fb01947231dd7b0fe1dbbd893a26a"
+                  is_portal: false
+                  pagination:
+                    page: 1
+                    page_size: 10
+                    total: 1
+                    total_pages: 1
+          portal:
+            value:
+              message: "Berhasil mengambil List users"
+              data:
+                - id: "65ae1a55-10af-42f3-8d89-850aa54d16de"
+                  name: "Subhan Pradana"
+                  username: "subhan.pradana"
+                  role: "user"
+                  role_id: "b8ef8e81-829e-4d29-af1c-ca88641fcac5"
+                  password: null
+                  is_portal: true
+                  pagination:
+                    page: 1
+                    page_size: 10
+                    total: 1
+                    total_pages: 1
+  401:
+    description: Empty Authorization header
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+        examples:
+          message:
+            value:
+              message: "Authorization header is required"
+  403:
+    description: User Not Admin Try to Get Data
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+        examples:
+          error:
+            value:
+              error: "Tidak diizinkan"

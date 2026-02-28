@@ -1,0 +1,100 @@
+tags:
+  - Documents
+summary: Buat dokumen baru
+description: Membuat dokumen baru ke dalam sistem dengan struktur database baru.
+security:
+  - bearerAuth: []
+requestBody:
+  required: true
+  content:
+    multipart/form-data:
+      schema:
+        type: object
+        required:
+          - file
+        properties:
+          file:
+            type: string
+            format: binary
+            description: File dokumen yang akan diunggah
+          metadata:
+            type: string
+            description: Metadata dokumen dalam format JSON string (opsional)
+          source_type:
+            type: string
+            enum: [portal, admin, user, website]
+            default: admin
+            description: Tipe sumber dokumen
+          chat_id:
+            type: string
+            format: uuid
+            description: Chat ID untuk user-specific attachments (hanya untuk source_type=user)
+responses:
+  201:
+    description: Berhasil menambahkan data dokumen
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+            document_id:
+              type: string
+              format: uuid
+              nullable: true
+        examples:
+          success:
+            value:
+              message: "Berhasil menambahkan data documents"
+              document_id: "a3b2f9b4-5c6d-4e8a-9f12-3456789abcde"
+  400:
+    description: Request tidak valid
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+            error:
+              type: string
+        examples:
+          no_file:
+            value:
+              error: "File is required"
+          file_too_large:
+            value:
+              message: "Ukuran file melebihi batas 10 MB."
+          invalid_file_type:
+            value:
+              message: "Tipe file tidak didukung. Gunakan: pdf, txt, docx."
+          invalid_chat_id:
+            value:
+              error: "Invalid chat_id format. Must be a valid UUID"
+  403:
+    description: Tidak diizinkan
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+        examples:
+          no_permission:
+            value:
+              error: "Anda tidak memiliki izin untuk mengunggah file"
+  500:
+    description: Server error
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+        examples:
+          save_error:
+            value:
+              error: "Gagal menyimpan dokumen"

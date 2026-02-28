@@ -1,0 +1,67 @@
+tags:
+  - Chats
+summary: Riwayat Chat
+description: Mendapatkan daftar sesi chat terakhir beserta informasi apakah ada pesan yang dipin dalam sesi tersebut
+security:
+  - bearerAuth: []
+responses:
+  200:
+    description: Daftar sesi chat terakhir
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+            data:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                    description: ID dari chat/sesi
+                  chat_id:
+                    type: string
+                    format: uuid
+                    description: Session ID (sama dengan id)
+                  title:
+                    type: string
+                    description: Judul sesi chat (dari kolom subject atau 'Untitled Session')
+                  pinned:
+                    type: boolean
+                    description: "True jika sesi di-pin"
+                  created_at:
+                    type: string
+                    format: date-time
+                    description: Waktu sesi dibuat
+        examples:
+          success:
+            value:
+              message: "Berhasil mengambil riwayat chat"
+              data:
+                - id: "123e4567-e89b-12d3-a456-426614174000"
+                  chat_id: "123e4567-e89b-12d3-a456-426614174000"
+                  title: "Apa itu benefit?"
+                  pinned: true
+                  created_at: "2024-01-01T00:00:00Z"
+                - id: "456e4567-e89b-12d3-a456-426614174001"
+                  chat_id: "456e4567-e89b-12d3-a456-426614174001"
+                  title: "Untitled Session"
+                  pinned: false
+                  created_at: "2024-01-02T00:00:00Z"
+  401:
+    description: Unauthorized
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+        examples:
+          error:
+            value:
+              message: "Unauthorized"

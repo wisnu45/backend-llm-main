@@ -1,0 +1,171 @@
+tags:
+  - Userdata
+summary: Mengupdate data user
+description: |
+  Mengupdate data User Local Atau User Portal By User ID
+security:
+  - bearerAuth: []
+requestBody:
+  required: true
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          name:
+            type: string
+            description: "Official Name"
+          username:
+            type: string
+            description: "Username Lokal atau Username Portal (akan dicek ke Portal)"
+          password:
+            type: string
+            description: "Password, Jika Portal kosongkan saja"
+          roles_id:
+            type: string
+            format: uuid
+            description: "Role ID valid"
+          is_portal:
+            type: boolean
+            description: "Apakah User dari Portal? Jika User Portal Wajib true"
+        example:
+          name: "Budi Santoso"
+          username: "budi"
+          password: "Rahasia123"
+          roles_id: "123e4567-e89b-12d3-a456-426614174000"
+          is_portal: false
+        portal:
+          name: "Official Portal User"
+          username: "portal_user"
+          password: ""
+          roles_id: "123e4567-e89b-12d3-a456-426614174000"
+          is_portal: true
+
+responses:
+  200:
+    description: Berhasil membuat User Lokal / User Portal
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+            message:
+              type: string
+            data:
+              type: object
+              properties:
+                id:
+                  type: string
+                  format: uuid
+                name:
+                  type: string
+                username:
+                  type: string
+                role:
+                  type: string
+                is_portal:
+                  type: boolean
+                created_at:
+                  type: string
+                  format: date-time
+                  nullable: true
+                  example: "2024-01-01T00:00:00Z"
+                updated_at:
+                  type: string
+                  format: date-time
+                  nullable: true
+                  example: "2024-01-01T00:00:00Z"
+        examples:
+          success:
+            value:
+              message: "User berhasil dibuat"
+              data:
+                id: "123e4567-e89b-12d3-a456-426614174000"
+                name: "Budi Santoso"
+                username: "budi"
+                password: "Rahasia123"
+                role: "user"
+                created_at: "2024-01-01T00:00:00Z"
+                updated_at: "2024-01-01T00:00:00Z"
+  400:
+    description: Invalid Request
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+        examples:
+          duplicate_username:
+            value:
+              error: "Username sudah digunakan"
+          empty_username_is_portal_user_id:
+            value:
+              error: "Username, dan Portal User, ID User diperlukan"
+          user_portal_not_checked_is_portal:
+            value:
+              error: "User Merupakan User Portal Valid"
+          user_local_checked_is_portal:
+            value:
+              error: "Masukkan User Portal Valid"
+          user_portal_empty_name_role:
+            value:
+              error: "Official Name, User Role diperlukan"
+          user_local_empty_name_password_role:
+            value:
+              error: "Official Name, Username, User Role, dan Password diperlukan"
+  401:
+    description: Empty Authorization header
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+        examples:
+          message:
+            value:
+              message: "Authorization header is required"
+  403:
+    description: User Not Admin Try to Get Data
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+        examples:
+          error:
+            value:
+              error: "Tidak diizinkan"
+  404:
+    description: Update User tidak ditemukan
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+        examples:
+          error:
+            value:
+              error: "User tidak ditemukan"
+  500:
+    description: Gagal Membuat user
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+        examples:
+          error:
+            value:
+              error: "Gagal membuat user"

@@ -1,0 +1,106 @@
+tags:
+  - Documents
+summary: Perbarui dokumen berdasarkan ID
+description: Memperbarui data dokumen berdasarkan ID dengan struktur database baru.
+security:
+  - bearerAuth: []
+parameters:
+  - in: path
+    name: doc_id
+    required: true
+    schema:
+      type: string
+      format: uuid
+requestBody:
+  required: false
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          original_filename:
+            type: string
+            description: Nama dokumen baru (opsional)
+          metadata:
+            type: object
+            description: Metadata dokumen (opsional)
+      examples:
+        metadata_only:
+          value:
+            original_filename: "Updated Document Name.pdf"
+            metadata: {"category": "Updated Category", "tags": ["new", "updated"]}
+    multipart/form-data:
+      schema:
+        type: object
+        properties:
+          original_filename:
+            type: string
+            description: Nama dokumen baru (opsional)
+          metadata:
+            type: string
+            description: Metadata dokumen dalam format JSON string (opsional)
+          file:
+            type: string
+            format: binary
+            description: File dokumen baru (opsional)
+responses:
+  200:
+    description: Berhasil memperbarui data dokumen
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+        examples:
+          success:
+            value:
+              message: "Berhasil memperbarui dokumen"
+  400:
+    description: Request tidak valid
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+            error:
+              type: string
+        examples:
+          no_changes:
+            value:
+              error: "Tidak ada perubahan yang dilakukan"
+          no_file_selected:
+            value:
+              message: "Tidak ada file yang dipilih"
+          invalid_filename:
+            value:
+              error: "Invalid file name"
+  403:
+    description: Tidak diizinkan
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+        examples:
+          portal_document:
+            value:
+              error: "Dokumen portal tidak dapat diubah"
+  404:
+    description: Tidak ditemukan
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+        examples:
+          error:
+            value:
+              error: "Dokumen tidak ditemukan"

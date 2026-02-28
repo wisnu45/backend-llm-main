@@ -1,0 +1,103 @@
+tags:
+  - Roles
+summary: Mengupdate data role
+description: |
+  Endpoint ini digunakan untuk mengupdate data role berdasarkan ID. Hanya dapat diakses oleh admin.
+  - Nama Role tidak boleh duplicate.
+  - Role dengan nama "admin" atau "user" hanya bisa mengupdate description, tidak bisa mengubah name.
+security:
+  - bearerAuth: []
+parameters:
+  - name: role_id
+    in: path
+    required: true
+    schema:
+      type: string
+      format: uuid
+    description: ID dari role yang akan diupdate
+requestBody:
+  required: true
+  content:
+    application/json:
+      schema:
+        type: object
+        required:
+          - name
+          - description
+        properties:
+          name:
+            type: string
+            example: unknown
+          description:
+            type: string
+            example: Role untuk unknown
+responses:
+  200:
+    description: Role berhasil diupdate
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: Role berhasil diupdate
+  400:
+    description: Invalid Request
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+        examples:
+          restrict_name:
+            value:
+              error: "Role dengan nama 'admin' tidak dapat mengubah nama"
+          empty_name_or_description:
+            value:
+              error: "Name, dan Description diperlukan"
+          duplicate_name:
+            value:
+              error: "Duplikat Nama Role"
+  401:
+    description: Tidak terautentikasi / token tidak valid
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: Unauthorized
+  403:
+    description: Tidak memiliki akses admin
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: Access tidak diizinkan
+  404:
+    description: Role tidak ditemukan
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+              example: Role tidak ditemukan
+  500:
+    description: Gagal mengupdate role
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+              example: Gagal membuat role

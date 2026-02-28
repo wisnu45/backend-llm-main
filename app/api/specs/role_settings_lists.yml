@@ -1,0 +1,94 @@
+tags:
+  - Role Settings
+summary: Mendapatkan seluruh data setting dan value setiap role berdasarkan Role ID
+description: |
+  Endpoint ini digunakan untuk mengambil list seluruh setting dan value per role yang tersedia. Hanya dapat diakses oleh admin.
+  - Membutuhkan parameter **Role ID di Path** untuk memfilter setting berdasarkan role.
+  - Jika suatu setting belum memiliki value untuk role tersebut, maka value akan diisi dengan default dari table settings.
+security:
+  - bearerAuth: []
+parameters:
+  - name: role_id
+    in: path
+    required: true
+    schema:
+      type: string
+      format: uuid
+    description: ID dari role yang akan diambil setting-nya
+responses:
+  200:
+    description: Berhasil mengambil list role settings
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: Berhasil mengambil List settings
+            data:
+              type: array
+              items:
+                type: object
+                properties:
+                  role_id:
+                    type: string
+                    format: uuid
+                    example: "2d328885-d408-4926-bc4f-785dcf32cd02"
+                  setting_id:
+                    type: string
+                    format: uuid
+                    example: "f2682f69-e968-4b56-975e-5be72c461415"
+                  type:
+                    type: string
+                    example: feature
+                  name:
+                    type: string
+                    example: Attachment
+                  description:
+                    type: string
+                    example: Attachment on/off
+                  data_type:
+                    type: string
+                    example: boolean
+                  unit:
+                    type: string
+                    nullable: true
+                  value:
+                    oneOf:
+                      - type: string
+                      - type: integer
+                      - type: boolean
+                      - type: array
+                      - type: object
+                    example: true
+  401:
+    description: Tidak terautentikasi / token tidak valid
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: Unauthorized
+  403:
+    description: Tidak memiliki akses admin
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: Access tidak diizinkan
+  500:
+    description: Gagal mengambil list role settings
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+              example: Gagal mengambil list setting

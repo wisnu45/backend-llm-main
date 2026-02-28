@@ -1,0 +1,115 @@
+tags:
+  - Settings
+summary: Mengupdate setting berdasarkan ID
+description: |
+  Endpoint ini digunakan untuk mengupdate data setting berdasarkan ID. Hanya dapat diakses oleh admin.
+  - Diusahakan input name capitalize (huruf depan besar) karena akan di proses di backend menjadi snake_case, dan di list akan format kembali menjadi capitalize (huruf depan besar).
+  - Data type wajib (string, integer, boolean, array, object), jika tidak akan menghasilkan error.
+  - Data type dan value wajib match, jika tidak akan menghasilkan error.
+security:
+  - bearerAuth: []
+parameters:
+  - name: setting_id
+    in: path
+    required: true
+    schema:
+      type: string
+      format: uuid
+    description: ID dari setting yang akan diupdate
+requestBody:
+  required: true
+  content:
+    application/json:
+      schema:
+        type: object
+        required:
+          - name
+          - type
+          - description
+          - data_type
+          - value
+        properties:
+          name:
+            type: string
+            example: max_login_attempts
+          type:
+            type: string
+            example: general
+          data_type:
+            type: string
+            example: integer
+          unit:
+            type: string
+            nullable: true
+            example: kali
+          value:
+            type: string
+            example: general
+          data_type:
+            type: string
+            example: integer
+          description:
+            type: string
+            example: Batas max chat topic auto delete, dilihat dari last date chat per topic
+          unit:
+            type: string
+            example: days
+          value:
+            oneOf:
+              - type: string
+              - type: integer
+              - type: boolean
+              - type: array
+              - type: object
+            example: 30
+responses:
+  200:
+    description: Setting berhasil diupdate
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: Setting berhasil diupdate
+  400:
+    description: Data tidak lengkap
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: Nama, Data Type, Type, dan Description diperlukan
+  401:
+    description: Tidak terautentikasi / token tidak valid
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: Unauthorized
+  403:
+    description: Tidak memiliki akses admin
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: Forbidden
+  500:
+    description: Gagal mengupdate setting
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: Gagal mengupdate setting

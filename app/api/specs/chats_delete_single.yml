@@ -1,0 +1,41 @@
+tags:
+  - Chats
+summary: Hard delete satu sesi chat
+description: Melakukan hard delete pada satu sesi chat dengan menghapus permanen semua record chat dari tabel chat_details.
+security:
+  - bearerAuth: []
+parameters:
+  - name: chat_id
+    in: path
+    required: true
+    schema:
+      type: string
+      format: uuid
+    description: UUID session chat yang akan dihapus permanen
+responses:
+  200:
+    description: Berhasil menghapus riwayat chat secara permanen
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+        examples:
+          success:
+            value:
+              message: "Berhasil menghapus riwayat chat"
+  400:
+    description: Session ID tidak valid
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+        examples:
+          error:
+            value:
+              message: "Session ID harus berupa UUID yang valid"

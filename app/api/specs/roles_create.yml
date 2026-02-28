@@ -1,0 +1,87 @@
+tags:
+  - Roles
+summary: Membuat role baru
+description: |
+  Endpoint ini digunakan untuk membuat role baru. Hanya dapat diakses oleh admin.
+  - Nama Role tidak boleh duplicate.
+  - Tidak boleh membuat role dengan nama "admin" atau "user".
+security:
+  - bearerAuth: []
+requestBody:
+  required: true
+  content:
+    application/json:
+      schema:
+        type: object
+        required:
+          - name
+          - description
+        properties:
+          name:
+            type: string
+            example: guest
+            description: |
+              Nama role. tidak boleh bernilai "admin" atau "user".
+          description:
+            type: string
+            example: Role untuk guest
+responses:
+  201:
+    description: Role berhasil dibuat
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: Role berhasil dibuat
+  400:
+    description: Invalid Request
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+        examples:
+          restrict_name:
+            value:
+              error: "Role dengan nama 'admin' tidak dapat dibuat"
+          empty_name_or_description:
+            value:
+              error: "Name, dan Description diperlukan"
+          duplicate_name:
+            value:
+              error: "Duplikat Nama Role"
+  401:
+    description: Tidak terautentikasi / token tidak valid
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+              example: Unauthorized
+  403:
+    description: Tidak memiliki akses admin
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: Access tidak diizinkan
+  500:
+    description: Gagal membuat role
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+              example: Gagal membuat role

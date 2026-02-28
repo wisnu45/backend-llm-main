@@ -1,0 +1,85 @@
+tags:
+  - Roles
+summary: Menghapus role
+description: |
+  Endpoint ini digunakan untuk menghapus role berdasarkan ID. Hanya dapat diakses oleh admin.
+  - Role dengan nama "admin" atau "user" tidak bisa dihapus.
+  - Role yang memiliki is_protected=true tidak bisa dihapus.
+  - Role yang masih digunakan oleh user tidak bisa dihapus.
+security:
+  - bearerAuth: []
+parameters:
+  - name: role_id
+    in: path
+    required: true
+    schema:
+      type: string
+      format: uuid
+    description: ID dari role yang akan dihapus
+responses:
+  200:
+    description: Role berhasil dihapus
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: Role berhasil dihapus
+  400:
+    description: Invalid Request
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+        examples:
+          restrict_name:
+            value:
+              error: "Role dengan nama 'admin' tidak dapat dihapus"
+          user_exists:
+            value:
+              error: "Terdapat User yang merupakan Role Ini"
+  401:
+    description: Tidak terautentikasi / token tidak valid
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: Unauthorized
+  403:
+    description: Tidak memiliki akses admin
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: Access tidak diizinkan
+  404:
+    description: Role tidak ditemukan
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+              example: Role tidak ditemukan
+  500:
+    description: Gagal menghapus role
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+              example: Gagal menghapus role

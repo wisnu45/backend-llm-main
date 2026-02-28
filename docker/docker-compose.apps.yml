@@ -1,0 +1,134 @@
+x-app-image: &app-image combiphar-app:latest
+
+x-app-build: &app-build
+  build:
+    context: ..
+    dockerfile: docker/Dockerfile.prod
+
+name: combiphar-apps
+
+services:
+  app:
+    <<: *app-build
+    image: *app-image
+    container_name: combiphar-app
+    env_file:
+      - ../.env
+    environment:
+      - FLASK_ENV=production
+      - TZ=UTC
+      - DB_HOST=${DB_HOST:-db}
+      - DB_USERNAME=${DB_USERNAME:-postgres}
+      - DB_PASSWORD=${DB_PASSWORD:-combiphar*2024}
+      - DB_DATABASE=${DB_DATABASE:-combiphar-db}
+      - DB_PORT=${DB_PORT:-5432}
+#      - VECTOR_DOC_MIN_SCORE=${VECTOR_DOC_MIN_SCORE:-0.5}
+#      - HYBRID_VECTOR_WEIGHT=${HYBRID_VECTOR_WEIGHT:-0.7}
+    ports:
+      - "8070:8070"
+    volumes:
+      - ../logs:/app/logs
+      - ../data:/app/data
+      - ../.env:/app/.env
+    networks:
+      - combiphar-network
+    restart: unless-stopped
+
+  sync-docs:
+    image: *app-image
+    container_name: combiphar-sync-docs
+    env_file:
+      - ../.env
+    environment:
+      - FLASK_ENV=production
+      - TZ=UTC
+      - DB_HOST=${DB_HOST:-db}
+      - DB_PORT=${DB_PORT:-5432}
+      - DB_USERNAME=${DB_USERNAME:-postgres}
+      - DB_PASSWORD=${DB_PASSWORD:-combiphar*2024}
+      - DB_DATABASE=${DB_DATABASE:-combiphar-db}
+      - VECTOR_DOC_MIN_SCORE=${VECTOR_DOC_MIN_SCORE:-0.5}
+      - HYBRID_VECTOR_WEIGHT=${HYBRID_VECTOR_WEIGHT:-0.7}
+    volumes:
+      - ../logs:/app/logs
+      - ../data:/app/data
+      - ../.env:/app/.env
+    networks:
+      - combiphar-network
+    command: ["python3", "app/services/pull_portal.py"]
+    restart: "no"
+    depends_on:
+      - app
+
+  sync-sites:
+    image: *app-image
+    container_name: combiphar-sync-sites
+    env_file:
+      - ../.env
+    environment:
+      - FLASK_ENV=production
+      - TZ=UTC
+      - DB_HOST=${DB_HOST:-db}
+      - DB_PORT=${DB_PORT:-5432}
+      - DB_USERNAME=${DB_USERNAME:-postgres}
+      - DB_PASSWORD=${DB_PASSWORD:-combiphar*2024}
+      - DB_DATABASE=${DB_DATABASE:-combiphar-db}
+      - VECTOR_DOC_MIN_SCORE=${VECTOR_DOC_MIN_SCORE:-0.5}
+      - HYBRID_VECTOR_WEIGHT=${HYBRID_VECTOR_WEIGHT:-0.7}
+    volumes:
+      - ../logs:/app/logs
+      - ../data:/app/data
+      - ../.env:/app/.env
+    networks:
+      - combiphar-network
+    command: ["python3", "app/services/pull_websites.py"]
+    restart: "no"
+    depends_on:
+      - app
+
+  # reset-sync:
+  #   image: *app-image
+  #   container_name: combiphar-reset-sync
+  #   env_file:
+  #     - ../.env
+  #   environment:
+  #     - FLASK_ENV=production
+  #     - TZ=UTC
+  #   networks:
+  #     - combiphar-network
+  #   depends_on:
+  #     - app
+  #   command: >
+  #     python -c "import logging; from app.api.documents import delete_all_documents; from app.services.document_sync_manager import DocumentSyncManager; logging.basicConfig(level=logging.INFO); print('Deleting all documents (DB + files + vectors)...'); res = delete_all_documents(); print('delete_all_documents result:', res); print('Running full portal + website sync via DocumentSyncManager.run_blocking...'); started, final_state = DocumentSyncManager.run_blocking(trigger_source='reset-sync', triggered_by='system', wait_for_db=True); print('run_blocking started:', started); print('final_state:', final_state); print('Reset + sync done (no HTTP calls).')"
+
+  cron:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.cron
+    container_name: combiphar-cron
+    env_file:
+      - ../.env
+    environment:
+      - TZ=UTC
+      - CRON_TZ=UTC
+      - PYTHONPATH=/app
+      - DB_HOST=${DB_HOST:-db}
+      - DB_PORT=${DB_PORT:-5432}
+      - DB_USERNAME=${DB_USERNAME:-postgres}
+      - DB_PASSWORD=${DB_PASSWORD:-combiphar*2024}
+      - DB_DATABASE=${DB_DATABASE:-combiphar-db}
+    volumes:
+      - ../app:/app/app
+      - ../data:/app/data
+      - ../logs:/logs
+      - ../cron/crontab:/etc/crontabs/root
+    restart: always
+    depends_on:
+      - app
+    networks:
+      - combiphar-network
+
+networks:
+  combiphar-network:
+    external: true
+    name: combiphar-network

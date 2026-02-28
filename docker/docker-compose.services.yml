@@ -1,0 +1,71 @@
+name: combiphar-services
+
+services:
+  db:
+    image: pgvector/pgvector:pg15
+    container_name: combiphar-db
+    environment:
+      - POSTGRES_USER=${DB_USERNAME:-postgres}
+      - POSTGRES_PASSWORD=${DB_PASSWORD:-combiphar*2024}
+      - POSTGRES_DB=${DB_DATABASE:-combiphar-db}
+      - TZ=UTC
+      - PGTZ=UTC
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+      - ../schema/init.sql:/docker-entrypoint-initdb.d/01-init.sql
+      - ../schema/pgvector.sql:/docker-entrypoint-initdb.d/02-pgvector.sql
+    networks:
+      - combiphar-network
+    restart: unless-stopped
+
+  db_migrate:
+    image: pgvector/pgvector:pg15
+    container_name: combiphar-db-migrate
+    env_file:
+      - ../.env
+    environment:
+      - DB_HOST=${DB_HOST:-db}
+      - DB_PORT=${DB_PORT:-5432}
+      - DB_USERNAME=${DB_USERNAME:-postgres}
+      - DB_PASSWORD=${DB_PASSWORD:-combiphar*2024}
+      - DB_DATABASE=${DB_DATABASE:-combiphar-db}
+      - MIGRATIONS_DIR=${MIGRATIONS_DIR:-/app/schema/migrations}
+      - TZ=UTC
+    volumes:
+      - ../schema:/app/schema:ro
+      - ../docker/run_migrations.sh:/app/run_migrations.sh:ro
+    depends_on:
+      - db
+    networks:
+      - combiphar-network
+    command: ["/bin/sh", "-c", "/app/run_migrations.sh"]
+    restart: "no"
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: combiphar-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@combiphar.com
+      PGADMIN_DEFAULT_PASSWORD: admin123
+      PGADMIN_CONFIG_SERVER_MODE: 'True'
+      TZ: UTC
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    depends_on:
+      - db
+    restart: unless-stopped
+    networks:
+      - combiphar-network
+
+volumes:
+  db_data:
+  pgadmin_data:
+
+networks:
+  combiphar-network:
+    external: true
+    name: combiphar-network

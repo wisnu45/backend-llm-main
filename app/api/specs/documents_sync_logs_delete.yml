@@ -1,0 +1,82 @@
+tags:
+  - Documents
+summary: Hapus log sinkronisasi dokumen
+description: |
+  Menghapus log sinkronisasi dokumen berdasarkan filter.
+  Jika tidak ada filter, seluruh log akan dihapus.
+security:
+  - bearerAuth: []
+parameters:
+  - in: query
+    name: sync_type
+    schema:
+      type: string
+      enum: [portal, website, manual]
+    description: Filter berdasarkan tipe sinkronisasi
+  - in: query
+    name: status
+    schema:
+      type: string
+      enum: [running, success, partial_success, failed]
+    description: Filter berdasarkan status sinkronisasi
+  - in: query
+    name: search
+    schema:
+      type: string
+    description: Pencarian bebas untuk error, doc ID, judul, atau filename
+  - in: query
+    name: start_date
+    schema:
+      type: string
+      format: date-time
+    description: "Hapus log mulai dari tanggal tertentu (ISO 8601, contoh: 2025-11-01)"
+  - in: query
+    name: end_date
+    schema:
+      type: string
+      format: date-time
+    description: "Hapus log sampai tanggal tertentu (ISO 8601, contoh: 2025-11-30)"
+responses:
+  200:
+    description: Berhasil menghapus log sinkronisasi dokumen
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: "Log sinkronisasi dokumen berhasil dihapus"
+            deleted:
+              type: integer
+              example: 12
+  400:
+    description: Parameter tidak valid
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: "Format start_date tidak valid. Gunakan ISO 8601."
+  403:
+    description: Akses ditolak
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: "Access log sinkronisasi dokumen tidak diizinkan"
+  500:
+    description: Kesalahan server internal
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: "Gagal menghapus log sinkronisasi dokumen"

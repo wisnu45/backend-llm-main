@@ -1,0 +1,251 @@
+tags:
+  - Chats
+summary: Mengajukan pertanyaan ke chatbot
+description: |
+  Mengajukan pertanyaan ke chatbot dan mendapatkan jawaban beserta dokumen sumber yang relevan.
+  - Jika `is_company=true`, chatbot akan fokus pada dokumen kebijakan perusahaan di vectordb.
+  - Jika `is_general=true`, chatbot akan menjawab langsung dari general ChatGPT tanpa retrieval.
+  - Jika `is_browse=true`, chatbot akan mencari jawaban hanya dari internet dan mengabaikan dokumen internal.
+security:
+  - bearerAuth: []
+requestBody:
+  required: true
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          question:
+            type: string
+            example: "Apa itu benefit?"
+            description: "Pertanyaan yang ingin diajukan ke chatbot."
+          chat_id:
+            type: string
+            format: uuid
+            example: "123e4567-e89b-12d3-a456-426614174000"
+            description: "ID sesi chat (harus UUID valid). Jika tidak diberikan, sistem akan otomatis membuat UUID baru."
+          is_browse:
+            type: boolean
+            example: false
+            description: "Jika true, chatbot akan mencari jawaban dari internet dan mengabaikan semua dokumen internal. Default: false."
+          is_company:
+            type: boolean
+            example: false
+            description: "Jika true, chatbot akan mencari jawaban dari dokumen kebijakan perusahaan di vectordb. Default: false."
+          is_general:
+            type: boolean
+            example: false
+            description: "Jika true, chatbot akan menjawab langsung dari general ChatGPT tanpa retrieval. Default: false."
+          attachments:
+            type: array
+            items:
+              type: string
+            description: "Array of base64 encoded documents untuk attachment (opsional). Alias: with_document"
+          with_document:
+            type: array
+            items:
+              type: string
+            description: "Array of base64 encoded documents untuk attachment (opsional). Legacy field, gunakan 'attachments'"
+        required:
+          - question
+responses:
+  200:
+    description: Jawaban dari chatbot dan dokumen sumber
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: "Berhasil mendapatkan jawaban"
+            data:
+              type: object
+              properties:
+                answer:
+                  type: string
+                  example: "Benefit adalah kompensasi non-gaji yang diberikan perusahaan kepada karyawan..."
+                  description: "Jawaban dari chatbot."
+                attachments:
+                  type: array
+                  description: "Daftar attachment yang diunggah oleh user."
+                  items:
+                    type: object
+                    properties:
+                      mimetype:
+                        type: string
+                        description: "Tipe MIME dari attachment."
+                        example: "image/png"
+                      ext:
+                        type: string
+                        description: "Ekstensi file dari attachment."
+                        example: "png"
+                      url:
+                        type: string
+                        description: "URL untuk mengunduh atau melihat attachment."
+                        example: "https://api.example.com/storage/123e4567-e89b-12d3-a456-426614174000"
+                source_documents:
+                  type: array
+                  description: "Daftar dokumen yang digunakan sebagai referensi untuk menjawab pertanyaan."
+                  items:
+                    type: object
+                    properties:
+                      content:
+                        type: string
+                        description: "Konten dokumen yang relevan"
+                      metadata:
+                        type: object
+                        properties:
+                          document_name:
+                            type: string
+                          document_source:
+                            type: string
+                          created_at:
+                            type: string
+                            format: date-time
+                        additionalProperties: true
+                        description: "Metadata dokumen sumber"
+                      score:
+                        type: object
+                        properties:
+                          combined:
+                            type: number
+                            description: "Skor gabungan relevansi dokumen"
+                          vector:
+                            type: number
+                            description: "Skor similarity vector"
+                          lexical:
+                            type: number
+                            description: "Skor lexical matching"
+                        description: "Skor relevansi dokumen"
+                        nullable: true
+                confidence:
+                  type: number
+                  description: "Skor kepercayaan jawaban (0-1)."
+                  example: 0.75
+                question:
+                  type: string
+                  example: "Apa itu benefit?"
+                  description: "Pertanyaan yang diajukan (ditambahkan oleh API)."
+                is_browse:
+                  type: boolean
+                  example: false
+                  description: "Status pencarian internet (ditambahkan oleh API)."
+                is_company:
+                  type: boolean
+                  example: false
+                  description: "Status pencarian dokumen perusahaan (ditambahkan oleh API)."
+                is_general:
+                  type: boolean
+                  example: false
+                  description: "Status permintaan jawaban langsung dari general GPT (ditambahkan oleh API)."
+                chat_id:
+                  type: string
+                  format: uuid
+                  example: "123e4567-e89b-12d3-a456-426614174000"
+                  description: "ID chat yang digunakan. Hanya muncul jika chat_id tidak diberikan dalam request."
+        examples:
+          success_without_chat_id:
+            summary: "Berhasil tanpa mengirim chat_id (chat_id dikembalikan)"
+            value:
+              message: "Berhasil mendapatkan jawaban"
+              data:
+                question: "Apa itu benefit?"
+                answer: "Benefit adalah ..."
+                is_browse: false
+                is_company: false
+                is_general: false
+                chat_id: "123e4567-e89b-12d3-a456-426614174000"
+                source_documents:
+                  - content: "Benefit adalah..."
+                    metadata:
+                      title: "Benefit.pdf"
+                      source: "document"
+                      score: 0.98
+                confidence: 0.95
+                attachments: 
+                  - mimetype: "image/png"
+                    ext: "png"
+                    url: "https://api.example.com/storage/123e4567-e89b-12d3-a456-426614174000"
+          success_with_chat_id:
+            summary: "Berhasil dengan mengirim chat_id (chat_id tidak dikembalikan)"
+            value:
+              message: "Berhasil mendapatkan jawaban"
+              data:
+                question: "Apa itu benefit?"
+                answer: "Benefit adalah ..."
+                is_browse: false
+                is_company: false
+                is_general: false
+                source_documents:
+                  - content: "Benefit adalah..."
+                    metadata:
+                      title: "Benefit.pdf"
+                      source: "document"
+                      score: 0.98
+                confidence: 0.95
+                attachments: 
+                  - mimetype: "image/png"
+                    ext: "png"
+                    url: "https://api.example.com/storage/123e4567-e89b-12d3-a456-426614174000"
+  400:
+    description: Pertanyaan tidak valid atau chat_id tidak valid
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+        examples:
+          missing_question:
+            value:
+              message: "Pertanyaan tidak boleh kosong"
+          invalid_uuid:
+            value:
+              message: "Chat ID harus berupa UUID yang valid"
+  401:
+    description: Unauthorized
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+  403:
+    description: Chat ID tidak ditemukan atau tidak memiliki akses
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: "Chat ID tidak ditemukan atau Anda tidak memiliki akses dengan Sesi ini."
+  429:
+    description: Batas penggunaan chat terlampaui
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: "Batas penggunaan chat harian terlampaui"
+            error_code:
+              type: string
+              example: "DAILY_LIMIT_EXCEEDED"
+            limits:
+              type: object
+              description: "Informasi batas penggunaan"
+            is_browse:
+              type: boolean
+            is_company:
+              type: boolean
+            is_general:
+              type: boolean
+        examples:
+          error:
+            value:
+              message: "Unauthorized"

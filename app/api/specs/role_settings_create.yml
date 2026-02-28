@@ -1,0 +1,107 @@
+tags:
+  - Role Settings
+summary: Membuat atau mengubah nilai role setting
+description: |
+  Membuat role setting baru atau mengubah nilainya untuk suatu role. Hanya dapat diakses oleh admin.
+security:
+  - bearerAuth: []
+requestBody:
+  required: true
+  content:
+    application/json:
+      schema:
+        type: object
+        required:
+          - setting_id
+          - role_id
+          - value
+        properties:
+          setting_id:
+            type: string
+            format: uuid
+            example: "3f9b2c1d-4e5f-6789-abcd-ef0123456789"
+          role_id:
+            type: string
+            format: uuid
+            example: "3f9b2c1d-4e5f-6789-abcd-ef0123456789"
+          value:
+            oneOf:
+              - type: string
+              - type: integer
+              - type: boolean
+              - type: array
+              - type: object
+            example: true
+responses:
+  201:
+    description: Role setting berhasil dibuat
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: Role setting berhasil dibuat
+  400:
+    description: Invalid Request / Invalid Value
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+        examples:
+          empty_setting_id_role_id_value:
+            value:
+              error: "Role, Feature, Value diperukan"
+          not_valid_value:
+            value:
+              error: "Nilai yang diinputkan tidak valid"
+  401:
+    description: Tidak terautentikasi / token tidak valid
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: Unauthorized
+  403:
+    description: Tidak memiliki akses admin
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: Access tidak diizinkan
+  404:
+    description: Role atau Setting tidak ditemukan
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+        examples:
+          not_found_setting:
+            value:
+              error: Setting tidak ditemukan
+          not_found_role:
+            value:
+              error: Role tidak ditemukan
+  500:
+    description: Gagal membuat role setting
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+              example: Gagal membuat role setting

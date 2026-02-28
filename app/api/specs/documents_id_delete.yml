@@ -1,0 +1,48 @@
+tags:
+  - Documents
+summary: Hapus dokumen (hard delete) berdasarkan ID
+description: Menghapus dokumen secara permanen berdasarkan ID. Operasi ini akan menghapus dokumen dari database, vector database (PGVector), dan file terkait dari server.
+security:
+  - bearerAuth: []
+parameters:
+  - in: path
+    name: doc_id
+    required: true
+    schema:
+      type: string
+      format: uuid
+responses:
+  200:
+    description: Berhasil menghapus data dokumen
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+            deleted_file:
+              type: string
+              description: Nama file original yang berhasil dihapus (jika ada)
+              nullable: true
+        examples:
+          success_with_file:
+            value:
+              message: "Berhasil menghapus data documents"
+              deleted_file: "sample_document.pdf"
+          success_without_file:
+            value:
+              message: "Berhasil menghapus data documents"
+  404:
+    description: Dokumen tidak ditemukan
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+        examples:
+          not_found:
+            value:
+              error: "Dokumen tidak ditemukan"

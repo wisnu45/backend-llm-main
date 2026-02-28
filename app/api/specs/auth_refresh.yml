@@ -1,0 +1,63 @@
+tags:
+  - Authentication
+summary: Refresh Access Token
+description: |
+  Endpoint untuk mendapatkan access token baru menggunakan refresh token.
+  - Access token adalah JWT dengan lifetime pendek (15 menit default) untuk keamanan
+  - Refresh token dibaca dari HttpOnly Secure Cookie (tidak dari request body)
+  - Digunakan ketika access token sudah expired
+parameters:
+  - in: cookie
+    name: refresh_token
+    required: true
+    schema:
+      type: string
+    description: JWT refresh token yang diperoleh saat login (disimpan sebagai HttpOnly Cookie)
+responses:
+  200:
+    description: Token berhasil di-refresh
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: "Token berhasil di-refresh"
+            data:
+              type: object
+              properties:
+                access_token:
+                  type: string
+                  description: Access token baru
+                  example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+  400:
+    description: Refresh token tidak ditemukan di cookie
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: "Refresh token diperlukan"
+  401:
+    description: Refresh token tidak valid atau expired
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: "Refresh token tidak valid atau sudah expired"
+  500:
+    description: Server error
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: "Gagal refresh token"

@@ -1,0 +1,120 @@
+tags:
+  - Documents
+summary: Mulai sinkronisasi dokumen portal & website
+description: Memicu proses sinkronisasi dokumen portal serta konten website secara asynchronous tanpa menjalankan perintah Docker secara manual.
+security:
+  - bearerAuth: []
+responses:
+  202:
+    description: Sinkronisasi berhasil dijadwalkan
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+            status:
+              type: object
+              properties:
+                state:
+                  type: string
+                  example: running
+                trigger_source:
+                  type: string
+                  nullable: true
+                started_at:
+                  type: string
+                  format: date-time
+                  nullable: true
+                finished_at:
+                  type: string
+                  format: date-time
+                  nullable: true
+                runtime_seconds:
+                  type: number
+                  format: float
+                  nullable: true
+                triggered_by:
+                  type: string
+                  nullable: true
+                updated_at:
+                  type: string
+                  format: date-time
+                  nullable: true
+                result:
+                  type: object
+                  nullable: true
+                error:
+                  type: string
+                  nullable: true
+        examples:
+          accepted:
+            value:
+              message: Proses sinkronisasi dokumen portal & website telah dimulai
+              status:
+                state: running
+                trigger_source: api
+                started_at: "2024-05-01T07:00:00Z"
+                finished_at: null
+                runtime_seconds: null
+                triggered_by: admin
+                updated_at: "2024-05-01T07:00:00Z"
+                result: null
+                error: null
+  409:
+    description: Sinkronisasi sedang berjalan
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+            status:
+              type: object
+              properties:
+                state:
+                  type: string
+                trigger_source:
+                  type: string
+                  nullable: true
+                started_at:
+                  type: string
+                  format: date-time
+                  nullable: true
+                finished_at:
+                  type: string
+                  format: date-time
+                  nullable: true
+                runtime_seconds:
+                  type: number
+                  format: float
+                  nullable: true
+                triggered_by:
+                  type: string
+                  nullable: true
+                updated_at:
+                  type: string
+                  format: date-time
+                  nullable: true
+                result:
+                  type: object
+                  nullable: true
+                error:
+                  type: string
+                  nullable: true
+        examples:
+          conflict:
+            value:
+              message: Sinkronisasi dokumen portal & website sedang berjalan
+              status:
+                state: running
+                trigger_source: api
+                started_at: "2024-05-01T07:00:00Z"
+                finished_at: null
+                runtime_seconds: 32.1
+                triggered_by: admin
+                updated_at: "2024-05-01T07:00:32Z"
+                result: null
+                error: null

@@ -1,0 +1,60 @@
+tags:
+  - Chats
+summary: Beri feedback like/dislike pada jawaban chat
+description: Memberikan feedback pada jawaban chat.
+parameters:
+  - in: path
+    name: chat_id
+    required: true
+    schema:
+      type: string
+      format: uuid
+    examples:
+      sample:
+        value: "123e4567-e89b-12d3-a456-426614174000"
+requestBody:
+  required: true
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          feedback:
+            type: string
+            enum: ["1", "-1"]
+            nullable: true
+            description: 1 untuk like, -1 untuk dislike, null untuk reset feedback
+      examples:
+        like:
+          value: {"feedback": "1"}
+        dislike:
+          value: {"feedback": "-1"}
+        reset:
+          value: {"feedback": null}
+responses:
+  200:
+    description: Feedback berhasil disimpan
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+        examples:
+          success:
+            value:
+              message: "Feedback berhasil disimpan"
+  400:
+    description: Request tidak valid
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+        examples:
+          error:
+            value:
+              message: "Request tidak valid"

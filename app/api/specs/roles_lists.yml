@@ -1,0 +1,106 @@
+tags:
+  - Roles
+summary: Mendapatkan daftar semua roles
+description: Endpoint ini digunakan untuk mengambil list seluruh roles yang tersedia. Hanya dapat diakses oleh admin.
+security:
+  - bearerAuth: []
+parameters:
+  - in: query
+    name: search
+    schema:
+      type: string
+    description: Pencarian berdasarkan nama role (opsional)
+  - in: query
+    name: page
+    schema:
+      type: integer
+      default: 1
+      minimum: 1
+    description: Halaman data yang diambil (default 1)
+  - in: query
+    name: page_size
+    schema:
+      type: integer
+      default: 10
+      minimum: 1
+    description: Jumlah data per halaman (default 10)
+responses:
+  200:
+    description: Berhasil mengambil list roles
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: Berhasil mengambil list roles
+            data:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                    example: a3b2f9b4-5c6d-4e8a-9f12-3456789abcde
+                  name:
+                    type: string
+                    example: admin
+                  description:
+                    type: string
+                    example: Role untuk admin
+                  is_protected:
+                    type: boolean
+                    example: false
+                  created_at:
+                    type: string
+                    format: date-time
+                    nullable: true
+                    example: "2024-01-01T00:00:00Z"
+                  updated_at:
+                    type: string
+                    format: date-time
+                    nullable: true
+                    example: "2024-01-01T00:00:00Z"
+            pagination:
+              type: object
+              properties:
+                page:
+                  type: integer
+                page_size:
+                  type: integer
+                total:
+                  type: integer
+                total_pages:
+                  type: integer
+  401:
+    description: Tidak terautentikasi / token tidak valid
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: Unauthorized
+  403:
+    description: Tidak memiliki akses admin
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: Access tidak diizinkan
+  500:
+    description: Gagal mengambil list role
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+              example: Gagal mengambil list role

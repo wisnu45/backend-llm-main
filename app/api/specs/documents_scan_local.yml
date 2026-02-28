@@ -1,0 +1,133 @@
+summary: Scan local documents
+description: Scan local documents directory and return file information including database status
+tags:
+  - Documents
+security:
+  - BearerAuth: []
+parameters:
+  - name: path
+    in: query
+    required: false
+    schema:
+      type: string
+      default: "data/documents"
+    description: Path to documents directory relative to project root
+  - name: extensions
+    in: query
+    required: false
+    schema:
+      type: array
+      items:
+        type: string
+    style: form
+    explode: true
+    description: Allowed file extensions (can be specified multiple times)
+    example: [".pdf", ".txt", ".docx"]
+responses:
+  200:
+    description: Files scanned successfully
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: "Found 10 files in data/documents"
+            files:
+              type: array
+              items:
+                type: object
+                properties:
+                  filename:
+                    type: string
+                    example: "manual.pdf"
+                  relative_path:
+                    type: string
+                    example: "manuals/manual.pdf"
+                  extension:
+                    type: string
+                    example: ".pdf"
+                  size_bytes:
+                    type: integer
+                    example: 1048576
+                  size_mb:
+                    type: number
+                    format: float
+                    example: 1.0
+                  modified_at:
+                    type: string
+                    format: date-time
+                    example: "2024-01-15T10:30:00+00:00"
+                  exists_in_db:
+                    type: boolean
+                    example: true
+                  db_created_at:
+                    type: string
+                    format: date-time
+                    nullable: true
+                    example: "2024-01-15T11:00:00+00:00"
+            summary:
+              type: object
+              properties:
+                total_files:
+                  type: integer
+                  example: 10
+                total_size_mb:
+                  type: number
+                  format: float
+                  example: 25.5
+                files_in_database:
+                  type: integer
+                  example: 7
+                files_not_in_database:
+                  type: integer
+                  example: 3
+                extensions_found:
+                  type: array
+                  items:
+                    type: string
+                  example: [".pdf", ".txt", ".docx"]
+            success:
+              type: boolean
+              example: true
+  401:
+    description: Unauthorized
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: "Authentication required"
+  404:
+    description: Documents path not found
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: "Documents path does not exist: data/documents"
+            files:
+              type: array
+              items: {}
+              example: []
+            success:
+              type: boolean
+              example: false
+  500:
+    description: Internal server error
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: "Error scanning local documents"
+            success:
+              type: boolean
+              example: false

@@ -1,0 +1,99 @@
+tags:
+  - Userdata
+summary: Mendapatkan User di Portal berdasarkan Username
+description: |
+  Mengambil profil user berdasarkan username (Portal).
+security:
+  - bearerAuth: []
+requestBody:
+  required: true
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          username:
+            type: string
+            example: "michael.wanandi"
+            description: "Username yang akan dicek ke Portal"
+responses:
+  200:
+    description: Mengambil data User di Portal berdasarkan username
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+            success:
+              type: string
+            data:
+              type: object
+              properties:
+                name:
+                  type: string
+                username:
+                  type: string
+        examples:
+          success:
+            value:
+              success: true
+              data:
+                name: "Michael Haryono Wanandi"
+                username: "michael.wanandi"
+  400:
+    description: Username Empty atau User sudah terdaftar atau
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+        examples:
+          empty_username:
+            value:
+              error: "Username diperlukan"
+          registered_username:
+            value:
+              error: "User sudah terpakai di Sistem"
+  401:
+    description: Empty Authorization header
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+        examples:
+          message:
+            value:
+              error: "Authorization header is required"
+  403:
+    description: User Not Admin Try to Get Data
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+        examples:
+          error:
+            value:
+              error: "Tidak diizinkan"
+  404:
+    description: Portal User tidak ditemukan
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+        examples:
+          error:
+            value:
+              error: "Username tidak ditemukan"

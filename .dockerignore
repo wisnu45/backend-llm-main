@@ -1,0 +1,72 @@
+# From .gitignore
+.venv
+.env
+.DS_Store
+.python-version
+
+.idea/
+.vscode/
+
+*.log
+*.old
+*.bak
+*_
+
+__pycache__/
+data/
+.github/*
+.backup/
+*:Zone.Identifier
+test_*
+
+# Additional Docker-specific ignores
+.dockerignore
+Dockerfile*
+docker-compose*.yml
+.git/
+.gitignore
+README.md
+LICENSE
+
+# Development and testing files
+.pytest_cache/
+.coverage
+.tox/
+.mypy_cache/
+.ruff_cache/
+
+# Documentation
+docs/
+*.md
+
+# Logs and temporary files
+logs/
+*.log
+tmp/
+temp/
+
+# Environment files (keep only what's needed)
+.env.*
+!.env.example
+
+# IDE and editor files
+*.swp
+*.swo
+*~
+.vim/
+.emacs.d/
+
+# OS generated files
+Thumbs.db
+.DS_Store?
+ehthumbs.db
+Icon?
+
+# Node modules (if any)
+node_modules/
+npm-debug.log*
+
+# Build artifacts that shouldn't be in container
+dist/
+build/
+*.egg-info/

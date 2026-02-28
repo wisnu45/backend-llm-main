@@ -1,0 +1,204 @@
+tags:
+  - Documents
+summary: Ambil detail informasi log sinkronisasi
+description: |
+  Mengambil informasi detail tentang operasi sinkronisasi dokumen tertentu,
+  termasuk hasil pemrosesan dokumen individual dan detail error.
+security:
+  - bearerAuth: []
+parameters:
+  - in: path
+    name: sync_log_id
+    required: true
+    schema:
+      type: string
+      format: uuid
+    description: ID log sinkronisasi untuk mengambil detail
+responses:
+  200:
+    description: Berhasil mengambil detail log sinkronisasi
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: "Berhasil mengambil detail log sinkronisasi dokumen"
+            data:
+              type: object
+              properties:
+                sync_log:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      format: uuid
+                      description: ID log sinkronisasi
+                    sync_type:
+                      type: string
+                      enum: [portal, website, manual]
+                      description: Tipe sinkronisasi
+                    status:
+                      type: string
+                      enum: [running, success, partial_success, failed]
+                      description: Status operasi sinkronisasi
+                    status_normalized:
+                      type: string
+                      enum: [running, success, partial_success, failed]
+                      nullable: true
+                      description: Status yang dinormalisasi (mis. succeeded -> success)
+                    total_documents:
+                      type: integer
+                      description: Total dokumen yang diproses
+                    successful_documents:
+                      type: integer
+                      description: Jumlah dokumen yang berhasil diproses
+                    failed_documents:
+                      type: integer
+                      description: Jumlah dokumen yang gagal
+                    total_website_documents:
+                      type: integer
+                      description: Total halaman website yang diproses
+                    successful_website_documents:
+                      type: integer
+                      description: Jumlah halaman website yang berhasil diproses
+                    failed_website_documents:
+                      type: integer
+                      description: Jumlah halaman website yang gagal diproses
+                    trigger_source:
+                      type: string
+                      description: Sumber pemicu sinkronisasi (api, cron, startup)
+                    triggered_by:
+                      type: string
+                      description: User atau sistem yang memicu sinkronisasi
+                    started_at:
+                      type: string
+                      format: date-time
+                      description: Waktu mulai sinkronisasi
+                    finished_at:
+                      type: string
+                      format: date-time
+                      nullable: true
+                      description: Waktu selesai sinkronisasi
+                    runtime_seconds:
+                      type: number
+                      format: float
+                      nullable: true
+                      description: Total runtime dalam detik
+                    error_message:
+                      type: string
+                      nullable: true
+                      description: Pesan error global jika sinkronisasi gagal
+                    metadata:
+                      type: object
+                      nullable: true
+                      description: Metadata tambahan dan ringkasan sinkronisasi
+                document_details:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      item_type:
+                        type: string
+                        nullable: true
+                        description: Jenis item yang diproses (document/website)
+                      item_url:
+                        type: string
+                        nullable: true
+                        description: URL halaman (untuk item website)
+                      item_source:
+                        type: string
+                        nullable: true
+                        description: Source domain (untuk item website)
+                      document_title:
+                        type: string
+                        nullable: true
+                        description: Judul dokumen dari portal
+                      document_filename:
+                        type: string
+                        nullable: true
+                        description: Nama file asli dari portal
+                      document_id:
+                        type: string
+                        nullable: true
+                        description: ID dokumen dari sistem portal
+                      status:
+                        type: string
+                        enum: [success, failed]
+                        description: Status pemrosesan untuk dokumen ini
+                      error_message:
+                        type: string
+                        nullable: true
+                        description: Pesan error spesifik jika dokumen gagal
+                      file_size:
+                        type: integer
+                        nullable: true
+                        description: Ukuran file dalam bytes
+                      metadata:
+                        type: object
+                        nullable: true
+                        description: Metadata tambahan dokumen
+                      processed_at:
+                        type: string
+                        format: date-time
+                        description: Waktu dokumen ini diproses
+                failed_documents:
+                  type: array
+                  description: Daftar dokumen yang gagal disinkronkan (ringkas)
+                  items:
+                    type: object
+                    properties:
+                      document_title:
+                        type: string
+                        nullable: true
+                        description: Judul dokumen dari portal
+                      document_filename:
+                        type: string
+                        nullable: true
+                        description: Nama file asli dari portal
+                      document_id:
+                        type: string
+                        nullable: true
+                        description: ID dokumen dari sistem portal
+                      file_identifier:
+                        type: string
+                        description: Identifier untuk ditampilkan (filename atau ID)
+                      error_message:
+                        type: string
+                        nullable: true
+                        description: Pesan error spesifik jika dokumen gagal
+                      is_global_error:
+                        type: boolean
+                        nullable: true
+                        description: Menandai error global jika tidak ada detail dokumen
+  403:
+    description: Akses ditolak
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: "Access detail log sinkronisasi dokumen tidak diizinkan"
+  404:
+    description: Log sinkronisasi tidak ditemukan
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: "Log sinkronisasi tidak ditemukan"
+  500:
+    description: Kesalahan server internal
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: "Gagal mengambil detail log sinkronisasi dokumen"

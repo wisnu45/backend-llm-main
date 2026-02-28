@@ -1,0 +1,116 @@
+tags:
+  - Userdata
+summary: Mendapatakan detail user berdasarkan ID
+description: |
+  Mendapatakan detail user berdasarkan ID. Hanya dapat diakses oleh admin.
+parameters:
+  - name: user_id
+    in: path
+    required: true
+    schema:
+      type: string
+      format: uuid
+    description: ID dari user yang ingin diambil detailnya
+security:
+  - bearerAuth: []
+responses:
+  200:
+    description: Mendapatkan Data semua User Lokal dan User Portal berdasarkan ID
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+            message:
+              type: string
+            data:
+              type: object
+              properties:
+                id:
+                  type: string
+                  format: uuid
+                is_portal:
+                  type: boolean
+                name:
+                  type: string
+                role:
+                  type: string
+                role_id:
+                  type: string
+                  format: uuid
+                username:
+                  type: string
+                is_protected:
+                  type: boolean
+                created_at:
+                  type: string
+                  format: date-time
+                updated_at:
+                  type: string
+                  format: date-time
+        examples:
+          local:
+            value:
+              message: "Berhasil mengambil List users"
+              data:
+                id: "f39fe75d-71e9-4c57-88e6-10ebbed28d02"
+                name: "user"
+                role: "user"
+                role_id: "f39fe75d-71e9-4c57-88e6-10ebbed28d02"
+                username: "user"
+                is_portal: false
+                created_at: "2025-09-14T16:33:46.736248+00:00"
+                updated_at: "2025-09-14T16:33:46.736248+00:00"
+          portal:
+            value:
+              message: "Berhasil mengambil List users"
+              data:
+                id: "f39fe75d-71e9-4c57-88e6-10ebbed28d02"
+                name: "portal"
+                role: "admin"
+                role_id: "f39fe75d-71e9-4c57-88e6-10ebbed28d02"
+                username: "portal"
+                is_portal: true
+                created_at: "2025-09-14T16:33:46.736248+00:00"
+                updated_at: "2025-09-14T16:33:46.736248+00:00"
+  401:
+    description: Empty Authorization header
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+        examples:
+          error:
+            value:
+              error: "Authorization header is required"
+  403:
+    description: User Not Admin Try to Get Data
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+        examples:
+          error:
+            value:
+              error: "Tidak diizinkan"
+  404:
+    description: User Tidak ditemukan
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+        examples:
+          error:
+            value:
+              error: "Gagal mengambil data user"

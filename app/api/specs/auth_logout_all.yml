@@ -1,0 +1,48 @@
+tags:
+  - Authentication
+summary: Logout dari Semua Device
+description: |
+  Endpoint untuk logout dari semua device/session.
+  - Blacklist current access token
+  - Revoke SEMUA refresh token milik user
+  - Hapus refresh token cookie dari device saat ini
+  - User harus login ulang di semua device
+security:
+  - bearerAuth: []
+responses:
+  200:
+    description: Berhasil logout dari semua device
+    headers:
+      Set-Cookie:
+        description: Hapus refresh token cookie
+        schema:
+          type: string
+          example: "refresh_token=; HttpOnly; Secure; SameSite=None; expires=Thu, 01 Jan 1970 00:00:00 GMT"
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: "Berhasil logout dari semua device"
+  401:
+    description: Token tidak valid atau tidak ada authorization header
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: "Authorization header is required"
+  500:
+    description: Server error
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: "Gagal logout dari semua device"

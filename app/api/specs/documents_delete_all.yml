@@ -1,0 +1,39 @@
+tags:
+  - Documents
+summary: Hapus semua dokumen dan file (hard delete)
+description: Menghapus seluruh data dokumen secara permanen dari database, vector database (PGVector), dan semua file terkait di server (hard delete).
+security:
+  - bearerAuth: []
+responses:
+  200:
+    description: Berhasil menghapus semua data dokumen dan file
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+            deleted_files:
+              type: array
+              items:
+                type: string
+              description: Daftar file yang berhasil dihapus dari server
+        examples:
+          success:
+            value:
+              message: "Berhasil menghapus semua data documents dan file"
+              deleted_files: ["document1.pdf", "document2.pdf", "document3.docx"]
+  403:
+    description: Tidak diizinkan
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+        examples:
+          error:
+            value:
+              message: "Tidak diizinkan"

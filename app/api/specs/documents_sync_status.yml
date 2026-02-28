@@ -1,0 +1,95 @@
+tags:
+  - Documents
+summary: Cek status sinkronisasi dokumen portal & website
+description: Mengembalikan status terbaru dari proses sinkronisasi dokumen portal dan konten website yang berjalan secara asynchronous.
+security:
+  - bearerAuth: []
+responses:
+  200:
+    description: Status sinkronisasi berhasil diambil
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+            status:
+              type: object
+              properties:
+                state:
+                  type: string
+                trigger_source:
+                  type: string
+                  nullable: true
+                started_at:
+                  type: string
+                  format: date-time
+                  nullable: true
+                finished_at:
+                  type: string
+                  format: date-time
+                  nullable: true
+                runtime_seconds:
+                  type: number
+                  format: float
+                  nullable: true
+                triggered_by:
+                  type: string
+                  nullable: true
+                updated_at:
+                  type: string
+                  format: date-time
+                  nullable: true
+                result:
+                  type: object
+                  nullable: true
+                error:
+                  type: string
+                  nullable: true
+        examples:
+          idle:
+            value:
+              message: Status sinkronisasi dokumen portal & website
+              status:
+                state: idle
+                trigger_source: null
+                started_at: null
+                finished_at: null
+                runtime_seconds: null
+                triggered_by: null
+                updated_at: null
+                result: null
+                error: null
+          success:
+            value:
+              message: Status sinkronisasi dokumen portal & website
+              status:
+                state: succeeded
+                trigger_source: api
+                started_at: "2024-05-01T07:00:00Z"
+                finished_at: "2024-05-01T07:05:12Z"
+                runtime_seconds: 312.5
+                triggered_by: admin
+                updated_at: "2024-05-01T07:05:12Z"
+                result:
+                  downloaded_files:
+                    - file_a.pdf
+                    - file_b.pdf
+                  ingested_urls:
+                    - https://www.combiphar.com/id/produk-a
+                    - https://www.combiphar.com/id/produk-b
+                error: null
+          failed:
+            value:
+              message: Status sinkronisasi dokumen portal & website
+              status:
+                state: failed
+                trigger_source: cron
+                started_at: "2024-05-01T07:00:00Z"
+                finished_at: "2024-05-01T07:02:10Z"
+                runtime_seconds: 130.8
+                triggered_by: admin
+                updated_at: "2024-05-01T07:02:10Z"
+                result: null
+                error: "Required dependencies not available. Aborting portal sync."

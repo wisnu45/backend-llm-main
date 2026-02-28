@@ -1,0 +1,90 @@
+tags:
+  - Documents
+summary: Ambil dokumen berdasarkan ID
+description: Mengambil detail dokumen berdasarkan ID dengan struktur database baru.
+security:
+  - bearerAuth: []
+parameters:
+  - in: path
+    name: doc_id
+    required: true
+    schema:
+      type: string
+      format: uuid
+responses:
+  200:
+    description: Berhasil mengambil data dokumen
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+            data:
+              type: object
+              properties:
+                id:
+                  type: string
+                  format: uuid
+                source_type:
+                  type: string
+                  enum: [portal, admin, user, website]
+                original_filename:
+                  type: string
+                stored_filename:
+                  type: string
+                mime_type:
+                  type: string
+                size_bytes:
+                  type: integer
+                metadata:
+                  description: Metadata tersimpan (JSONB)
+                  oneOf:
+                    - type: object
+                    - type: string
+                storage_path:
+                  type: string
+                created_at:
+                  type: string
+                  format: date-time
+                updated_at:
+                  type: string
+                  format: date-time
+                  nullable: true
+                uploaded_by_name:
+                  type: string
+                  nullable: true
+                document_url:
+                  type: string
+                  nullable: true
+        examples:
+          success:
+            value:
+              message: "Berhasil mengambil data dokumen"
+              data:
+                id: "a3b2f9b4-5c6d-4e8a-9f12-3456789abcde"
+                source_type: "admin"
+                original_filename: "Benefit.pdf"
+                stored_filename: "550e8400-e29b-41d4-a716-446655440000.pdf"
+                mime_type: "application/pdf"
+                size_bytes: 1048576
+                metadata: {"category": "HR", "language": "id"}
+                storage_path: "data/documents/admin/550e8400-e29b-41d4-a716-446655440000.pdf"
+                created_at: "2025-01-01T00:00:00Z"
+                updated_at: "2025-01-01T00:00:00Z"
+                uploaded_by_name: "Admin User"
+                document_url: "https://api.example.com/storage/550e8400-e29b-41d4-a716-446655440000.pdf"
+  404:
+    description: Tidak ditemukan
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+        examples:
+          error:
+            value:
+              error: "Dokumen tidak ditemukan"

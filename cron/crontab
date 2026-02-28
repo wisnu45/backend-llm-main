@@ -1,0 +1,16 @@
+# ┌───────────── menit (0 - 59)
+# │ ┌───────────── jam (0 - 23)
+# │ │ ┌───────────── hari dalam bulan (1 - 31)
+# │ │ │ ┌───────────── bulan (1 - 12)
+# │ │ │ │ ┌───────────── hari dalam minggu (0 - 6) (Minggu=0)
+# │ │ │ │ │
+# │ │ │ │ │
+# 0 1 * * * python3 app/api/cron.py >> /logs/cron.log 2>&1
+# 0 1 * * * python3 app/services/pull_portal.py >> /logs/cron.log 2>&1
+# 0 1 * * * python3 app/services/pull_websites.py >> /logs/cron.log 2>&1
+
+*/5 * * * * python3 -m app.api.cron >> /logs/cron.log 2>&1
+# */1 * * * * python3 -m app.services.pull_portal >> /logs/cron.log 2>&1
+# */1 * * * * python3 -m app.services.pull_websites >> /logs/cron.log 2>&1
+
+# */3 * * * * wget -q -O- https://example.com/ >> /var/log/cron.log 2>&1

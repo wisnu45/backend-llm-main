@@ -1,0 +1,97 @@
+tags:
+  - Settings
+summary: Membuat setting baru
+description: |
+  Endpoint ini digunakan untuk membuat setting baru. Hanya dapat diakses oleh admin.
+  - Diusahakan input name capitalize (huruf depan besar) karena akan di proses di backend menjadi snake_case, dan di list akan format kembali menjadi capitalize (huruf depan besar).
+  - Data type wajib (string, integer, boolean, array, object), jika tidak akan menghasilkan error.
+  - Data type dan value wajib match, jika tidak akan menghasilkan error.
+security:
+  - bearerAuth: []
+requestBody:
+  required: true
+  content:
+    application/json:
+      schema:
+        type: object
+        required:
+          - name
+          - type
+          - description
+          - data_type
+          - value
+        properties:
+          name:
+            type: string
+            example: Chat topic expired days
+          type:
+            type: string
+            example: general
+          data_type:
+            type: string
+            example: integer
+          description:
+            type: string
+            example: Maksimal percobaan login
+          unit:
+            type: string
+            example: kali
+          value:
+            oneOf:
+              - type: string
+              - type: integer
+              - type: boolean
+              - type: array
+              - type: object
+            example: 5
+responses:
+  201:
+    description: Setting berhasil dibuat
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: Setting berhasil dibuat
+  400:
+    description: Data tidak lengkap
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: Key, Value, dan Description diperlukan
+  401:
+    description: Tidak terautentikasi / token tidak valid
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: Unauthorized
+  403:
+    description: Tidak memiliki akses admin
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: Forbidden
+  500:
+    description: Gagal membuat setting
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: Gagal membuat setting

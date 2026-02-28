@@ -1,0 +1,109 @@
+tags:
+  - Chats
+summary: Pin / Unpin chat_history
+description: |
+  Mengatur status `pinned` pada chat_history berdasarkan `chat_id`.
+  - Jika dalam sebuah `chat_id` memiliki `pinned=true`, maka sesi tersebut dianggap pinned dan akan muncul di bagian atas daftar (/chats/history).
+  - Default jika body tidak dikirim: `pinned` akan diset ke `true` (pin).
+security:
+  - bearerAuth: []
+parameters:
+  - in: path
+    name: chat_id
+    required: true
+    schema:
+      type: string
+      format: uuid
+    examples:
+      sample:
+        value: "123e4567-e89b-12d3-a456-426614174111"
+requestBody:
+  required: false
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          pinned:
+            type: boolean
+            example: true
+            description: "True untuk pin, False untuk unpin. Default: false jika tidak dikirim."
+      examples:
+        default:
+            value: {}
+        pinned:
+            value:
+              pinned: true
+        unpin:
+            value:
+              pinned: false
+responses:
+  200:
+    description: Berhasil mengubah status pinned
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+            data:
+              type: object
+              properties:
+                id:
+                  type: string
+                  format: uuid
+                pinned:
+                  type: boolean
+        examples:
+          pinned:
+            value:
+              message: "Berhasil pin chat"
+              data:
+                id: "123e4567-e89b-12d3-a456-426614174111"
+                pinned: true
+          unpinned:
+            value:
+              message: "Berhasil unpin chat"
+              data:
+                id: "123e4567-e89b-12d3-a456-426614174111"
+                pinned: false
+  400:
+    description: Request tidak valid (misal pinned bukan boolean)
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+        examples:
+          invalid_type:
+            value:
+              message: "Field pinned harus boolean"
+  404:
+    description: Data tidak ditemukan
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+        examples:
+          not_found:
+            value:
+              message: "Chat history tidak ditemukan"
+  401:
+    description: Unauthorized
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+        examples:
+          unauthorized:
+            value:
+              message: "Unauthorized"

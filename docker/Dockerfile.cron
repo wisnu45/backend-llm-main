@@ -1,0 +1,46 @@
+FROM python:3.10.13
+
+ENV TZ=UTC \
+    PYTHONUNBUFFERED=1 \
+    PYTHONPATH=/app
+
+WORKDIR /app
+
+# System dependencies (match main application image)
+RUN apt-get update \
+ && apt-get -y install --no-install-recommends \
+      curl \
+      ca-certificates \
+      tzdata \
+      poppler-utils \
+      tesseract-ocr \
+      libtesseract-dev \
+ && apt-get clean \
+ && rm -rf /var/lib/apt/lists/*
+
+# Configure timezone
+RUN ln -snf /usr/share/zoneinfo/${TZ} /etc/localtime \
+ && echo "${TZ}" > /etc/timezone
+
+# Install Python dependencies
+COPY requirements.txt .
+ENV PIP_NO_CACHE_DIR=1 PIP_DEFAULT_TIMEOUT=120
+RUN python -m pip install --upgrade pip setuptools wheel && \
+    pip config set global.require-hashes false && \
+    pip config set install.require-hashes false && \
+    pip install --no-cache-dir -r requirements.txt
+
+# Install supercronic scheduler
+RUN curl -sSL https://github.com/aptible/supercronic/releases/download/v0.2.29/supercronic-linux-amd64 -o /usr/local/bin/supercronic \
+ && chmod +x /usr/local/bin/supercronic
+
+# Copy project files
+COPY . .
+
+# Ensure log directories exist
+RUN mkdir -p /logs && touch /logs/cron.log
+
+ENV CRON_TZ=UTC \
+    PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+CMD ["supercronic", "/etc/crontabs/root"]
