@@ -1,0 +1,118 @@
+import axios, { AxiosError } from 'axios';
+import Cookies from 'js-cookie';
+import { SessionToken } from './cookies'; // penyimpanan access_token
+// import { toast } from '@/components/ui/use-toast';
+
+const api = axios.create({
+  baseURL: import.meta.env.VITE_API_ENDPOINT
+  // headers: {
+  //   'Content-Type': 'application/json'
+  // }
+});
+
+export const baseAxios = axios.create({
+  baseURL: import.meta.env.VITE_API_ENDPOINT
+  // headers: {
+  //   'Content-Type': 'application/json'
+  // }
+});
+
+api.interceptors.request.use((config) => {
+  const accessToken = SessionToken.get();
+  if (accessToken) {
+    config.headers.Authorization = `Bearer ${accessToken}`;
+  }
+  return config;
+});
+
+async function refreshAccessToken() {
+  try {
+    const {
+      username = '',
+      name = '',
+      role = '',
+      roles_id = '',
+      error_connection = '',
+      is_company = 'true'
+    } = Cookies.get();
+
+    const response = await axios.post(
+      `${import.meta.env.VITE_API_ENDPOINT}/auth/refresh`,
+      {},
+      { withCredentials: true }
+      // { headers: { 'Content-Type': 'application/json' } },
+    );
+
+    const newAccessToken = response.data.data.access_token;
+
+    SessionToken.set({
+      access_token: newAccessToken,
+      username,
+      name,
+      role,
+      roles_id,
+      error_connection,
+      is_company
+    });
+
+    return newAccessToken;
+  } catch (err) {
+    console.error('Refresh token failed:', err);
+    return null;
+  }
+}
+
+api.interceptors.response.use(
+  (response) => response,
+  async (error: AxiosError) => {
+    const originalRequest = error.config as typeof error.config & {
+      _retry?: boolean;
+    };
+
+    // Check for network errors
+    if (
+      error.code === 'ERR_NETWORK' ||
+      error.code === 'ENOTFOUND' ||
+      error.code === 'ECONNABORTED' ||
+      error.message === 'Network Error' ||
+      !navigator.onLine
+    ) {
+      // Add network error flag to the error object
+      const networkError = error as AxiosError & { isNetworkError?: boolean };
+      networkError.isNetworkError = true;
+      return Promise.reject(networkError);
+    }
+
+    if (error.response?.status === 401 && !originalRequest?._retry) {
+      originalRequest._retry = true;
+
+      const newToken = await refreshAccessToken();
+
+      if (newToken) {
+        originalRequest.headers.Authorization = `Bearer ${newToken}`;
+        return api(originalRequest);
+      } else {
+        SessionToken.remove();
+        Cookies.remove('refresh_token');
+        window.location.href =
+          '/auth/signin?error=Session expired. Please log in again.';
+      }
+    }
+    // if (error.response?.status === 403) {
+    //   toast({
+    //     title: 'Tidak Memiliki Akses',
+    //     description: 'Anda tidak memiliki akses ke sumber daya ini.',
+    //     variant: 'destructive'
+    //   });
+    //   SessionToken.remove();
+    //     Cookies.remove('refresh_token');
+    //    window.location.href =
+    //       '/auth/signin?error=Session expired. Please log in again.';
+    //   window.location.href = '/auth/signin';
+    // }
+
+    return Promise.reject(error);
+  }
+);
+
+export default api;

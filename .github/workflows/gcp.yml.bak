@@ -1,0 +1,35 @@
+# name: Build
+# on:
+#   push:
+#     branches:
+#       - main
+
+# jobs:
+#   deploy-staging:
+#     name: Build and push to GCP
+#     runs-on: ubuntu-latest
+#     if: github.ref == 'refs/heads/main'
+#     env:
+#       IMAGE_NAME: stg-e-samsat-aceh
+#       PROJECT_ID: gothic-imprint-275509
+#       ARTIFACT_REGISTRY_ID: cloud-run-source-deploy
+#       SERVICE_KEY: gothic-imprint-275509-ac90095da5c0.json
+#     steps:
+#       - name: Checkout
+#         uses: actions/checkout@v2
+#       - name: GCloud Auth
+#         run: gcloud auth activate-service-account --key-file=$SERVICE_KEY
+#       - name: Docker Build
+#         run: docker build -t asia-southeast2-docker.pkg.dev/$PROJECT_ID/$ARTIFACT_REGISTRY_ID/$IMAGE_NAME:latest . -f staging-e-samsat-aceh-web.Dockerfile
+#       - name: Docker Auth
+#         run: cat $SERVICE_KEY | docker login -u _json_key --password-stdin https://asia-southeast2-docker.pkg.dev
+#       - name: Docker Push
+#         run: docker push asia-southeast2-docker.pkg.dev/$PROJECT_ID/$ARTIFACT_REGISTRY_ID/$IMAGE_NAME:latest
+#       ##TEST
+#       - name: Docker Deploy
+#         run: gcloud run deploy staging-e-samsat-aceh-web
+#           --image asia-southeast2-docker.pkg.dev/$PROJECT_ID/$ARTIFACT_REGISTRY_ID/$IMAGE_NAME:latest
+#           --region asia-southeast2
+#           --platform managed
+#           --allow-unauthenticated
+#           --project $PROJECT_ID
